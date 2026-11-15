@@ -37,6 +37,24 @@ intermedias de sala y consola para identificar futuras regresiones.
   tarjeta están la leyenda y otros contenidos que completan la columna. No se
   estira una tarjeta vacía para igualar artificialmente las alturas.
 
+## Cinemática de apertura
+
+Medición en Edge, headless, con Playwright sobre el build de producción:
+
+- Gráficos Alto, cabina ya estabilizada, en la pasada completa más reciente: 60 FPS en cuatro muestras. Pasadas anteriores en este mismo Edge se quedaron en 30 FPS cuando el navegador presentaba a 30 Hz.
+- Misma cabina, con el límite de refresco desactivado: 109, 212 y 387 FPS. El intervalo medio de `requestAnimationFrame` fue 4,9 ms. En este equipo la escena supera el objetivo de 60 FPS cuando el navegador no la recorta al refresco.
+- Gráficos Ajustado y CPU emulada a 4×, en la pasada completa más reciente: 18 FPS en la ventana del salto y después 59, 60, 59 y 60. Pasadas anteriores, con el navegador a 30 Hz, se quedaron en 24–31. Esa emulación no es un equipo modesto. 30 FPS estables en hardware modesto siguen sin medirse en otro aparato.
+- El contador cae al saltar el tiempo de la prueba. Esa caída no es la reproducción continua.
+- Three.js va en un chunk propio (`runtime`, 609 kB, 155 kB gzip). El bundle de la cubierta no lo incluye. El aviso de Vite por superar 500 kB sigue presente.
+- Una ruta de modelo que no existe deja el aviso en pantalla. La secuencia publicada usa mallas propias. Omitir entra en «Revisar soporte vital».
+- A 1440, 768 y 390 px el lienzo conserva la proporción de la ventana. Ajustado usa relación de píxeles 1 y sombras apagadas.
+- Si el navegador pierde el contexto WebGL, el tiempo de la escena se detiene y aparece el aviso. Al recuperarse, el aviso desaparece.
+- El fundido entre exterior y cabina no se queda en negro. El plano del saludo muestra a Titus y a Alex.
+- Three.js no se descarga en el menú. Entra en un chunk aparte al pulsar Jugar, y el bundle de la cubierta no contiene el renderizador WebGL.
+- Esc cierra la cinemática, suelta el reproductor y deja el nivel 1 jugable. Continuar, con partida guardada, no vuelve a montarla.
+- Jugar con una partida existente pide confirmación. Conservar la partida no la borra. Empezar de nuevo sí reproduce la cinemática, y al llegar al final entra en «Revisar soporte vital» con el reproductor ya liberado.
+- Lista de la cinemática, comprobada en la misma pasada: partida nueva abre la escena; el casco, Alex, Titus y el visor están en la escena con mallas propias; a los 24 s Alex está sentado y mira a Titus, a los 52 s Titus señala y a los 74 s Alex ha caminado; cada subtítulo coincide con su frase, incluida la de 384 400 km; la cámara pasa de exterior a cabina; Esc detiene el audio, congela el contador de fotogramas de la cinemática y abre el nivel 1; Continuar no la repite. El recorrido de la cubierta, la galería, el móvil y el menú siguieron pasando en esa misma ejecución.
+
 ## Límites explícitos
 Los GLB son geometría editable con jerarquías, sin rig esquelético ni clips. La
 animación está programada y exportada a atlas. La escena y el fondo son conceptuales.

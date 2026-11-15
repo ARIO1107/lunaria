@@ -1,7 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Game from './components/Game.jsx';
+import App from './components/App.jsx';
 import './styles/index.css';
 import './styles/exploration.css';
+import './styles/menu.css';
+import './styles/campaign.css';
 
-createRoot(document.getElementById('root')).render(<React.StrictMode><Game /></React.StrictMode>);
+createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);

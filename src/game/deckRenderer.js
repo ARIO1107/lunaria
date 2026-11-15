@@ -60,8 +60,9 @@ export function drawDeck(ctx, width, height, state, art, zoom = 1) {
   const sprites = art.manifest.props.map(prop => ({ depth: prop.depth, draw: () => {
     ctx.drawImage(art.images[prop.file], prop.x, prop.y, prop.w, prop.h);
   } }));
+  const titusMood = state.titusMood || (near ? 'alert' : 'normal');
   sprites.push({ depth: player.y, draw: () => drawActor(ctx, art, 'astronaut', player, time, moving, 'normal', reduced) });
-  sprites.push({ depth: titus.y, draw: () => drawActor(ctx, art, 'titus', titus, time, false, near ? 'alert' : 'normal', reduced) });
+  sprites.push({ depth: titus.y, draw: () => drawActor(ctx, art, 'titus', titus, time, false, titusMood, reduced) });
   sprites.sort((a, b) => a.depth - b.depth).forEach(sprite => sprite.draw());
   if (near) {
     const p = projectFloor(deck, { x: near.x + near.w / 2, y: near.y + near.h });
@@ -73,4 +74,8 @@ export function drawDeck(ctx, width, height, state, art, zoom = 1) {
     ctx.fillStyle = '#17252c'; ctx.textAlign = 'center'; ctx.fillText(label, pos.x, pos.y - 86);
   }
   ctx.restore();
+  if (state.emergency) {
+    ctx.fillStyle = '#ff5a3224';
+    ctx.fillRect(0, 0, width, height);
+  }
 }

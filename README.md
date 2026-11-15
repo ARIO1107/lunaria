@@ -1,8 +1,9 @@
 # Lunaria · Cubierta de exploración
 
 Entorno web 2.5D para un simulador de astronautas junior (7–12 años).
-**Los niveles están por definir.** Esta entrega prepara la nave, el astronauta,
-Titus y las interacciones para incorporar las misiones que escriba el equipo.
+La beta recorre cinco niveles, del embarque al puesto lunar, y después abre
+un modo de operaciones por turnos. Alex se mueve por la nave y por la superficie.
+Titus explica los objetivos. Los números de recursos son unidades de juego.
 
 ## Ejecutar
 
@@ -14,6 +15,13 @@ npm run dev
 ```
 
 Abre `http://localhost:5173`. En PowerShell con scripts bloqueados usa `npm.cmd`.
+
+El menú de terminal abre la aplicación. **Jugar** empieza la campaña con una
+cinemática de embarque. **Continuar** recupera la campaña guardada en este navegador.
+**Seleccionar misión** abre solo los niveles ya desbloqueados, o cualquiera si se marca
+el modo demostración.
+Usa ↑/↓, Enter y Escape, o selecciona las opciones con el puntero.
+La configuración de volumen y animaciones se guarda localmente.
 
 **Controles:** WASD/flechas para caminar, E/Espacio para inspeccionar un equipo,
 botones +/− para acercar la cámara. En móvil hay controles bajo la nave.
@@ -28,7 +36,8 @@ botones +/− para acercar la cámara. En móvil hay controles bajo la nave.
 - Sprites originales en ocho orientaciones, marcha y tres estados de Titus.
 - Profundidad por posición: personajes y consolas se ocultan unos a otros.
 - Colisiones, cámara con zoom, interacción y recuperación de fallos de carga.
-- Fichas educativas con enlaces NASA, sin misiones activas ni telemetría ficticia.
+- Fichas educativas con enlaces NASA. Los indicadores de la cinemática se nombran como indicadores de juego, no como telemetría NASA.
+- Campaña jugable de cinco niveles y un modo de operaciones. El objetivo del nivel 1 es revisar el soporte vital.
 
 ## Modelos editables y pipeline
 
@@ -64,20 +73,26 @@ Necesita Microsoft Edge instalado. El script inicia su propio servidor Vite y lo
 cierra al terminar. El taller interactivo, con Vite iniciado, está en
 `http://localhost:5173/tools/asset-studio.html`.
 
-**Three.js se usa para fabricar el arte, no en el juego publicado.** El juego usa
-React, Tailwind y Canvas 2D con imágenes locales (~2 MB en conjunto). Los GLB no
-se copian al sitio publicado ni se descargan durante la partida.
+**Three.js entra en el juego solo con la cinemática de apertura**, en un chunk
+aparte que se descarga al pulsar Jugar. La exploración sigue en Canvas 2D.
+Los GLB de `art/exports` no se descargan durante la partida. La cinemática
+construye el casco, a Alex y a Titus con mallas propias y puede cargar un GLB
+si se le pasa una ruta. No hay voces grabadas: los diálogos van en subtítulos
+y la música es original, generada en el navegador.
 
-## Preparado para las misiones
+## Campaña
 
-`src/game/missionRegistry.js` comienza vacío. Cada estación tiene ID estable;
-un módulo futuro se registra con `id`, `stationId`, `title` y `Component`.
-El componente recibe `{ station, onClose }`. Ver [docs/architecture.md](docs/architecture.md).
+La partida jugable está en `src/components/CampaignScreen.jsx` y
+`src/data/levelDefinitions.js`. Jugar, si no hay partida, reproduce la
+cinemática y entra al nivel 1. Continuar no la repite. Esc u «Omitir cinemática»
+también entran al nivel 1. El diseño y las fuentes están en
+[docs/game-design.md](docs/game-design.md) y
+[docs/scientific-sources.md](docs/scientific-sources.md).
 
-El experimento anterior de lanzamiento se conserva en `LaunchPanel.jsx`,
-`launchSimulation.js` y sus pruebas, pero no está conectado al juego ni representa
-un nivel aprobado. Las cifras propuestas anteriormente siguen identificadas por
-su nivel de verificación en `src/data/nasaTelemetry.js`.
+El registro de la cubierta sigue aceptando un módulo por estación. Ver
+[docs/architecture.md](docs/architecture.md). Las cifras de
+`src/data/nasaTelemetry.js` pertenecen al experimento de lanzamiento y no se
+muestran como telemetría real.
 
 ## Verificar y publicar
 
@@ -93,8 +108,8 @@ hosting estático; las rutas relativas admiten GitHub Pages en una subcarpeta.
 
 ## Ciencia
 
-Nave conceptual y fondo ilustrado, no una reconstrucción de Apolo. Las futuras
-misiones deberán distinguir datos históricos documentados, condiciones iniciales
-y ajustes educativos. Claridad para niños no significa decisiones triviales.
+Nave conceptual y fondo ilustrado, no una reconstrucción de Apolo. Los datos
+científicos enlazan a NASA; los recursos, las tolerancias y el mapa son
+parámetros del simulador. Claridad para niños no significa decisiones triviales.
 
 [Dirección de arte](docs/art-direction.md) · [Arquitectura](docs/architecture.md)

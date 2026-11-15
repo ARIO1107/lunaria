@@ -15,7 +15,7 @@ export const FURNITURE = [
 ];
 export const STATIONS = [
   { id: 'propulsion', name: 'Panel de propulsión', short: 'Propulsión', x: 700, y: 125, w: 120, h: 52 },
-  { id: 'coas', name: 'Radar de acoplamiento COAS', short: 'COAS', x: 838, y: 220, w: 65, h: 100 },
+  { id: 'coas', name: 'Mira de alineación COAS', short: 'COAS', x: 838, y: 220, w: 65, h: 100 },
   { id: 'lander', name: 'Control de descenso lunar', short: 'Descenso', x: 720, y: 425, w: 115, h: 52 },
   { id: 'breakers', name: 'Disyuntores y DSKY', short: 'DSKY', x: 365, y: 165, w: 95, h: 50 },
   { id: 'oxygen', name: 'Monitor de soporte vital', short: 'Soporte vital', x: 490, y: 370, w: 80, h: 55 },
@@ -45,5 +45,16 @@ export function moveActor(actor, dx, dy, dt) {
   }
   return { ...actor, x, y };
 }
-export const nearestStation = (actor) => STATIONS.find(s => Math.hypot(actor.x - (s.x + s.w / 2), actor.y - (s.y + s.h / 2)) < Math.max(s.w, s.h) / 2 + 52) ?? null;
+export function nearestStation(actor) {
+  let nearest = null;
+  let distance = Infinity;
+  for (const station of STATIONS) {
+    const candidate = Math.hypot(actor.x - station.x - station.w / 2, actor.y - station.y - station.h / 2);
+    if (candidate < Math.max(station.w, station.h) / 2 + 52 && candidate < distance) {
+      nearest = station;
+      distance = candidate;
+    }
+  }
+  return nearest;
+}
 export const roomAt = (actor) => ROOMS.find(r => inside(actor.x, actor.y, r))?.name ?? 'Pasillo de conexión';

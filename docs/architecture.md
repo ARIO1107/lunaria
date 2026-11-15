@@ -42,9 +42,11 @@ missions.register({
 ```
 
 La consola abre el componente dentro de un diálogo y pausa el movimiento de la
-tripulación. El componente recibe `{ station, onClose }`. Puede gestionar su estado
-y finalizar llamando a `onClose`. No hay un sistema de progresión, guardado o
-condiciones de victoria prefijado: se diseñará con los niveles escritos.
+tripulación. El componente recibe `{ station, onClose, onComplete }`. Cuando cumpla sus
+condiciones de victoria, puede llamar a `onComplete` para guardar el estado
+«Completada» y a `onClose` para volver a la cubierta. El menú permite marcar
+módulos registrados como bloqueados con `locked: true`. El guardado local
+conserva la posición, el zoom y los IDs de misiones completadas.
 
 IDs disponibles: `propulsion`, `coas`, `lander`, `breakers`, `oxygen`, `suit`, `eva`.
 El registro rechaza IDs desconocidos, duplicados y estaciones ya ocupadas.
@@ -61,8 +63,18 @@ Los GLB guardan modelos editables con sus piezas, no un rig esquelético. Las po
 de los personajes se calculan en `art/models.js`, y sus animaciones se exportan en
 atlas. Es posible sustituir un modelo por un GLB externo respetando cámara y anclaje.
 
+## Campaña
+
+`src/game/campaign.js` guarda la partida en `lunaria.campaign.v1`. El reducer es la
+única vía para completar objetivos, gastar recursos y cambiar de nivel.
+`StationMission` usa el objetivo activo: una estación no abre el reto de otra.
+La superficie lunar vive en `surfaceWorld.js` y no altera las colisiones de la nave.
+El registro acepta esas estaciones y sigue permitiendo un solo módulo por `stationId`.
+
 ## Límites actuales
 
-No hay niveles activos, progreso persistente ni datos en tiempo real. La nave es
-conceptual. El fondo no es una fotografía NASA. El anterior prototipo de lanzamiento
-permanece en sus archivos y pruebas, desconectado de la experiencia actual.
+La nave y la superficie son conceptuales. El fondo no es una fotografía NASA.
+El ascenso reutiliza el simulador existente y lo presenta como mecánica de juego.
+El descenso usa 1,62 m/s² como gravedad de referencia; el empuje y los límites de
+velocidad son parámetros del simulador. Las operaciones lunares avanzan por turnos,
+no por días lunares. El detalle de fuentes está en `docs/scientific-sources.md`.

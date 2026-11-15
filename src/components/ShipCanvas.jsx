@@ -6,14 +6,22 @@ import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 
 const MOVEMENT = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
-export default function ShipCanvas({ paused, onNear, onRoom, onInteract, inputRef, zoom = 1 }) {
+export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false }) {
   const canvasRef = useRef(null);
   const keys = useRef(new Set());
-  const state = useRef({ player: { x: 480, y: 300 }, titus: { x: 435, y: 270 }, nearId: null, room: '' });
-  const reduced = useReducedMotion();
+  const state = useRef(null);
+  if (state.current === null) {
+    const player = positionRef.current;
+    const offset = { x: player.x - 45, y: player.y - 30 };
+    state.current = { player, titus: canOccupy(offset.x, offset.y, 12) ? offset : { ...player }, nearId: null, room: '' };
+  }
+  const systemReducedMotion = useReducedMotion();
+  const reduced = reducedMotion || systemReducedMotion;
   const [art, setArt] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
+  const interactRef = useRef(onInteract);
+  interactRef.current = onInteract;
   useEffect(() => {
     let cancelled = false;
     setLoadError('');
@@ -28,7 +36,7 @@ export default function ShipCanvas({ paused, onNear, onRoom, onInteract, inputRe
       if (MOVEMENT.has(e.code)) keys.current.add(e.code);
       if ((e.code === 'KeyE' || e.code === 'Space') && !e.repeat) {
         const station = nearestStation(state.current.player);
-        if (station) onInteract(station);
+        if (station) interactRef.current(station);
       }
     };
     const up = e => keys.current.delete(e.code);
@@ -36,7 +44,7 @@ export default function ShipCanvas({ paused, onNear, onRoom, onInteract, inputRe
     window.addEventListener('keydown', down); window.addEventListener('keyup', up);
     window.addEventListener('blur', clear); document.addEventListener('visibilitychange', clear);
     return () => { clear(); window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); window.removeEventListener('blur', clear); document.removeEventListener('visibilitychange', clear); };
-  }, [paused, art, onInteract, inputRef]);
+  }, [paused, art, inputRef]);
 
   useAnimationFrame((dt, time) => {
     const canvas = canvasRef.current;
@@ -53,6 +61,7 @@ export default function ShipCanvas({ paused, onNear, onRoom, onInteract, inputRe
     if (!paused) {
       s.player = moveActor(s.player, dx, dy, dt);
       if (dx || dy) s.player.angle = Math.atan2(dx, dy);
+      positionRef.current = s.player;
       // A floating robot follows with frame-rate independent lerp. If a wall is in
       // the way, move towards the player's trail instead of crossing the hull.
       const target = canOccupy(s.player.x - 40, s.player.y - 25, 12) ? { x: s.player.x - 40, y: s.player.y - 25 } : s.player;
@@ -69,7 +78,7 @@ export default function ShipCanvas({ paused, onNear, onRoom, onInteract, inputRe
     if (room !== s.room) { s.room = room; onRoom(room); }
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: Boolean(dx || dy) }, art, zoom);
+    drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: !reduced && Boolean(dx || dy), titusMood, emergency }, art, zoom);
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>{!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>Reintentar carga</button></> : <p>Preparando la cubierta y la tripulación…</p>}</div>}</div>;
 }

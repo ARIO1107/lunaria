@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { moveActor, canOccupy } from '../src/game/world.js';
+import { moveActor, canOccupy, nearestStation } from '../src/game/world.js';
 
 test('astronaut cannot leave the hull or walk through a console', () => {
   assert.equal(canOccupy(10, 10), false);
@@ -22,4 +22,10 @@ test('diagonal movement has the same speed as axial movement', () => {
   const axial = moveActor(p, 1, 0, 0.1);
   const diagonal = moveActor(p, 1, 1, 0.1);
   assert.ok(Math.abs(Math.hypot(diagonal.x - p.x, diagonal.y - p.y) - (axial.x - p.x)) < 0.001);
+});
+
+test('overlapping interaction ranges select the closest station', () => {
+  assert.equal(canOccupy(860, 169), true);
+  assert.equal(nearestStation({ x: 860, y: 169 }).id, 'coas');
+  assert.equal(nearestStation({ x: 480, y: 300 }), null);
 });

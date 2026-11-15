@@ -1,0 +1,36 @@
+.story-screen { min-height: 100dvh; display: grid; place-items: center; padding: 32px 16px; background: #070d12; }
+.story-card { width: min(720px, 100%); background: #162026; border: 1px solid #3d4c46; border-radius: 8px; padding: 28px; display: grid; gap: 14px; }
+.story-card h1 { font-size: 28px; font-weight: 600; letter-spacing: -.4px; }
+.story-card p { color: var(--muted); line-height: 1.6; }
+.story-kicker { color: var(--accent); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.objective-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.objective-list li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--muted); }
+.objective-list li[data-state="current"] { color: var(--text); }
+.objective-list input { margin-top: 3px; }
+.resource-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.resource-strip span { background: #121a1c; border: 1px solid #31403a; border-radius: 4px; padding: 6px 8px; font-size: 12px; }
+.campaign-message { min-height: 1.4em; color: var(--green); font-size: 13px; }
+.emergency-banner { background: #4a241c; color: #ffd7cc; padding: 10px 12px; border-radius: 4px; font-size: 13px; }
+.emergency-deck .deck-viewport { box-shadow: inset 0 0 90px #ff5a3233; }
+.beta-panel { padding: 20px 24px 28px; display: grid; gap: 12px; }
+.beta-panel h3 { font-size: 18px; }
+.beta-panel p, .beta-panel label { line-height: 1.55; }
+.beta-check { display: flex; gap: 10px; align-items: flex-start; min-height: 44px; }
+.beta-actions, .beta-meters { display: flex; flex-wrap: wrap; gap: 8px; }
+.beta-meters span { background: #101816; padding: 8px 10px; border-radius: 4px; }
+.orbit-diagram { display: flex; justify-content: space-between; align-items: center; min-height: 72px; border: 1px dashed #4d5c54; border-radius: 6px; padding: 8px 16px; }
+.orbit-diagram i { font-style: normal; font-size: 28px; }
+.landing-view { position: relative; height: 240px; background: linear-gradient(#101820, #2a3034 70%, #6d675d); border-radius: 6px; overflow: hidden; }
+.landing-moon { position: absolute; inset: auto 0 0; height: 28px; background: #8d877c; }
+.landing-pad { position: absolute; bottom: 28px; height: 10px; background: #d7c27a; color: #1b160c; font-size: 11px; text-align: center; }
+.landing-craft { position: absolute; width: 28px; margin-left: -14px; text-align: center; color: #f4f1e4; }
+.landing-craft i { display: block; color: #ffb15a; font-style: normal; }
+.signal-bars { font-family: Consolas, monospace; letter-spacing: 2px; }
+.op-grid { display: grid; gap: 8px; }
+.op-grid button { justify-content: space-between; text-align: left; }
+.demo-flag { color: var(--accent); font-size: 12px; }
+@media (max-width: 760px) {
+  .exploration-shell .app-header { flex-wrap: wrap; align-items: flex-start; }
+  .exploration-shell .app-header nav { flex-wrap: wrap; width: 100%; }
+  .resource-strip { width: 100%; }
+}
