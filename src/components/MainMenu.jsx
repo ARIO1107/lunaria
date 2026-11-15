@@ -4,6 +4,7 @@ import { levels } from '../data/levelDefinitions.js';
 import CrewGallery from './CrewGallery.jsx';
 import Modal from './Modal.jsx';
 import { playSound } from '../audio/audioManager.js';
+import { t } from '../i18n/translate.js';
 
 const media = import.meta.env.BASE_URL + 'assets/menu/';
 const lunarImage = new URL(media + 'lunar.png', document.baseURI).href;
@@ -24,7 +25,7 @@ function Icon({ name }) {
 }
 
 function MissionDiagram() {
-  return <svg className="terminal-diagram" viewBox="0 0 360 112" role="img" aria-label="Esquema de una nave modular con paneles solares">
+  return <svg className="terminal-diagram" viewBox="0 0 360 112" role="img" aria-label={t('Esquema de una nave modular con paneles solares')}>
     <defs>
       <pattern id="ship-grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0v16" fill="none" stroke="currentColor" strokeOpacity=".14" /></pattern>
     </defs>
@@ -55,36 +56,36 @@ function Settings({ settings, onSettings }) {
       else await document.documentElement.requestFullscreen();
       setMessage('');
     } catch {
-      setMessage('El navegador no pudo cambiar a pantalla completa.');
+      setMessage(t('El navegador no pudo cambiar a pantalla completa.'));
     }
   }
 
   return <div className="terminal-content">
-    <label className="terminal-setting" htmlFor="master-volume">Volumen general <output>{settings.volume} %</output></label>
+    <label className="terminal-setting" htmlFor="master-volume">{t('Volumen general')} <output>{settings.volume} %</output></label>
     <input id="master-volume" type="range" min="0" max="100" value={settings.volume}
       onChange={event => onSettings({ ...settings, volume: Number(event.target.value) })} />
-    <p className="terminal-muted">La música y los efectos se activan al pulsar o tocar la pantalla. El volumen y el silencio se guardan en este navegador. La cinemática no incluye voces grabadas: los diálogos van en subtítulos.</p>
-    <label className="terminal-setting" htmlFor="graphics-quality">Gráficos de la cinemática</label>
+    <p className="terminal-muted">{t('La música y los efectos se activan al pulsar o tocar la pantalla. El volumen y el silencio se guardan en este navegador. La cinemática no incluye voces grabadas: los diálogos van en subtítulos.')}</p>
+    <label className="terminal-setting" htmlFor="graphics-quality">{t('Gráficos de la cinemática')}</label>
     <select id="graphics-quality" value={settings.graphics || 'alto'} onChange={event => onSettings({ ...settings, graphics: event.target.value })}>
-      <option value="alto">Alto</option>
-      <option value="ajustado">Ajustado</option>
+      <option value="alto">{t('Alto')}</option>
+      <option value="ajustado">{t('Ajustado')}</option>
     </select>
-    <p className="terminal-muted">El menú tiene un fondo suave sintetizado. La película usa su propia música. No hay voces grabadas.</p>
-    <label className="terminal-setting"><span>Silenciar música y efectos</span>
+    <p className="terminal-muted">{t('El menú tiene un fondo suave sintetizado. La película usa su propia música. No hay voces grabadas.')}</p>
+    <label className="terminal-setting"><span>{t('Silenciar música y efectos')}</span>
       <input type="checkbox" checked={settings.soundEnabled === false}
         onChange={event => onSettings({ ...settings, soundEnabled: !event.target.checked })} />
     </label>
-    <label className="terminal-setting"><span>Reducir animaciones</span>
+    <label className="terminal-setting"><span>{t('Reducir animaciones')}</span>
       <input type="checkbox" checked={settings.reducedMotion}
         onChange={event => onSettings({ ...settings, reducedMotion: event.target.checked })} />
     </label>
     <button className="terminal-action" onClick={toggleFullscreen} disabled={!document.fullscreenEnabled}>
-      {full ? 'Salir de pantalla completa' : 'Activar pantalla completa'}
+      {full ? t('Salir de pantalla completa') : t('Activar pantalla completa')}
     </button>
     {message && <p role="status">{message}</p>}
-    <h3>Controles</h3>
-    <p>Menú: ↑ y ↓ para navegar, Enter para seleccionar, Escape para volver.</p>
-    <p>Cubierta: WASD o flechas para moverte, E o Espacio para inspeccionar. En pantallas táctiles puedes usar los botones del mapa.</p>
+    <h3>{t('Controles')}</h3>
+    <p>{t('Menú: ↑ y ↓ para navegar, Enter para seleccionar, Escape para volver.')}</p>
+    <p>{t('Cubierta: WASD o flechas para moverte, E o Espacio para inspeccionar. En pantallas táctiles puedes usar los botones del mapa.')}</p>
   </div>;
 }
 
@@ -97,8 +98,8 @@ function LevelSelect({ progress, onStartLevel }) {
   const [demo, setDemo] = useState(false);
   const done = progress?.completedLevels ?? [];
   return <div className="terminal-content">
-    <p>Los niveles se abren en orden. El modo demostración permite saltar para una prueba y queda marcado en la partida.</p>
-    <label className="terminal-setting"><span>Modo demostración</span>
+    <p>{t('Los niveles se abren en orden. El modo demostración permite saltar para una prueba y queda marcado en la partida.')}</p>
+    <label className="terminal-setting"><span>{t('Modo demostración')}</span>
       <input type="checkbox" checked={demo} onChange={event => setDemo(event.target.checked)} />
     </label>
     <ul className="terminal-cards">
@@ -108,9 +109,9 @@ function LevelSelect({ progress, onStartLevel }) {
         const available = unlocked || demo;
         const status = complete ? 'completed' : unlocked ? 'available' : 'blocked';
         return <li key={level.id} data-status={status}>
-          <h3>Nivel {level.id}: {level.title}</h3>
-          <p>{complete ? 'Completada' : unlocked ? 'Disponible' : 'Bloqueado'}</p>
-          {available && <button className="terminal-action" onClick={() => onStartLevel(level.id, demo && !unlocked)}>{complete ? 'Repetir nivel' : level.id === 6 ? 'Abrir operaciones' : 'Jugar este nivel'}</button>}
+          <h3>{t('Nivel {id}: {title}', { id: level.id, title: t(level.title) })}</h3>
+          <p>{complete ? t('Completada') : unlocked ? t('Disponible') : t('Bloqueado')}</p>
+          {available && <button className="terminal-action" onClick={() => onStartLevel(level.id, demo && !unlocked)}>{complete ? t('Repetir nivel') : level.id === 6 ? t('Abrir operaciones') : t('Jugar este nivel')}</button>}
         </li>;
       })}
     </ul>
@@ -156,12 +157,21 @@ export default function MainMenu({ progress, settings, onSettings, onStart, onSt
   }
 
   const close = () => { playSound('close'); setPanel(null); };
-  const title = panel === 'overwrite' ? 'Nueva partida' : options.find(([id]) => id === panel)?.[1];
+  const rawTitle = panel === 'overwrite' ? 'Nueva partida' : options.find(([id]) => id === panel)?.[1];
+  const title = rawTitle ? t(rawTitle) : '';
+  function chooseLanguage(next) {
+    playSound('click');
+    onSettings({ ...settings, language: next });
+  }
 
   return <main className="terminal-menu" style={{ '--lunar-image': 'url("' + lunarImage + '")' }}>
     <div className="terminal-frame" aria-hidden="true" />
+    <div className="terminal-lang" role="group" aria-label={t('Idioma')}>
+      <button type="button" aria-pressed={settings.language !== 'es'} aria-label={t('Inglés')} onClick={() => chooseLanguage('en')}>EN</button>
+      <button type="button" aria-pressed={settings.language === 'es'} aria-label={t('Español')} onClick={() => chooseLanguage('es')}>ES</button>
+    </div>
     <span className="terminal-version">v{version}</span>
-    <span className="terminal-status"><i aria-hidden="true" />Sistemas en línea</span>
+    <span className="terminal-status"><i aria-hidden="true" />{t('Sistemas en línea')}</span>
     <div className="terminal-layout">
       <header className="terminal-header">
         <h1 className="terminal-logo" role="img" aria-label="Lunaria">
@@ -169,24 +179,24 @@ export default function MainMenu({ progress, settings, onSettings, onStart, onSt
           <span className="terminal-logo-mark"><img src={media + 'logo.jpg'} alt="" /></span>
           <span className="terminal-logo-word"><img src={media + 'logo.jpg'} alt="" /></span>
         </h1>
-        <p className="terminal-tagline"><span>&gt; Tu aventura comienza más allá de la Tierra</span></p>
+        <p className="terminal-tagline"><span>{t('> Tu aventura comienza más allá de la Tierra')}</span></p>
       </header>
-      <nav className="terminal-nav" aria-label="Menú principal">
+      <nav className="terminal-nav" aria-label={t('Menú principal')}>
         {options.map(([id, label], index) => <button type="button" key={id}
           ref={element => { buttons.current[index] = element; }}
           className="terminal-option" data-selected={selected === index}
           aria-describedby={id === 'resume' && !canResume ? 'terminal-no-save' : undefined}
           disabled={id === 'resume' && !canResume}
           onFocus={() => setSelected(index)} onClick={event => { event.currentTarget.focus(); choose(id); }}>
-          <Icon name={id} /><span>{label}</span>
-          {id === 'resume' && !canResume && <small id="terminal-no-save">Sin partida</small>}
+          <Icon name={id} /><span>{t(label)}</span>
+          {id === 'resume' && !canResume && <small id="terminal-no-save">{t('Sin partida')}</small>}
         </button>)}
       </nav>
       <aside className="terminal-mission" aria-labelledby="terminal-mission-title">
-        <h2 id="terminal-mission-title"><span>&gt; MISIÓN</span></h2>
+        <h2 id="terminal-mission-title"><span>{t('> MISIÓN')}</span></h2>
         <div className="terminal-mission-body">
-          <p>Simulador de misiones espaciales para astronautas junior.</p>
-          <p>Explora, aprende, gestiona recursos y completa desafíos más allá de la Tierra.</p>
+          <p>{t('Simulador de misiones espaciales para astronautas junior.')}</p>
+          <p>{t('Explora, aprende, gestiona recursos y completa desafíos más allá de la Tierra.')}</p>
           <MissionDiagram />
         </div>
       </aside>
@@ -194,9 +204,9 @@ export default function MainMenu({ progress, settings, onSettings, onStart, onSt
     <footer className="terminal-footer">
       <span className="terminal-event"><Icon name="orbit" /> NASA Space Apps Challenge 2026</span>
       <div className="terminal-keys">
-        <span><kbd>↑</kbd> <kbd>↓</kbd> Navegar</span>
-        <span><kbd>Enter</kbd> Seleccionar</span>
-        <span><kbd>Esc</kbd> Atrás</span>
+        <span><kbd>↑</kbd> <kbd>↓</kbd> {t('Navegar')}</span>
+        <span><kbd>Enter</kbd> {t('Seleccionar')}</span>
+        <span><kbd>Esc</kbd> {t('Atrás')}</span>
       </div>
     </footer>
     {panel && <Modal title={title} onClose={close} wide={panel === 'crew' || panel === 'missions'} className="terminal-dialog">
@@ -204,21 +214,21 @@ export default function MainMenu({ progress, settings, onSettings, onStart, onSt
       {panel === 'settings' && <Settings settings={settings} onSettings={onSettings} />}
       {panel === 'missions' && <LevelSelect progress={progress} onStartLevel={onStartLevel} />}
       {panel === 'overwrite' && <div className="terminal-content">
-        <h3>Hay una expedición guardada</h3>
-        <p>Jugar de nuevo sustituye esa partida en este navegador. Continuar la conserva.</p>
-        <button className="terminal-action" onClick={() => onStart(false)}>Empezar de nuevo</button>
-        <button className="terminal-action" onClick={close}>Conservar la partida</button>
+        <h3>{t('Hay una expedición guardada')}</h3>
+        <p>{t('Jugar de nuevo sustituye esa partida en este navegador. Continuar la conserva.')}</p>
+        <button className="terminal-action" onClick={() => onStart(false)}>{t('Empezar de nuevo')}</button>
+        <button className="terminal-action" onClick={close}>{t('Conservar la partida')}</button>
       </div>}
       {panel === 'credits' && <div className="terminal-content">
         <h3>Lunaria</h3>
-        <p>Simulador educativo con arte original. Desarrollo registrado en el repositorio por el equipo de Lunaria, con contribuciones de José Ario Gutiérrez Blanco (ARIO1107).</p>
-        <p>Las fichas de la cubierta enlazan a material educativo de NASA.</p>
-        <a href="https://github.com/ARIO1107/lunaria" target="_blank" rel="noreferrer">Ver repositorio y contribuciones</a>
+        <p>{t('Simulador educativo con arte original. Desarrollo registrado en el repositorio por el equipo de Lunaria, con contribuciones de José Ario Gutiérrez Blanco (ARIO1107).')}</p>
+        <p>{t('Las fichas de la cubierta enlazan a material educativo de NASA.')}</p>
+        <a href="https://github.com/ARIO1107/lunaria" target="_blank" rel="noreferrer">{t('Ver repositorio y contribuciones')}</a>
       </div>}
       {panel === 'exit' && <div className="terminal-content">
-        <h3>Fin de la transmisión</h3>
-        <p>Gracias por explorar con Lunaria. ¡Hasta la próxima, comandante!</p>
-        <button className="terminal-action" onClick={close}>Volver al menú</button>
+        <h3>{t('Fin de la transmisión')}</h3>
+        <p>{t('Gracias por explorar con Lunaria. ¡Hasta la próxima, comandante!')}</p>
+        <button className="terminal-action" onClick={close}>{t('Volver al menú')}</button>
       </div>}
     </Modal>}
   </main>;

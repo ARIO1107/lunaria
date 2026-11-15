@@ -16,8 +16,8 @@ function levelOneReadyToFilm() {
 async function ready(page) {
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0, { timeout: 30000 });
 }
 async function walk(page, key, duration) {
@@ -28,32 +28,32 @@ test('the first mission opens the life-support checks on the deck', async ({ pag
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.clock.install();
   await ready(page);
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
-  await expect(page.locator('.deck-mode')).toContainText('En tierra');
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
+  await expect(page.locator('.deck-mode')).toContainText('On the ground');
   await expect(page.locator('canvas.ship-canvas')).toHaveAttribute('data-sky', 'pad');
   await page.locator('canvas').focus();
   await walk(page, 'ArrowDown', 1400);
-  await expect(page.locator('.station-card h3').first()).toHaveText('Soporte vital');
+  await expect(page.locator('.station-card h3').first()).toHaveText('Life support');
   await page.keyboard.press('e');
-  await expect(page.getByRole('heading', { name: 'Monitor de soporte vital', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Life-support monitor', exact: true })).toBeVisible();
   const bay = page.locator('.fp-bay canvas');
   await expect(bay).toHaveAttribute('data-vista', 'pad');
   await expect(bay).toHaveAttribute('data-station', 'oxygen');
   await page.clock.runFor(150);
   await bay.screenshot({ path: 'test-results/fp-bay.png' });
   await expect(page.getByRole('checkbox', { name: 'Oxígeno disponible' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Encender motores' })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Probar estabilidad' }).click();
-  await expect(page.getByText(/ventilación está apagada/)).toBeVisible();
-  await page.getByRole('button', { name: 'Activar ventilación' }).click();
-  await page.getByRole('button', { name: 'Abrir suministro de oxígeno' }).click();
-  await page.getByRole('button', { name: 'Activar eliminación de CO₂' }).click();
-  await page.getByRole('button', { name: 'Probar estabilidad' }).click();
+  await expect(page.getByRole('button', { name: 'Start the engines' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Test stability' }).click();
+  await expect(page.getByText(/ventilation is off/)).toBeVisible();
+  await page.getByRole('button', { name: 'Turn on ventilation' }).click();
+  await page.getByRole('button', { name: 'Open the oxygen supply' }).click();
+  await page.getByRole('button', { name: 'Turn on CO₂ removal' }).click();
+  await page.getByRole('button', { name: 'Test stability' }).click();
   await page.clock.runFor(1000);
-  await expect(page.getByRole('button', { name: 'Preparar soporte vital' })).toBeEnabled();
-  await page.getByRole('button', { name: 'Preparar soporte vital' }).click();
-  await expect(page.getByRole('dialog').getByText(/comprobar la energía/)).toBeVisible();
-  await expect(page.getByRole('link', { name: /Consultar referencia NASA/ })).toHaveAttribute('href', /nasa.gov/);
+  await expect(page.getByRole('button', { name: 'Ready life support' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Ready life support' }).click();
+  await expect(page.getByRole('dialog').getByText(/check the power/)).toBeVisible();
+  await expect(page.getByRole('link', { name: /See the NASA reference/ })).toHaveAttribute('href', /nasa.gov/);
   await page.keyboard.press('Escape');
   await expect(page.locator('canvas')).toBeFocused();
   expect(errors).toEqual([]);
@@ -64,19 +64,19 @@ test('asset loading failure has a working retry', async ({ page }) => {
   await page.route('**/generated/titus.png', route => allow ? route.continue() : route.abort());
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
-  await expect(page.getByRole('button', { name: 'Reintentar carga' })).toBeVisible();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
+  await expect(page.getByRole('button', { name: 'Retry loading' })).toBeVisible();
   allow = true;
-  await page.getByRole('button', { name: 'Reintentar carga' }).click();
+  await page.getByRole('button', { name: 'Retry loading' }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0);
   await expect(page.locator('canvas')).toBeVisible();
 });
 
 test('crew gallery shows actual rendered models and can be closed by keyboard', async ({ page }) => {
   await ready(page);
-  await page.getByRole('button', { name: 'La tripulación', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'La tripulación de Lunaria' })).toBeVisible();
+  await page.getByRole('button', { name: 'The crew', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'The Lunaria crew' })).toBeVisible();
   for (const img of await page.locator('.crew-gallery img').all()) {
     expect(await img.evaluate(el => el.complete && el.naturalWidth === 768)).toBe(true);
   }
@@ -94,12 +94,12 @@ for (const width of [1440, 768, 390]) {
     await page.screenshot({ path: `test-results/deck-${width}.png`, fullPage: true });
     if (width === 1440) {
       await expect(page.locator('.titus-bubble')).toBeVisible();
-      await expect(page.locator('.titus-bubble')).toContainText(/Capitán Alex/);
-      await expect(page.locator('.titus-bubble')).toContainText(/soporte vital/);
+      await expect(page.locator('.titus-bubble')).toContainText(/Captain Alex/);
+      await expect(page.locator('.titus-bubble')).toContainText(/life support/);
     }
-    await page.getByRole('button', { name: 'Acercar cámara' }).click();
+    await page.getByRole('button', { name: 'Zoom in' }).click();
     await expect(page.locator('.zoom-controls span')).toHaveText('130 %');
-    await page.getByRole('button', { name: 'Alejar cámara' }).click();
+    await page.getByRole('button', { name: 'Zoom out' }).click();
     await expect(page.locator('.zoom-controls span')).toHaveText('115 %');
   });
 }
@@ -107,7 +107,7 @@ for (const width of [1440, 768, 390]) {
 test('the opening cinematic renders and can be skipped into level 1', async ({ page }) => {
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   const shoot = async (time, name) => {
@@ -138,19 +138,19 @@ test('the opening cinematic renders and can be skipped into level 1', async ({ p
   console.log('FPS_ALTO_SETTLED', samples.join(','), 'median', median);
   expect(median).toBeGreaterThan(8);
   await shoot(71, 'console');
-  const skip = page.getByRole('button', { name: 'Omitir cinemática' });
+  const skip = page.getByRole('button', { name: 'Skip cinematic' });
   if (await skip.count()) await skip.click();
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
 });
 
 test('skipping the opening fades through black into the deck', async ({ page }) => {
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.locator('[data-cinematic-root] canvas')).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
   await expect.poll(async () => Number(await page.locator('.cinematic-fade').evaluate(node => getComputedStyle(node).opacity)), { timeout: 2000 }).toBeGreaterThan(0.2);
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
   await expect(page.locator('.scene-veil')).toHaveCount(0, { timeout: 4000 });
 });
 
@@ -174,7 +174,7 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   });
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   await expect(canvas).toHaveAttribute('data-cast', 'Cinematic_Hull Cinematic_Alex Cinematic_Titus visor');
@@ -194,18 +194,18 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   };
 
   const greet = await shot(24);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('¡Buenos días, comandante Alex! Hoy comienza nuestra aventura.');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('Good morning, Commander Alex! Our adventure starts today.');
   const walk = await shot(71);
   await expect(page.locator('.cinematic-subtitle')).toHaveCount(0);
-  await expect(page.locator('.cinematic-title')).toContainText('MISIÓN 01 — EL LANZAMIENTO');
+  await expect(page.locator('.cinematic-title')).toContainText('MISSION 01 — THE LAUNCH');
   const wide = await shot(8);
   await expect(page.locator('.cinematic-subtitle')).toHaveCount(0);
-  await expect(page.locator('.cinematic-title')).toContainText('Capítulo 1 — El lanzamiento');
+  await expect(page.locator('.cinematic-title')).toContainText('Chapter 1 — The launch');
   await expect(canvas).toHaveAttribute('data-backdrop', 'pad');
   await expect(canvas).toHaveAttribute('data-sequence', 'opening');
   await canvas.screenshot({ path: 'test-results/opening-pad.png' });
   const distance = await shot(36);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('sistemas principales');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('main systems');
   expect(greet.pose[1]).toBeGreaterThan(1);
   expect(greet.pose[2]).toBeGreaterThan(0.4);
   expect(walk.pose[1]).toBeLessThan(0.2);
@@ -213,7 +213,7 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   expect(walk.pose[3]).not.toBe(greet.pose[3]);
   const point = await shot(44);
   expect(point.pose[5]).toBeLessThan(-1);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('soporte vital');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('life support');
   expect(wide.inside).toBe('0');
   expect(distance.inside).toBe('1');
   expect(wide.cam).not.toBe(distance.cam);
@@ -222,9 +222,9 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   expect(['running', 'suspended']).toContain(alive[0]);
 
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
-  await expect(page.getByText('Comencemos por soporte vital.')).toBeVisible();
-  await expect(page.locator('.deck-mode')).toContainText('En tierra');
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
+  await expect(page.getByText('Let us start with life support.')).toBeVisible();
+  await expect(page.locator('.deck-mode')).toContainText('On the ground');
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
   await expect(page.locator('canvas.ship-canvas')).toHaveAttribute('data-sky', 'pad');
   await expect.poll(scores).toEqual(['closed']);
@@ -234,10 +234,10 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   expect(await page.evaluate(() => window.__lunariaCinematicFrames)).toBe(frozen);
   expect(await page.evaluate(() => window.__lunariaCinematic)).toBeUndefined();
 
-  await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+  await page.getByRole('button', { name: 'Main menu', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -252,7 +252,7 @@ test('the cinematic leaves the deck stable and a saved game does not replay it',
   await page.goto('/');
   await skipSiteIntro(page);
   expect(bundles.some(path => path.includes('runtime'))).toBe(false);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   expect(bundles.some(path => path.includes('runtime'))).toBe(true);
@@ -261,29 +261,29 @@ test('the cinematic leaves the deck stable and a saved game does not replay it',
   expect(deckText.includes('WebGLRenderer')).toBe(false);
 
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__lunariaCinematic)).toBeUndefined();
 
-  await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+  await page.getByRole('button', { name: 'Main menu', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Hay una expedición guardada' })).toBeVisible();
-  await page.getByRole('button', { name: 'Conservar la partida' }).click();
+  await page.getByRole('button', { name: 'Main menu', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'A saved expedition is already here' })).toBeVisible();
+  await page.getByRole('button', { name: 'Keep this save' }).click();
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
-  await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
+  await page.getByRole('button', { name: 'Main menu', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Start over' }).click();
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   await page.evaluate(() => window.__lunariaCinematic.seek(99.9));
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__lunariaCinematic)).toBeUndefined();
   expect(errors).toEqual([]);
@@ -292,13 +292,13 @@ test('the cinematic leaves the deck stable and a saved game does not replay it',
 test('the cinematic reports a missing model, follows the screen, and recovers WebGL', async ({ page }) => {
   await page.goto('/?modelo=/no-existe.glb');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('No se pudo cargar un modelo de la cinemática.', { timeout: 15000 });
+  await expect(alert).toContainText('A cinematic model could not be loaded.', { timeout: 15000 });
   await page.waitForTimeout(500);
-  await expect(alert).toContainText('No se pudo cargar un modelo de la cinemática.');
+  await expect(alert).toContainText('A cinematic model could not be loaded.');
 
   for (const [width, height] of [[1440, 1000], [768, 1024], [390, 844]]) {
     await page.setViewportSize({ width, height });
@@ -311,24 +311,24 @@ test('the cinematic reports a missing model, follows the screen, and recovers We
     node.__loseExt = gl.getExtension('WEBGL_lose_context');
     node.__loseExt.loseContext();
   });
-  await expect(page.getByText('El navegador perdió la imagen 3D.')).toBeVisible();
+  await expect(page.getByText('The browser lost the 3D picture.')).toBeVisible();
   await page.waitForTimeout(700);
   const during = Number(await canvas.getAttribute('data-time'));
   expect(during - before).toBeLessThan(0.3);
   await canvas.evaluate(node => node.__loseExt.restoreContext());
-  await expect(page.getByText('El navegador perdió la imagen 3D.')).toHaveCount(0);
+  await expect(page.getByText('The browser lost the 3D picture.')).toHaveCount(0);
   await expect(canvas).toHaveAttribute('data-lost', '0');
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
 });
 
 test('adjusted graphics stay measurable under CPU load', async ({ page }) => {
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Configuración' }).click();
+  await page.getByRole('button', { name: 'Settings' }).click();
   await page.locator('#graphics-quality').selectOption('ajustado');
-  await page.getByRole('button', { name: 'Cerrar panel' }).click();
-  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await page.getByRole('button', { name: 'Close panel' }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   await expect(canvas).toHaveAttribute('data-quality', 'ajustado');
@@ -344,22 +344,22 @@ test('adjusted graphics stay measurable under CPU load', async ({ page }) => {
   }
   console.log('FPS_AJUSTADO_CPU4', samples.join(','));
   expect(samples.filter(value => value > 0).length).toBeGreaterThan(0);
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
-  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
+  await expect(page.getByRole('heading', { name: 'Check life support' })).toBeVisible();
 });
 
 test('phone controls reach a console without a keyboard', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 1000 });
   await page.clock.install(); await ready(page);
-  for (const [name, duration] of [['Mover abajo', 900]]) {
+  for (const [name, duration] of [['Move down', 900]]) {
     const button = page.getByRole('button', { name, exact: true });
     await button.scrollIntoViewIfNeeded();
     const rect = await button.boundingBox();
     await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2);
     await page.mouse.down(); await page.clock.runFor(duration); await page.mouse.up();
   }
-  await page.locator('.touch-controls').getByRole('button', { name: 'Inspeccionar', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Monitor de soporte vital', exact: true })).toBeVisible();
+  await page.locator('.touch-controls').getByRole('button', { name: 'Inspect', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Life-support monitor', exact: true })).toBeVisible();
   await expect(page.locator('.fp-bay canvas')).toHaveAttribute('data-vista', 'pad');
   await page.clock.runFor(150);
   await page.screenshot({ path: 'test-results/station-mobile.png', fullPage: true });
@@ -372,7 +372,7 @@ test('the launch film plays only after ascent success and can be skipped to the 
   await page.addInitScript(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), { key: campaignKey, value: saved });
   await page.goto('/');
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   await expect(canvas).toHaveAttribute('data-sequence', 'launch');
@@ -384,27 +384,27 @@ test('the launch film plays only after ascent success and can be skipped to the 
     }).toBe(true);
   };
   await seekTo(4);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('Iniciamos la secuencia de lanzamiento');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('starting the launch sequence');
   await expect(page.locator('.cinematic-title h1')).toHaveText('9');
   await expect(canvas).toHaveAttribute('data-backdrop', 'pad');
   await seekTo(14);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('Encendido confirmado');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('Ignition confirmed');
   await canvas.screenshot({ path: 'test-results/launch-ignition.png' });
   await seekTo(30);
   expect(Number(await canvas.getAttribute('data-altitude'))).toBeGreaterThan(10);
   await expect(canvas).toHaveAttribute('data-backdrop', 'ascent');
   await seekTo(50);
-  await expect(page.locator('.cinematic-subtitle')).toContainText('Hemos completado nuestra primera misión');
+  await expect(page.locator('.cinematic-subtitle')).toContainText('completed our first mission');
   await expect(canvas).toHaveAttribute('data-backdrop', 'orbit');
   await expect(canvas).toHaveAttribute('data-altitude', '0.0');
   await canvas.screenshot({ path: 'test-results/launch-orbit.png' });
-  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
-  await expect(page.getByText('Misión completada')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'El lanzamiento' })).toBeVisible();
-  await expect(page.getByText('órbita terrestre')).toBeVisible();
-  await page.getByRole('button', { name: 'Continuar al siguiente nivel' }).click();
-  await expect(page.getByRole('heading', { name: 'Conoce tu nave' })).toBeVisible();
-  await expect(page.getByText('Estamos en vuelo hacia la Luna')).toBeVisible();
-  await page.getByRole('button', { name: 'Comenzar misión' }).click();
+  await page.getByRole('button', { name: 'Skip cinematic' }).click();
+  await expect(page.getByText('Mission complete')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The launch' })).toBeVisible();
+  await expect(page.getByText('Earth orbit')).toBeVisible();
+  await page.getByRole('button', { name: 'Continue to the next level' }).click();
+  await expect(page.getByRole('heading', { name: 'Know your ship' })).toBeVisible();
+  await expect(page.getByText('We are flying toward the Moon')).toBeVisible();
+  await page.getByRole('button', { name: 'Start mission' }).click();
   await expect(page.locator('canvas.ship-canvas')).toHaveAttribute('data-sky', 'space');
 });

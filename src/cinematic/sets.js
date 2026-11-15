@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createCinematicAstronaut, createCinematicTitus } from './cast.js';
+import { t } from '../i18n/translate.js';
 
 const PROFILE = [
   [1.12, -6.35], [1.22, -5.5], [1.38, -4.2], [1.52, -2.1], [1.58, 0.4],
@@ -145,12 +146,12 @@ function screenTexture() {
     ctx.strokeRect(12, 12, w - 24, h - 24);
     ctx.fillStyle = '#9be8f2';
     ctx.font = 'bold 46px Segoe UI, sans-serif';
-    ctx.fillText('AIRE', 40, 90);
-    ctx.fillText('ENERGÍA', 40, 160);
-    ctx.fillText('RUMBO', 40, 230);
+    ctx.fillText(t('AIRE'), 40, 90);
+    ctx.fillText(t('ENERGÍA'), 40, 160);
+    ctx.fillText(t('RUMBO'), 40, 230);
     ctx.font = '26px Segoe UI, sans-serif';
     ctx.fillStyle = '#e8b95d';
-    ctx.fillText('Indicadores de juego', 40, 286);
+    ctx.fillText(t('Indicadores de juego'), 40, 286);
   }, 512, 320);
 }
 
@@ -162,16 +163,16 @@ function holoTexture() {
     ctx.strokeRect(16, 16, w - 32, h - 32);
     ctx.fillStyle = '#d8faff';
     ctx.font = 'bold 42px Segoe UI, sans-serif';
-    ctx.fillText('AIRE', 40, 86);
-    ctx.fillText('ENERGÍA', 40, 156);
-    ctx.fillText('RUMBO', 40, 226);
+    ctx.fillText(t('AIRE'), 40, 86);
+    ctx.fillText(t('ENERGÍA'), 40, 156);
+    ctx.fillText(t('RUMBO'), 40, 226);
     ctx.fillStyle = '#9be8f2';
     ctx.fillRect(300, 58, 160, 16);
     ctx.fillRect(300, 128, 120, 16);
     ctx.fillRect(300, 198, 150, 16);
     ctx.font = '24px Segoe UI, sans-serif';
     ctx.fillStyle = '#e8b95d';
-    ctx.fillText('Indicadores de juego', 40, 280);
+    ctx.fillText(t('Indicadores de juego'), 40, 280);
   }, 512, 320);
 }
 

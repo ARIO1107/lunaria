@@ -1,4 +1,5 @@
 import { CORRIDORS, ROOMS, STATIONS, WORLD } from './world.js';
+import { t } from '../i18n/translate.js';
 
 const C = { ink: '#0e1315', wall: '#718080', floor: '#333d40', tile: '#424d4f', green: '#9be3b6', gold: '#e8bf69', white: '#e6e8dd' };
 function box(ctx, x, y, w, h, fill, radius = 0, stroke) {
@@ -145,6 +146,6 @@ export function drawRocket(ctx, width, height, flight, reduced) {
   ctx.fillStyle = '#b7c1b9'; ctx.beginPath(); ctx.moveTo(-18, 75); ctx.lineTo(-32, 111); ctx.lineTo(-18, 111); ctx.fill();
   ctx.beginPath(); ctx.moveTo(18, 75); ctx.lineTo(32, 111); ctx.lineTo(18, 111); ctx.fill();
   ctx.restore();
-  text(ctx, 'SATURNO V / S-IC', 18, 28, 12, '#b9c8bf');
-  text(ctx, 'Animación esquemática', 18, height - 20, 12, '#b9c8bf');
+  text(ctx, t('SATURNO V / S-IC'), 18, 28, 12, '#b9c8bf');
+  text(ctx, t('Animación esquemática'), 18, height - 20, 12, '#b9c8bf');
 }

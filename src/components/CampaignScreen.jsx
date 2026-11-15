@@ -18,6 +18,7 @@ import { playSound, startGameBed, stopGameBed, suspendAudio } from '../audio/aud
 import { titusAtStation } from '../game/titusGuide.js';
 import { bubbleSpeech } from '../game/titusBubbles.js';
 import FirstPersonBay from '../view/FirstPersonBay.jsx';
+import { t } from '../i18n/translate.js';
 
 registerCampaignStations(StationMission);
 
@@ -48,31 +49,31 @@ function Meter({ label, value, mark }) {
 function Resources({ campaign }) {
   const { ship, lander, base } = campaign.resources;
   if (campaign.currentLevel >= 5) {
-    return <div className="hud-meters" aria-label="Recursos de la estación, en unidades simuladas">
-      <Meter mark="⚡" label="Energía" value={base.energy} />
-      <Meter mark="O₂" label="Oxígeno" value={base.oxygen} />
-      <Meter mark="💧" label="Agua" value={base.water} />
-      <p className="hud-meter-note">Refugio {base.habitatOperational ? 'listo' : 'pendiente'} · Ciencia {base.science} · Ciclo {campaign.cycle}</p>
+    return <div className="hud-meters" aria-label={t('Recursos de la estación, en unidades simuladas')}>
+      <Meter mark="⚡" label={t('Energía')} value={base.energy} />
+      <Meter mark="O₂" label={t('Oxígeno')} value={base.oxygen} />
+      <Meter mark="💧" label={t('Agua')} value={base.water} />
+      <p className="hud-meter-note">{t('Refugio {habitat} · Ciencia {science} · Ciclo {cycle}', { habitat: t(base.habitatOperational ? 'listo' : 'pendiente'), science: base.science, cycle: campaign.cycle })}</p>
     </div>;
   }
   if (campaign.currentLevel === 4) {
-    return <div className="hud-meters" aria-label="Recursos del descenso, en unidades simuladas">
-      <Meter mark="⛽" label="Combustible del módulo" value={lander.fuel} />
-      <Meter mark="⛽" label="Combustible de la nave" value={ship.fuel} />
-      <p className="hud-meter-note">Zona {campaign.site}</p>
+    return <div className="hud-meters" aria-label={t('Recursos del descenso, en unidades simuladas')}>
+      <Meter mark="⛽" label={t('Combustible del módulo')} value={lander.fuel} />
+      <Meter mark="⛽" label={t('Combustible de la nave')} value={ship.fuel} />
+      <p className="hud-meter-note">{t('Zona {id}', { id: campaign.site })}</p>
     </div>;
   }
-  return <div className="hud-meters" aria-label="Recursos de la nave, en unidades simuladas">
-    <Meter mark="⚡" label="Energía" value={ship.energy} />
-    <Meter mark="O₂" label="Oxígeno" value={ship.oxygen} />
-    <Meter mark="⛽" label="Combustible" value={ship.fuel} />
+  return <div className="hud-meters" aria-label={t('Recursos de la nave, en unidades simuladas')}>
+    <Meter mark="⚡" label={t('Energía')} value={ship.energy} />
+    <Meter mark="O₂" label={t('Oxígeno')} value={ship.oxygen} />
+    <Meter mark="⛽" label={t('Combustible')} value={ship.fuel} />
   </div>;
 }
 
 function deckLocation(campaign, onSurface) {
-  if (onSurface) return 'Superficie lunar';
-  if (campaign.currentLevel === 1) return 'Cubierta de la nave · En tierra (Base de lanzamiento)';
-  return 'Cubierta de la nave · En el espacio';
+  if (onSurface) return t('Superficie lunar');
+  if (campaign.currentLevel === 1) return t('Cubierta de la nave · En tierra (Base de lanzamiento)');
+  return t('Cubierta de la nave · En el espacio');
 }
 
 function Story({ kicker, title, children, actions }) {
@@ -83,14 +84,14 @@ function Story({ kicker, title, children, actions }) {
 
 function Operations({ campaign, dispatch }) {
   const light = campaign.cycle % 2 !== 0;
-  return <section className="station-card hud-panel hud-frame"><div className="section-heading"><h3>Turno de operaciones</h3><span>Ciclo {campaign.cycle}</span></div>
-    <p>{light ? 'Hay iluminación en este turno. Los paneles pueden recargar.' : 'Turno de sombra. Los paneles no generan electricidad.'} Los números son unidades de juego, no mediciones de una misión.</p>
+  return <section className="station-card hud-panel hud-frame"><div className="section-heading"><h3>{t('Turno de operaciones')}</h3><span>{t('Ciclo {id}', { id: campaign.cycle })}</span></div>
+    <p>{light ? t('Hay iluminación en este turno. Los paneles pueden recargar.') : t('Turno de sombra. Los paneles no generan electricidad.')} {t('Los números son unidades de juego, no mediciones de una misión.')}</p>
     <div className="op-grid">
       {Object.entries(operationsActions).map(([name, action]) => <button key={name} className="secondary-button" disabled={campaign.usedActions.includes(name)}
-        onClick={() => dispatch({ type: 'operation', name })}>{action.title}</button>)}
-      <button className="primary-button" onClick={() => dispatch({ type: 'operation', name: 'cycle' })}>Cerrar ciclo</button>
+        onClick={() => dispatch({ type: 'operation', name })}>{t(action.title)}</button>)}
+      <button className="primary-button" onClick={() => dispatch({ type: 'operation', name: 'cycle' })}>{t('Cerrar ciclo')}</button>
     </div>
-    <p>Actividades {campaign.activities}/3 · ciclos cerrados {Math.max(0, campaign.cycle - 1)}/3. Cada botón explica su costo al usarlo y solo cuenta una vez por ciclo.</p>
+    <p>{t('Actividades {activities}/3 · ciclos cerrados {cycles}/3. Cada botón explica su costo al usarlo y solo cuenta una vez por ciclo.', { activities: campaign.activities, cycles: Math.max(0, campaign.cycle - 1) })}</p>
   </section>;
 }
 
@@ -225,32 +226,32 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
       volume={settings.volume} soundEnabled={settings.soundEnabled !== false} quality={settings.graphics || 'alto'} />;
   }
   if (campaign.phase === 'briefing') {
-    return <Story kicker={'Nivel ' + level.id} title={level.title} actions={<>
-      <button className="primary-button" onClick={() => { playSound('open'); dispatch({ type: 'begin' }); }}>Comenzar misión</button>
-      <button className="secondary-button" onClick={leave}>Menú principal</button>
+    return <Story kicker={t('Nivel {id}', { id: level.id })} title={t(level.title)} actions={<>
+      <button className="primary-button" onClick={() => { playSound('open'); dispatch({ type: 'begin' }); }}>{t('Comenzar misión')}</button>
+      <button className="secondary-button" onClick={leave}>{t('Menú principal')}</button>
     </>}>
-      <p>{level.subtitle}</p><p>{level.intro}</p>
-      {campaign.flags.demo && <p className="demo-flag">Modo demostración: este salto no forma parte de la secuencia normal.</p>}
+      <p>{t(level.subtitle)}</p><p>{t(level.intro)}</p>
+      {campaign.flags.demo && <p className="demo-flag">{t('Modo demostración: este salto no forma parte de la secuencia normal.')}</p>}
     </Story>;
   }
   if (campaign.phase === 'complete') {
     const fact = factsForLevel(level.id)[0];
-    return <Story kicker="Misión completada" title={level.title} actions={<>
-      {campaign.currentLevel < 6 && <button className="primary-button" onClick={() => dispatch({ type: 'advance' })}>Continuar al siguiente nivel</button>}
-      {campaign.currentLevel === 6 && <button className="primary-button" onClick={() => dispatch({ type: 'continueOps' })}>Seguir explorando</button>}
-      <button className="secondary-button" onClick={leave}>Menú principal</button>
+    return <Story kicker={t('Misión completada')} title={t(level.title)} actions={<>
+      {campaign.currentLevel < 6 && <button className="primary-button" onClick={() => dispatch({ type: 'advance' })}>{t('Continuar al siguiente nivel')}</button>}
+      {campaign.currentLevel === 6 && <button className="primary-button" onClick={() => dispatch({ type: 'continueOps' })}>{t('Seguir explorando')}</button>}
+      <button className="secondary-button" onClick={leave}>{t('Menú principal')}</button>
     </>}>
-      <p>{level.summary}</p>
+      <p>{t(level.summary)}</p>
       <ScienceFact fact={fact} />
-      {campaign.currentLevel === 6 && <p>Decisiones de este tramo: {campaign.decisions.slice(-6).join(' · ') || 'operaciones de la estación'}.</p>}
+      {campaign.currentLevel === 6 && <p>{t('Decisiones de este tramo: {choices}.', { choices: campaign.decisions.slice(-6).map(item => t(item)).join(' · ') || t('operaciones de la estación') })}</p>}
     </Story>;
   }
   if (campaign.phase === 'failed') {
-    return <Story kicker="Intento interrumpido" title="Titus guarda el punto de control" actions={<>
-      <button className="primary-button" onClick={() => dispatch({ type: 'retry' })}>Reintentar</button>
-      <button className="secondary-button" onClick={leave}>Menú principal</button>
+    return <Story kicker={t('Intento interrumpido')} title={t('Titus guarda el punto de control')} actions={<>
+      <button className="primary-button" onClick={() => dispatch({ type: 'retry' })}>{t('Reintentar')}</button>
+      <button className="secondary-button" onClick={leave}>{t('Menú principal')}</button>
     </>}>
-      <p>{campaign.message || 'Un recurso esencial se agotó. Volvemos al inicio de este nivel, sin repetir los anteriores.'}</p>
+      <p>{t(campaign.message || 'Un recurso esencial se agotó. Volvemos al inicio de este nivel, sin repetir los anteriores.')}</p>
     </Story>;
   }
 
@@ -260,7 +261,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     + (level.id === 6 ? (campaign.cycle >= 4 ? 1 : 0) + (campaign.activities >= 3 ? 1 : 0) : 0);
   const missionPercent = missionTotal === 0 ? 0 : Math.round((missionDone / missionTotal) * 100);
   const soundOff = settings.soundEnabled === false;
-  const guideLine = campaign.message || (task ? task.prompt : 'Explora con calma. Cada estación explica su función.');
+  const guideLine = t(campaign.message || (task ? task.prompt : 'Explora con calma. Cada estación explica su función.'));
   const guideBody = guideLine.replace(/^Titus:\s*/, '');
   return <div className={'app-shell exploration-shell hud-deck' + (emergency ? ' emergency-deck' : '')}>
     <header className="app-header hud-frame">
@@ -272,93 +273,93 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
         </svg>
         <h1>Lunaria</h1>
       </div>
-      <p className="hud-level">Nivel {level.id}: {level.title}</p>
-      <div className="deck-mode">{campaign.flags.demo && <span className="demo-flag">Demostración · </span>}{deckLocation(campaign, onSurface)}</div>
-      <nav aria-label="Controles de la misión">
-        <button className="quiet-button hud-nav" onClick={leave}><Glyph name="menu" />Menú<span className="hud-sr"> principal</span></button>
-        <button className="quiet-button hud-nav" onClick={() => { playSound('close'); setModal({ type: 'pause' }); }}><Glyph name="pause" />Pausa</button>
-        <button className="quiet-button hud-nav" onClick={() => onSettings({ ...settings, soundEnabled: soundOff })}><Glyph name={soundOff ? 'muted' : 'sound'} />{soundOff ? 'Activar sonido' : 'Silenciar'}</button>
-        <button className="quiet-button hud-nav" onClick={() => setModal({ type: 'log' })}><Glyph name="book" />Bitácora</button>
-        <button className="quiet-button hud-nav" onClick={() => setModal({ type: 'crew' })}><Glyph name="crew" />La tripulación</button>
+      <p className="hud-level">{t('Nivel {id}: {title}', { id: level.id, title: t(level.title) })}</p>
+      <div className="deck-mode">{campaign.flags.demo && <span className="demo-flag">{t('Demostración · ')}</span>}{deckLocation(campaign, onSurface)}</div>
+      <nav aria-label={t('Controles de la misión')}>
+        <button className="quiet-button hud-nav" onClick={leave}><Glyph name="menu" /><span aria-hidden="true">{t('Menú')}</span><span className="hud-sr">{t('Menú principal')}</span></button>
+        <button className="quiet-button hud-nav" onClick={() => { playSound('close'); setModal({ type: 'pause' }); }}><Glyph name="pause" />{t('Pausa')}</button>
+        <button className="quiet-button hud-nav" onClick={() => onSettings({ ...settings, soundEnabled: soundOff })}><Glyph name={soundOff ? 'muted' : 'sound'} />{soundOff ? t('Activar sonido') : t('Silenciar')}</button>
+        <button className="quiet-button hud-nav" onClick={() => setModal({ type: 'log' })}><Glyph name="book" />{t('Bitácora')}</button>
+        <button className="quiet-button hud-nav" onClick={() => setModal({ type: 'crew' })}><Glyph name="crew" />{t('La tripulación')}</button>
       </nav>
     </header>
     {(emergency || solarAlert) && <p className="emergency-banner" role="alert">{emergency
-      ? 'Emergencia eléctrica ficticia. Titus: la señal desconocida no explica esta avería. Repara, protege el aire y prepara el frenado orbital.'
-      : 'Ejercicio de meteorología espacial. No es una dosis calculada. Suspende las salidas, pulsa Preparar refugio y después cierra el ciclo.'}</p>}
+      ? t('Emergencia eléctrica ficticia. Titus: la señal desconocida no explica esta avería. Repara, protege el aire y prepara el frenado orbital.')
+      : t('Ejercicio de meteorología espacial. No es una dosis calculada. Suspende las salidas, pulsa Preparar refugio y después cierra el ciclo.')}</p>}
     <main className="hud-main">
       <div className="game-layout exploration-layout">
-        <aside className="hud-mission" aria-label="Misión">
+        <aside className="hud-mission" aria-label={t('Misión')}>
           <section className="hud-panel hud-frame hud-brief">
-            <p className="hud-kicker"><i aria-hidden="true" />Misión {String(level.id).padStart(2, '0')}</p>
-            <h2>{task ? task.title : level.title}</h2>
-            <p className="hud-copy">{task ? task.prompt : 'Objetivos de este tramo completados.'}</p>
+            <p className="hud-kicker"><i aria-hidden="true" />{t('Misión {id}', { id: String(level.id).padStart(2, '0') })}</p>
+            <h2>{task ? t(task.title) : t(level.title)}</h2>
+            <p className="hud-copy">{task ? t(task.prompt) : t('Objetivos de este tramo completados.')}</p>
           </section>
           <section className="station-card hud-panel hud-frame">
-            <h3>{description?.role || (near ? near.name : 'Objetivos')}</h3>
+            <h3>{t(description?.role || (near ? near.name : 'Objetivos'))}</h3>
             <ul className="objective-list">
               {level.tasks.map(item => <li key={item.id} data-state={campaign.completedObjectives.includes(item.id) ? 'done' : item.id === task?.id ? 'current' : 'waiting'}>
-                <input type="checkbox" readOnly checked={campaign.completedObjectives.includes(item.id)} aria-label={item.title} />
-                <span>{item.title}</span>
+                <input type="checkbox" readOnly checked={campaign.completedObjectives.includes(item.id)} aria-label={t(item.title)} />
+                <span>{t(item.title)}</span>
               </li>)}
               {campaign.currentLevel === 6 && <>
-                <li data-state={campaign.cycle >= 4 ? 'done' : 'current'}><input type="checkbox" readOnly checked={campaign.cycle >= 4} aria-label="Tres ciclos" /><span>Cerrar tres ciclos</span></li>
-                <li data-state={campaign.activities >= 3 ? 'done' : 'current'}><input type="checkbox" readOnly checked={campaign.activities >= 3} aria-label="Tres actividades" /><span>Tres actividades científicas o de mantenimiento</span></li>
+                <li data-state={campaign.cycle >= 4 ? 'done' : 'current'}><input type="checkbox" readOnly checked={campaign.cycle >= 4} aria-label={t('Tres ciclos')} /><span>{t('Cerrar tres ciclos')}</span></li>
+                <li data-state={campaign.activities >= 3 ? 'done' : 'current'}><input type="checkbox" readOnly checked={campaign.activities >= 3} aria-label={t('Tres actividades')} /><span>{t('Tres actividades científicas o de mantenimiento')}</span></li>
               </>}
             </ul>
             <div className="hud-progress">
-              <div><span>Progreso de la misión</span><strong>{missionPercent} %</strong></div>
-              <div className="hud-progress-track" role="progressbar" aria-valuenow={missionPercent} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso de la misión"><i style={{ width: missionPercent + '%' }} /></div>
+              <div><span>{t('Progreso de la misión')}</span><strong>{missionPercent} %</strong></div>
+              <div className="hud-progress-track" role="progressbar" aria-valuenow={missionPercent} aria-valuemin={0} aria-valuemax={100} aria-label={t('Progreso de la misión')}><i style={{ width: missionPercent + '%' }} /></div>
             </div>
-            <button className="primary-button hud-inspect" disabled={!near} onClick={() => near && openStation(near)}>{near ? 'Inspeccionar equipo' : 'Acércate a un equipo'} <kbd>E</kbd></button>
+            <button className="primary-button hud-inspect" disabled={!near} onClick={() => near && openStation(near)}>{near ? t('Inspeccionar equipo') : t('Acércate a un equipo')} <kbd>E</kbd></button>
           </section>
           {campaign.currentLevel === 6 && <Operations campaign={campaign} dispatch={dispatch} />}
-          {campaign.collectedSamples.length > 0 && <section className="station-card hud-panel hud-frame"><h3>Muestras</h3><ul className="objective-list">{campaign.collectedSamples.map(sample => <li key={sample.id}><span>{sampleNames[sample.id] || sample.id} · {sample.analyzed ? 'analizada' : 'pendiente'}</span></li>)}</ul></section>}
+          {campaign.collectedSamples.length > 0 && <section className="station-card hud-panel hud-frame"><h3>{t('Muestras')}</h3><ul className="objective-list">{campaign.collectedSamples.map(sample => <li key={sample.id}><span>{t((sampleNames[sample.id] || sample.id) + ' · ' + (sample.analyzed ? 'analizada' : 'pendiente'))}</span></li>)}</ul></section>}
         </aside>
-        <section className="ship-section hud-frame" aria-label={onSurface ? 'Superficie lunar' : 'Exploración de la nave'}>
-          <div className="map-toolbar"><span><i className="status-light" /> {room}</span><div className="zoom-controls"><button aria-label="Alejar cámara" disabled={zoom <= .8} onClick={() => changeZoom(-.15)}>−</button><span>{Math.round(zoom * 100)} %</span><button aria-label="Acercar cámara" disabled={zoom >= 1.75} onClick={() => changeZoom(.15)}>+</button></div></div>
+        <section className="ship-section hud-frame" aria-label={onSurface ? t('Superficie lunar') : t('Exploración de la nave')}>
+          <div className="map-toolbar"><span><i className="status-light" /> {t(room)}</span><div className="zoom-controls"><button aria-label={t('Alejar cámara')} disabled={zoom <= .8} onClick={() => changeZoom(-.15)}>−</button><span>{Math.round(zoom * 100)} %</span><button aria-label={t('Acercar cámara')} disabled={zoom >= 1.75} onClick={() => changeZoom(.15)}>+</button></div></div>
           {onSurface
             ? <SurfaceCanvas positionRef={surfacePos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={solarAlert ? 'danger' : 'normal'} speech={speech} />
             : <ShipCanvas positionRef={shipPos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={emergency ? 'danger' : undefined} emergency={emergency} grounded={campaign.currentLevel === 1} guidePoint={guidePoint} speech={speech} />}
-          <div className="touch-controls" aria-label="Controles táctiles de movimiento">
-            {[['↑', 0, -1, 'arriba'], ['←', -1, 0, 'izquierda'], ['↓', 0, 1, 'abajo'], ['→', 1, 0, 'derecha']].map(([label, x, y, name]) => <button key={name} aria-label={'Mover ' + name} onPointerDown={event => direction(event, x, y)} onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}>{label}</button>)}
-            <button disabled={!near} onClick={() => near && openStation(near)}>Inspeccionar</button>
+          <div className="touch-controls" aria-label={t('Controles táctiles de movimiento')}>
+            {[['↑', 0, -1, 'arriba'], ['←', -1, 0, 'izquierda'], ['↓', 0, 1, 'abajo'], ['→', 1, 0, 'derecha']].map(([label, x, y, name]) => <button key={name} aria-label={t('Mover {dir}', { dir: t(name) })} onPointerDown={event => direction(event, x, y)} onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}>{label}</button>)}
+            <button disabled={!near} onClick={() => near && openStation(near)}>{t('Inspeccionar')}</button>
           </div>
         </section>
         <aside className="mission-sidebar exploration-sidebar">
-          <section className="hud-panel hud-frame hud-status" aria-label={campaign.currentLevel >= 5 || onSurface ? 'Estado de la estación' : 'Estado de la nave'}>
-            <h3>{campaign.currentLevel >= 5 || onSurface ? 'Estado de la estación' : 'Estado de la nave'}</h3>
+          <section className="hud-panel hud-frame hud-status" aria-label={campaign.currentLevel >= 5 || onSurface ? t('Estado de la estación') : t('Estado de la nave')}>
+            <h3>{campaign.currentLevel >= 5 || onSurface ? t('Estado de la estación') : t('Estado de la nave')}</h3>
             <Resources campaign={campaign} />
           </section>
           <section className="crew-card hud-panel hud-frame">
-            <h3>Titus{solarAlert || emergency ? <span>Atención</span> : null}</h3>
-            <button className="portrait-button" onClick={() => setModal({ type: 'titus' })} aria-label="Preguntar a Titus"><img src={assetUrl('astronaut-portrait.png')} alt="" /><img src={assetUrl('titus-portrait.png')} alt="" /></button>
-            <p><b>Titus: </b>{guideBody}</p>
+            <h3>{t('Titus')}{solarAlert || emergency ? <span>{t('Atención')}</span> : null}</h3>
+            <button className="portrait-button" onClick={() => setModal({ type: 'titus' })} aria-label={t('Preguntar a Titus')}><img src={assetUrl('astronaut-portrait.png')} alt="" /><img src={assetUrl('titus-portrait.png')} alt="" /></button>
+            <p><b>{t('Titus')}: </b>{guideBody}</p>
           </section>
         </aside>
       </div>
     </main>
     <footer className="hud-footer">
       <span>v{version}</span>
-      <span className="hud-online"><i className="status-light" />{emergency || solarAlert ? 'Alerta de sistemas' : 'Sistemas en línea'}</span>
+      <span className="hud-online"><i className="status-light" />{emergency || solarAlert ? t('Alerta de sistemas') : t('Sistemas en línea')}</span>
       <div className="map-footer">
-        <span className="hud-key"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Moverse</span></span>
-        <span className="hud-key"><kbd>Flechas</kbd><span>Moverse</span></span>
-        <span className="hud-key"><kbd>E</kbd><span>Inspeccionar</span></span>
-        <span className="hud-key"><kbd>Espacio</kbd><span>Inspeccionar</span></span>
+        <span className="hud-key"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>{t('Moverse')}</span></span>
+        <span className="hud-key"><kbd>{t('Flechas')}</kbd><span>{t('Moverse')}</span></span>
+        <span className="hud-key"><kbd>E</kbd><span>{t('Inspeccionar')}</span></span>
+        <span className="hud-key"><kbd>{t('Espacio')}</kbd><span>{t('Inspeccionar')}</span></span>
       </div>
     </footer>
-    {modal?.type === 'station' && <Modal title={modal.station.name} wide className="fp-dialog" onClose={close}>
+    {modal?.type === 'station' && <Modal title={t(modal.station.name)} wide className="fp-dialog" onClose={close}>
       <FirstPersonBay stationId={modal.station.id} vista={onSurface ? 'surface' : campaign.currentLevel === 1 ? 'pad' : 'space'} reduced={settings.reducedMotion} quality={settings.graphics || 'alto'} caption={campaign.message} />
       <StationMission station={modal.station} state={campaign} dispatch={dispatch} onClose={close} />
     </Modal>}
-    {modal?.type === 'titus' && <Modal title="Titus" onClose={close}><TitusAssistant level={campaign.currentLevel} objective={task} station={near} emergency={emergency || solarAlert} discoveredFacts={campaign.discoveredFacts} onDiscover={id => dispatch({ type: 'discover', id })} /></Modal>}
-    {modal?.type === 'log' && <Modal title="Bitácora científica" onClose={close}><ScienceLogbook discoveredFacts={campaign.discoveredFacts} /></Modal>}
-    {modal?.type === 'crew' && <Modal title="La tripulación de Lunaria" wide onClose={close}><CrewGallery /></Modal>}
-    {modal?.type === 'pause' && <Modal title="Pausa" onClose={() => { suspendAudio(); close(); }}><div className="source-content">
-      <p>El movimiento y los minijuegos están detenidos. Los recursos no cambian mientras lees.</p>
-      <button className="secondary-button" onClick={() => onSettings({ ...settings, soundEnabled: settings.soundEnabled === false })}>{settings.soundEnabled === false ? 'Activar sonido' : 'Silenciar'}</button>
-      <p>Volumen guardado: {settings.volume} %. Cámbialo en Configuración del menú principal.</p>
-      <button className="primary-button" onClick={leave}>Guardar y salir al menú</button>
+    {modal?.type === 'titus' && <Modal title={t('Titus')} onClose={close}><TitusAssistant level={campaign.currentLevel} objective={task} station={near} emergency={emergency || solarAlert} discoveredFacts={campaign.discoveredFacts} onDiscover={id => dispatch({ type: 'discover', id })} /></Modal>}
+    {modal?.type === 'log' && <Modal title={t('Bitácora científica')} onClose={close}><ScienceLogbook discoveredFacts={campaign.discoveredFacts} /></Modal>}
+    {modal?.type === 'crew' && <Modal title={t('La tripulación de Lunaria')} wide onClose={close}><CrewGallery /></Modal>}
+    {modal?.type === 'pause' && <Modal title={t('Pausa')} onClose={() => { suspendAudio(); close(); }}><div className="source-content">
+      <p>{t('El movimiento y los minijuegos están detenidos. Los recursos no cambian mientras lees.')}</p>
+      <button className="secondary-button" onClick={() => onSettings({ ...settings, soundEnabled: settings.soundEnabled === false })}>{settings.soundEnabled === false ? t('Activar sonido') : t('Silenciar')}</button>
+      <p>{t('Volumen guardado: {volume} %. Cámbialo en Configuración del menú principal.', { volume: settings.volume })}</p>
+      <button className="primary-button" onClick={leave}>{t('Guardar y salir al menú')}</button>
     </div></Modal>}
   </div>;
 }

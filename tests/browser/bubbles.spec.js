@@ -8,7 +8,7 @@ async function continueSaved(page, state) {
   await page.evaluate(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), { key: campaignKey, value: state });
   await page.reload();
   await skipSiteIntro(page);
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0, { timeout: 30000 });
 }
 
@@ -47,11 +47,11 @@ async function bubbleClearance(page) {
 test('the habitat bubble stays off Alex and Titus', async ({ page }) => {
   const started = campaignReducer({ ...campaignAtLevel(1), phase: 'briefing' }, { type: 'begin' });
   await continueSaved(page, { ...started, position: { x: 480, y: 300 } });
-  await expect(page.locator('.map-toolbar')).toContainText('Hábitat');
-  await expect(page.locator('.titus-bubble')).toContainText(/soporte vital/);
+  await expect(page.locator('.map-toolbar')).toContainText('Habitat');
+  await expect(page.locator('.titus-bubble')).toContainText(/life support/);
   const wide = await bubbleClearance(page);
   expect(wide).toMatchObject({ alex: false, titus: false, tail: 'above' });
-  await page.getByRole('button', { name: 'Acercar cámara' }).click();
+  await page.getByRole('button', { name: 'Zoom in' }).click();
   const zoomed = await bubbleClearance(page);
   expect(zoomed.alex).toBe(false);
   expect(zoomed.titus).toBe(false);
@@ -66,16 +66,16 @@ test('level 3 uses fault lamps and the top-down bubble hides inside the station'
   await continueSaved(page, state);
   const bubble = page.locator('.titus-bubble');
   await expect(bubble).toBeVisible();
-  await expect(bubble).toContainText(/Capitán Alex/);
-  await expect(bubble).toContainText(/lámpara roja/);
-  await page.getByRole('button', { name: 'Inspeccionar equipo' }).click();
+  await expect(bubble).toContainText(/Captain Alex/);
+  await expect(bubble).toContainText(/red lamp/);
+  await page.getByRole('button', { name: 'Inspect equipment' }).click();
   await expect(bubble).toHaveCount(0);
-  await page.getByRole('button', { name: 'Soporte vital' }).click();
-  await expect(page.getByText(/está estable/)).toBeVisible();
-  await page.getByRole('button', { name: 'Propulsión' }).click();
-  await expect(page.getByRole('button', { name: 'Bajar disyuntor de propulsión' })).toBeVisible();
+  await page.getByRole('button', { name: 'Life support' }).click();
+  await expect(page.getByText(/is stable/)).toBeVisible();
+  await page.getByRole('button', { name: 'Propulsion' }).click();
+  await expect(page.getByRole('button', { name: 'Lower the propulsion breaker' })).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.locator('.titus-bubble')).toContainText(/Fuente:/);
+  await expect(page.locator('.titus-bubble')).toContainText(/Source:/);
   const clearance = await bubbleClearance(page);
   expect(clearance.alex).toBe(false);
   expect(clearance.titus).toBe(false);
@@ -85,9 +85,9 @@ test('level 6 operations still show a Titus bubble on the surface', async ({ pag
   const state = campaignReducer(campaignAtLevel(6), { type: 'begin' });
   await continueSaved(page, state);
   await expect(page.locator('.titus-bubble')).toBeVisible();
-  await expect(page.locator('.titus-bubble')).toContainText(/Capitán Alex/);
-  await expect(page.locator('.titus-bubble')).toContainText(/ciclos|actividades/);
-  await expect(page.getByRole('region', { name: 'Superficie lunar' })).toBeVisible();
+  await expect(page.locator('.titus-bubble')).toContainText(/Captain Alex/);
+  await expect(page.locator('.titus-bubble')).toContainText(/cycles|activities/);
+  await expect(page.getByRole('region', { name: 'Lunar surface' })).toBeVisible();
   const clearance = await bubbleClearance(page);
   expect(clearance.alex).toBe(false);
   expect(clearance.titus).toBe(false);

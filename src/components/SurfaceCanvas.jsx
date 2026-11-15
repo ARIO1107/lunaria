@@ -5,6 +5,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { SURFACE_OBJECTS, surfaceSpawn, canOccupySurface, moveSurfaceActor, nearestSurfaceObject } from '../game/surfaceWorld.js';
 import { placeCrewBubble } from '../game/bubblePlace.js';
 import { tickCrew } from '../audio/audioManager.js';
+import { t } from '../i18n/translate.js';
 
 function sprite(ctx, art, name, actor, time, moving, mood, reduced) {
   const meta = art.manifest.actors[name];
@@ -35,7 +36,7 @@ function drawObject(ctx, object, near) {
     ctx.strokeStyle = '#6c7c78'; ctx.strokeRect(x + w * .2, y + h * .48, w * .3, h * .5);
   }
   ctx.font = '12px Segoe UI, sans-serif'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#e5eadd'; ctx.fillText(object.short, x + w / 2, y + h + 22);
+  ctx.fillStyle = '#e5eadd'; ctx.fillText(t(object.short), x + w / 2, y + h + 22);
 }
 
 function surfaceSpot(width, height, player, actor, zoom) {
@@ -143,14 +144,16 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     items.push({ depth: state.titus.y, draw: () => sprite(ctx, art, 'titus', state.titus, time, false, titusMood, reduced) });
     items.sort((a, b) => a.depth - b.depth).forEach(item => item.draw());
     if (near) {
+      const label = t('E · ' + near.short);
+      ctx.font = '600 13px Segoe UI, sans-serif';
+      const labelW = ctx.measureText(label).width + 24;
       ctx.fillStyle = '#e9c989';
       ctx.beginPath();
-      ctx.roundRect(state.player.x - 110, state.player.y - 108, 220, 26, 4);
+      ctx.roundRect(state.player.x - labelW / 2, state.player.y - 108, labelW, 26, 4);
       ctx.fill();
       ctx.fillStyle = '#17252c';
       ctx.textAlign = 'center';
-      ctx.font = '600 13px Segoe UI, sans-serif';
-      ctx.fillText('E · ' + near.short, state.player.x, state.player.y - 90);
+      ctx.fillText(label, state.player.x, state.player.y - 90);
     }
     ctx.restore();
     const bubble = bubbleRef.current;
@@ -164,8 +167,8 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     }
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0}
-    aria-label="Superficie lunar. WASD o flechas para caminar. E para interactuar." />
-    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{speech}</span></p>}
-    {!art && <div className="asset-loading" role="status">{error ? <><p>{error}</p><button onClick={() => setAttempt(value => value + 1)}>Reintentar carga</button></> : <p>Preparando la superficie lunar…</p>}</div>}
+    aria-label={t('Superficie lunar. WASD o flechas para caminar. E para interactuar.')} />
+    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{t(speech)}</span></p>}
+    {!art && <div className="asset-loading" role="status">{error ? <><p>{error}</p><button onClick={() => setAttempt(value => value + 1)}>{t('Reintentar carga')}</button></> : <p>{t('Preparando la superficie lunar…')}</p>}</div>}
   </div>;
 }

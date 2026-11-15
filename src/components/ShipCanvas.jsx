@@ -6,6 +6,7 @@ import { tickCrew } from '../audio/audioManager.js';
 import { loadArt } from '../game/assets.js';
 import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import { t } from '../i18n/translate.js';
 
 const MOVEMENT = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false, grounded = false, guidePoint = null, speech = '' }) {
@@ -97,7 +98,7 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
       );
     }
   });
-  return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>
-    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{speech}</span></p>}
-    {!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>Reintentar carga</button></> : <p>Preparando la cubierta y la tripulación…</p>}</div>}</div>;
+  return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label={t('Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.')}>{t('Tu navegador necesita soporte Canvas para mostrar la nave.')}</canvas>
+    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{t(speech)}</span></p>}
+    {!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>{t('Reintentar carga')}</button></> : <p>{t('Preparando la cubierta y la tripulación…')}</p>}</div>}</div>;
 }

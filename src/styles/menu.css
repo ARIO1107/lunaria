@@ -34,6 +34,29 @@
   filter: drop-shadow(0 0 5px #39ff1440);
   clip-path: polygon(0 30px, 30px 0, calc(100% - 30px) 0, 100% 30px, 100% calc(100% - 30px), calc(100% - 30px) 100%, 30px 100%, 0 calc(100% - 30px), 0 30px, 2px 31px, 2px calc(100% - 31px), 31px calc(100% - 2px), calc(100% - 31px) calc(100% - 2px), calc(100% - 2px) calc(100% - 31px), calc(100% - 2px) 31px, calc(100% - 31px) 2px, 31px 2px, 2px 31px);
 }
+.terminal-lang {
+  position: absolute;
+  z-index: 3;
+  top: 26px;
+  left: clamp(34px, 3.6vw, 72px);
+  display: flex;
+  gap: 8px;
+}
+.terminal-lang button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line-green);
+  background: #031411f0;
+  color: var(--lime);
+  font: inherit;
+  letter-spacing: .08em;
+}
+.terminal-lang button[aria-pressed="true"] { background: var(--lime); color: #020b03; }
+.terminal-lang button:focus-visible { outline: 2px solid #f5f5f5; outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .terminal-lang button:hover:not([aria-pressed="true"]) { background: #0c2a18; }
+}
 .terminal-version { position: absolute; top: 30px; right: clamp(34px, 3.6vw, 72px); color: var(--lime); font-size: .9em; }
 .terminal-status {
   position: absolute;
@@ -209,6 +232,7 @@
     background: linear-gradient(90deg, #020807b2, #02080728 83%), linear-gradient(0deg, #020807, transparent 38%), var(--lunar-image) 19% center / cover no-repeat;
   }
   .terminal-frame { inset: 8px; }
+  .terminal-lang { top: 14px; left: 22px; }
   .terminal-version { top: 18px; right: 24px; }
   .terminal-status { top: 42px; right: 24px; font-size: .7em; }
   .terminal-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "buttons" "mission"; gap: 23px; }

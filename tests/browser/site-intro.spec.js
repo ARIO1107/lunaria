@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const introMenu = page => page.getByRole('button', { name: 'Jugar', exact: true });
+const introMenu = page => page.getByRole('button', { name: 'Play', exact: true });
 
 test('the actual logo video ends before the main menu opens', async ({ page }) => {
   await page.goto('/');
@@ -38,10 +38,10 @@ test('the menu melody starts after interaction and stops on mute', async ({ page
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Omitir intro' }).click();
-  await page.getByRole('button', { name: 'Configuración' }).click();
+  await page.getByRole('button', { name: 'Skip intro' }).click();
+  await page.getByRole('button', { name: 'Settings' }).click();
   await expect.poll(() => page.evaluate(() => window.menuAudio.starts)).toBe(1);
-  await page.getByRole('checkbox', { name: /silenciar/i }).check();
+  await page.getByRole('checkbox', { name: /mute/i }).check();
   await expect.poll(() => page.evaluate(() => window.menuAudio.stops)).toBe(1);
 });
 

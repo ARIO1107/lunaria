@@ -7,6 +7,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import TitusDialogue from './TitusDialogue.jsx';
 import CheckIcon from './CheckIcon.jsx';
 import { playSound } from '../audio/audioManager.js';
+import { t } from '../i18n/translate.js';
 
 const H = nasaTelemetry.launch.verified;
 function Meter({ label, value, display, danger = false, safeLimit }) {
@@ -41,45 +42,45 @@ export default function LaunchPanel({ flight, setFlight, onFinish, onClose }) {
 
   if (done) return <div className="result-panel">
     <div className={`result-symbol ${flight.status}`} aria-hidden="true">{flight.status === 'success' ? <CheckIcon /> : '↻'}</div>
-    <h3>{flight.status === 'success' ? 'Primera etapa. Gran paso.' : 'Cada intento te enseña algo.'}</h3>
-    <p>{guidance.text}</p>
-    <section className="telemetry-card"><h3>Telemetría Real NASA</h3><p>Apolo 11 · 16 de julio de 1969. Tu vuelo es una simulación acelerada ×{GAME_TUNING.missionTimeScale}.</p>
-      <table><thead><tr><th>Evento</th><th>Apolo 11</th><th>Tu simulación</th></tr></thead><tbody>
-        <tr><td>Max Q</td><td>T+{missionClock(H.maxQTimeS)}</td><td>{flight.time >= H.maxQTimeS ? 'Atravesado' : 'No alcanzado'}</td></tr>
-        <tr><td>Apagado central</td><td>T+{missionClock(H.centerEngineCutoffTimeS)}</td><td>{flight.cutoffTime === null ? 'Sin ejecutar' : `T+${missionClock(flight.cutoffTime)}`}</td></tr>
-        <tr><td>Separación S-IC</td><td>T+{missionClock(H.separationTimeS)}</td><td>{flight.separationTime === null ? 'Sin ejecutar' : `T+${missionClock(flight.separationTime)}`}</td></tr>
+    <h3>{flight.status === 'success' ? t('Primera etapa. Gran paso.') : t('Cada intento te enseña algo.')}</h3>
+    <p>{t(guidance.text)}</p>
+    <section className="telemetry-card"><h3>{t('Telemetría Real NASA')}</h3><p>{t('Apolo 11 · 16 de julio de 1969. Tu vuelo es una simulación acelerada ×{scale}.', { scale: GAME_TUNING.missionTimeScale })}</p>
+      <table><thead><tr><th>{t('Evento')}</th><th>{t('Apolo 11')}</th><th>{t('Tu simulación')}</th></tr></thead><tbody>
+        <tr><td>{t('Max Q')}</td><td>T+{missionClock(H.maxQTimeS)}</td><td>{flight.time >= H.maxQTimeS ? t('Atravesado') : t('No alcanzado')}</td></tr>
+        <tr><td>{t('Apagado central')}</td><td>T+{missionClock(H.centerEngineCutoffTimeS)}</td><td>{flight.cutoffTime === null ? t('Sin ejecutar') : `T+${missionClock(flight.cutoffTime)}`}</td></tr>
+        <tr><td>{t('Separación S-IC')}</td><td>T+{missionClock(H.separationTimeS)}</td><td>{flight.separationTime === null ? t('Sin ejecutar') : `T+${missionClock(flight.separationTime)}`}</td></tr>
       </tbody></table>
-      <p>Máxima aceleración histórica: {H.peakAccelerationG} g. La carga y el calor del juego son indicadores normalizados, no mediciones históricas.</p>
-      <a href={nasaTelemetry.launch.source.url} target="_blank" rel="noreferrer">Consultar cronología oficial NASA ↗</a>
+      <p>{t('Máxima aceleración histórica: {g} g. La carga y el calor del juego son indicadores normalizados, no mediciones históricas.', { g: H.peakAccelerationG })}</p>
+      <a href={nasaTelemetry.launch.source.url} target="_blank" rel="noreferrer">{t('Consultar cronología oficial NASA ↗')}</a>
     </section>
-    <div className="flex flex-wrap gap-3"><button className="primary-button" onClick={() => { if (flight.status === 'success') onFinish(); else onClose(); }}>{flight.status === 'success' ? 'Ver el despegue' : 'Volver a la nave'}</button>
-      <button className="secondary-button" onClick={() => { action('reset'); setPaused(false); }}>Repetir entrenamiento</button></div>
+    <div className="flex flex-wrap gap-3"><button className="primary-button" onClick={() => { if (flight.status === 'success') onFinish(); else onClose(); }}>{flight.status === 'success' ? t('Ver el despegue') : t('Volver a la nave')}</button>
+      <button className="secondary-button" onClick={() => { action('reset'); setPaused(false); }}>{t('Repetir entrenamiento')}</button></div>
   </div>;
 
   const inMaxQ = flight.time >= GAME_TUNING.maxQStartS && flight.time <= GAME_TUNING.maxQEndS;
   const canCut = flight.status === 'flying' && flight.time >= H.centerEngineCutoffTimeS && !flight.centerOff && !paused;
   const canSeparate = flight.status === 'flying' && flight.centerOff && flight.time >= H.separationTimeS && !paused;
   return <div className="launch-panel">
-    <div className="launch-topline"><span>Nivel 1 · Secuencia de ascenso S-IC</span><strong className="mission-clock">T+{missionClock(flight.time)}</strong><span>Tiempo ×{GAME_TUNING.missionTimeScale}</span></div>
-    <div className="launch-grid"><div className="rocket-view"><canvas ref={canvas} aria-label="Animación esquemática del Saturno V" /><div className="engine-readout">Motores F-1 <strong>{flight.status === 'ready' ? '0' : flight.centerOff ? '4' : '5'} / 5</strong></div></div>
+    <div className="launch-topline"><span>{t('Nivel 1 · Secuencia de ascenso S-IC')}</span><strong className="mission-clock">T+{missionClock(flight.time)}</strong><span>{t('Tiempo ×{scale}', { scale: GAME_TUNING.missionTimeScale })}</span></div>
+    <div className="launch-grid"><div className="rocket-view"><canvas ref={canvas} aria-label={t('Animación esquemática del Saturno V')} /><div className="engine-readout">{t('Motores F-1')} <strong>{flight.status === 'ready' ? '0' : flight.centerOff ? '4' : '5'} / 5</strong></div></div>
       <div className="flight-controls">
-        <div className="flight-state"><span>{paused ? 'Simulación en pausa' : flight.status === 'ready' ? 'Esperando encendido' : canSeparate ? 'Separación disponible' : inMaxQ ? 'Zona Max Q' : 'Ascenso en curso'}</span><span className="status-light" /></div>
-        <Meter label="Carga aerodinámica" value={flight.pressure} display={`${Math.round(flight.pressure * 100)} %`} danger={flight.pressure > .7} safeLimit={.7} />
-        <small>Zona segura: hasta 70 %. Indicador de juego.</small>
-        <Meter label="Estrés del vehículo" value={flight.heat / 100} display={`${Math.round(flight.heat)} / 100`} danger={flight.heat > 70} />
-        <div className="acceleration"><span>Aceleración simulada</span><strong>{flight.acceleration.toFixed(1)} <small>g</small></strong></div>
-        <label className="throttle-label" htmlFor="throttle">Acelerador <strong>{Math.round(flight.throttle * 100)} %</strong></label>
+        <div className="flight-state"><span>{t(paused ? 'Simulación en pausa' : flight.status === 'ready' ? 'Esperando encendido' : canSeparate ? 'Separación disponible' : inMaxQ ? 'Zona Max Q' : 'Ascenso en curso')}</span><span className="status-light" /></div>
+        <Meter label={t('Carga aerodinámica')} value={flight.pressure} display={`${Math.round(flight.pressure * 100)} %`} danger={flight.pressure > .7} safeLimit={.7} />
+        <small>{t('Zona segura: hasta 70 %. Indicador de juego.')}</small>
+        <Meter label={t('Estrés del vehículo')} value={flight.heat / 100} display={`${Math.round(flight.heat)} / 100`} danger={flight.heat > 70} />
+        <div className="acceleration"><span>{t('Aceleración simulada')}</span><strong>{flight.acceleration.toFixed(1)} <small>g</small></strong></div>
+        <label className="throttle-label" htmlFor="throttle">{t('Acelerador')} <strong>{Math.round(flight.throttle * 100)} %</strong></label>
         <input id="throttle" type="range" min="35" max="100" step="1" value={Math.round(flight.throttle * 100)} disabled={flight.status !== 'flying' || paused} onChange={e => action('throttle', Number(e.target.value) / 100)} />
-        <div className="throttle-presets"><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', .6)}>60 % · Max Q</button><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', 1)}>100 % · Ascenso</button></div>
+        <div className="throttle-presets"><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', .6)}>{t('60 % · Max Q')}</button><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', 1)}>{t('100 % · Ascenso')}</button></div>
         <div className="launch-actions">
-          {flight.status === 'ready' ? <button className="primary-button" onClick={() => { playSound('launch'); action('ignite'); }}>Encender motores</button> : <button className="secondary-button" onClick={() => { playSound('click'); setPaused(!paused); }}>{paused ? 'Reanudar vuelo' : 'Pausar vuelo'}</button>}
-          <button className={canCut ? 'primary-button' : 'secondary-button'} disabled={!canCut} onClick={() => { playSound('beep'); action('cutoff'); }}>{flight.centerOff ? 'Motor central apagado' : 'Apagar motor central'}</button>
-          <button className={canSeparate ? 'primary-button' : 'secondary-button'} disabled={!canSeparate} onClick={() => { playSound('stage'); action('separate'); }}>Separar etapa</button>
+          {flight.status === 'ready' ? <button className="primary-button" onClick={() => { playSound('launch'); action('ignite'); }}>{t('Encender motores')}</button> : <button className="secondary-button" onClick={() => { playSound('click'); setPaused(!paused); }}>{paused ? t('Reanudar vuelo') : t('Pausar vuelo')}</button>}
+          <button className={canCut ? 'primary-button' : 'secondary-button'} disabled={!canCut} onClick={() => { playSound('beep'); action('cutoff'); }}>{flight.centerOff ? t('Motor central apagado') : t('Apagar motor central')}</button>
+          <button className={canSeparate ? 'primary-button' : 'secondary-button'} disabled={!canSeparate} onClick={() => { playSound('stage'); action('separate'); }}>{t('Separar etapa')}</button>
         </div>
-        <small>Apagado desde 02:15 · Separación desde 02:42. Cerrar el panel pausa el vuelo.</small>
+        <small>{t('Apagado desde 02:15 · Separación desde 02:42. Cerrar el panel pausa el vuelo.')}</small>
       </div>
     </div>
     <TitusDialogue mood={guidance.mood}>{guidance.text}</TitusDialogue>
-    <p className="simulation-note">Adaptación educativa: el Saturno V real no tenía este acelerador manual. Completar S-IC no equivale aún a alcanzar órbita.</p>
+    <p className="simulation-note">{t('Adaptación educativa: el Saturno V real no tenía este acelerador manual. Completar S-IC no equivale aún a alcanzar órbita.')}</p>
   </div>;
 }

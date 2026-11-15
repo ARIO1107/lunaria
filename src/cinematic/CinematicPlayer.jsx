@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { cardAt, durationOf, fadeAt, lineAt } from './script.js';
+import { t } from '../i18n/translate.js';
 import './cinematic.css';
 
 export default function CinematicPlayer({ sequence = 'opening', onComplete, reducedMotion = false, volume = 70, soundEnabled = true, quality = 'alto' }) {
@@ -72,15 +73,15 @@ export default function CinematicPlayer({ sequence = 'opening', onComplete, redu
 
   const launchFilm = sequence === 'launch';
   return <div className="cinematic-root" data-cinematic-root data-sequence={sequence}>
-    <canvas ref={canvasRef} aria-label={launchFilm ? 'Cinemática tridimensional del despegue' : 'Cinemática tridimensional de apertura'} />
+    <canvas ref={canvasRef} aria-label={t(launchFilm ? 'Cinemática tridimensional del despegue' : 'Cinemática tridimensional de apertura')} />
     <div className={'cinematic-fade' + (ui.fade ? ' show' : '') + (ui.handoff ? ' handoff' : '')} />
-    {!ui.ready && !ui.error && <p className="cinematic-loading" role="status">Preparando la cinemática…</p>}
-    {ui.error && <p className="cinematic-loading" role="alert">{ui.error} {launchFilm ? 'Puedes ver el resumen de la misión.' : 'Puedes entrar directo a la nave.'}</p>}
-    {ui.lost && <p className="cinematic-loading" role="alert">El navegador perdió la imagen 3D.</p>}
-    {ui.card && <div className="cinematic-title"><p>{ui.card.kicker}</p><h1>{ui.card.title}</h1>{ui.card.detail && <span>{ui.card.detail}</span>}</div>}
-    {ui.line && <p className="cinematic-subtitle" role="status"><strong>{ui.line.speaker}</strong> {ui.line.text}</p>}
-    <p className="cinematic-note">{launchFilm ? 'Música y efectos del juego. En el vacío real el motor no se oye.' : 'Música y efectos del juego, en la plataforma de lanzamiento.'}</p>
-    <button className="secondary-button cinematic-skip" onClick={skip}>Omitir cinemática</button>
-    <span className="cinematic-hint">Esc · Omitir</span>
+    {!ui.ready && !ui.error && <p className="cinematic-loading" role="status">{t('Preparando la cinemática…')}</p>}
+    {ui.error && <p className="cinematic-loading" role="alert">{t(ui.error)} {t(launchFilm ? 'Puedes ver el resumen de la misión.' : 'Puedes entrar directo a la nave.')}</p>}
+    {ui.lost && <p className="cinematic-loading" role="alert">{t('El navegador perdió la imagen 3D.')}</p>}
+    {ui.card && <div className="cinematic-title"><p>{t(ui.card.kicker)}</p><h1>{t(ui.card.title)}</h1>{ui.card.detail && <span>{t(ui.card.detail)}</span>}</div>}
+    {ui.line && <p className="cinematic-subtitle" role="status"><strong>{ui.line.speaker}</strong> {t(ui.line.text)}</p>}
+    <p className="cinematic-note">{t(launchFilm ? 'Música y efectos del juego. En el vacío real el motor no se oye.' : 'Música y efectos del juego, en la plataforma de lanzamiento.')}</p>
+    <button className="secondary-button cinematic-skip" onClick={skip}>{t('Omitir cinemática')}</button>
+    <span className="cinematic-hint">{t('Esc · Omitir')}</span>
   </div>;
 }

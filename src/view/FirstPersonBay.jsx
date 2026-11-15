@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { t } from '../i18n/translate.js';
 
 export default function FirstPersonBay({ stationId, vista, reduced = false, quality = 'alto', caption = '' }) {
   const canvasRef = useRef(null);
@@ -17,7 +18,7 @@ export default function FirstPersonBay({ stationId, vista, reduced = false, qual
     };
   }, [stationId, vista, reduced, quality]);
   return <div className="fp-bay">
-    {failed ? <p>La vista de la cabina no pudo iniciarse. Puedes seguir la tarea en el panel.</p> : <canvas key={`${stationId}-${vista}-${quality}`} ref={canvasRef} aria-label="Vista en primera persona desde la consola de Alex" />}
-    {caption && <p className="fp-speech">{caption}</p>}
+    {failed ? <p>{t('La vista de la cabina no pudo iniciarse. Puedes seguir la tarea en el panel.')}</p> : <canvas key={`${stationId}-${vista}-${quality}`} ref={canvasRef} aria-label={t('Vista en primera persona desde la consola de Alex')} />}
+    {caption && <p className="fp-speech">{t(caption)}</p>}
   </div>;
 }

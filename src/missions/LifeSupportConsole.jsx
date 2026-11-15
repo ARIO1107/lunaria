@@ -3,6 +3,7 @@ import { stationDescriptions } from '../data/stationDescriptions.js';
 import { createLifeSupport, lifeProblem, lifeReadout, LIFE_READY } from '../game/lifeSupport.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { playSound } from '../audio/audioManager.js';
+import { t } from '../i18n/translate.js';
 
 const INTRO = 'Observa el diagrama. ¿Qué sucede si el aire no circula?';
 
@@ -56,9 +57,9 @@ export default function LifeSupportConsole({ onAnswer }) {
   }
 
   return <div className={'eclss' + (readout.circulating ? ' eclss-live' : '') + (reduced ? ' eclss-still' : '')}>
-    <p className="eclss-speech" role="status"><b>Titus. </b>{speech}</p>
+    <p className="eclss-speech" role="status"><b>Titus. </b>{t(speech)}</p>
     <div className="eclss-layout">
-      <svg className="eclss-diagram" viewBox="0 0 360 280" role="img" aria-label="Diagrama de circulación del aire">
+      <svg className="eclss-diagram" viewBox="0 0 360 280" role="img" aria-label={t('Diagrama de circulación del aire')}>
         <rect x="8" y="8" width="344" height="264" rx="16" className="eclss-board" />
         <g className={rig.valve && rig.fan ? 'eclss-pipe' : 'eclss-pipe eclss-pipe-off'}>
           <path d="M70 78 H150 V150 H250 V78 H300" />
@@ -72,43 +73,43 @@ export default function LifeSupportConsole({ onAnswer }) {
         </g>
         <g className={'eclss-part' + (rig.valve ? ' is-on' : '')} transform="translate(132 62)">
           <rect width="36" height="28" rx="6" />
-          <text x="18" y="18">Válvula</text>
+          <text x="18" y="18">{t('Válvula')}</text>
         </g>
         <g className={'eclss-part' + (rig.fan ? ' is-on' : '')} transform="translate(210 128)">
           <circle cx="22" cy="22" r="20" />
-          <text x="22" y="26">Aire</text>
+          <text x="22" y="26">{t('Aire')}</text>
         </g>
         <g className={'eclss-part' + (rig.scrubber ? ' is-on' : '')} transform="translate(78 196)">
           <rect width="92" height="32" rx="6" />
-          <text x="46" y="20">Quitar CO₂</text>
+          <text x="46" y="20">{t('Quitar CO₂')}</text>
         </g>
         <g className="eclss-cabin">
           <rect x="228" y="40" width="96" height="70" rx="8" />
-          <text x="276" y="80">Cabina</text>
+          <text x="276" y="80">{t('Cabina')}</text>
         </g>
       </svg>
-      <section className="eclss-screen" aria-label="Panel de diagnóstico">
+      <section className="eclss-screen" aria-label={t('Panel de diagnóstico')}>
         <div className="eclss-gauge">
           <b>{readout.supply}%</b>
-          <span>Suministro</span>
+          <span>{t('Suministro')}</span>
         </div>
         <ul>
-          <li>Presión de juego: estable</li>
-          <li>Capacidad de juego: depósitos a bordo</li>
-          <li>Flujo: {rig.fan ? (rig.valve ? 'circulando' : 'solo recircula') : 'detenido'}</li>
+          <li>{t('Presión de juego: estable')}</li>
+          <li>{t('Capacidad de juego: depósitos a bordo')}</li>
+          <li>{t('Flujo: ' + (rig.fan ? (rig.valve ? 'circulando' : 'solo recircula') : 'detenido'))}</li>
         </ul>
         <Meter label="O₂" value={readout.supply} tone="o2" />
         <Meter label="CO₂" value={readout.co2} tone="co2" />
-        <p>Indicadores de juego. No son una medición de una cabina real. Presión, cantidad de oxígeno y CO₂ son cosas distintas.</p>
+        <p>{t('Indicadores de juego. No son una medición de una cabina real. Presión, cantidad de oxígeno y CO₂ son cosas distintas.')}</p>
       </section>
     </div>
     <div className="eclss-controls">
-      <button type="button" className={rig.fan ? 'primary-button' : 'secondary-button'} onClick={() => toggle('fan')}>{rig.fan ? 'Ventilación activa' : 'Activar ventilación'}</button>
-      <button type="button" className={rig.valve ? 'primary-button' : 'secondary-button'} onClick={() => toggle('valve')}>{rig.valve ? 'Suministro abierto' : 'Abrir suministro de oxígeno'}</button>
-      <button type="button" className={rig.scrubber ? 'primary-button' : 'secondary-button'} onClick={() => toggle('scrubber')}>{rig.scrubber ? 'Eliminación de CO₂ activa' : 'Activar eliminación de CO₂'}</button>
-      <button type="button" className="secondary-button" disabled={testing} onClick={testSystem}>{testing ? 'Probando estabilidad…' : 'Probar estabilidad'}</button>
-      <button type="button" className="primary-button" disabled={!rig.stable || testing} onClick={() => onAnswer(LIFE_READY)}>Preparar soporte vital</button>
+      <button type="button" className={rig.fan ? 'primary-button' : 'secondary-button'} onClick={() => toggle('fan')}>{rig.fan ? t('Ventilación activa') : t('Activar ventilación')}</button>
+      <button type="button" className={rig.valve ? 'primary-button' : 'secondary-button'} onClick={() => toggle('valve')}>{rig.valve ? t('Suministro abierto') : t('Abrir suministro de oxígeno')}</button>
+      <button type="button" className={rig.scrubber ? 'primary-button' : 'secondary-button'} onClick={() => toggle('scrubber')}>{rig.scrubber ? t('Eliminación de CO₂ activa') : t('Activar eliminación de CO₂')}</button>
+      <button type="button" className="secondary-button" disabled={testing} onClick={testSystem}>{testing ? t('Probando estabilidad…') : t('Probar estabilidad')}</button>
+      <button type="button" className="primary-button" disabled={!rig.stable || testing} onClick={() => onAnswer(LIFE_READY)}>{t('Preparar soporte vital')}</button>
     </div>
-    {description && <a href={description.source} target="_blank" rel="noreferrer">Consultar referencia NASA</a>}
+    {description && <a href={description.source} target="_blank" rel="noreferrer">{t('Consultar referencia NASA')}</a>}
   </div>;
 }

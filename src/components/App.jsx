@@ -6,6 +6,8 @@ import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { campaignAtLevel, campaignReducer, createCampaign, readCampaign, saveCampaign } from '../game/campaign.js';
 import { readSettings, saveSettings } from '../game/session.js';
 import { configureAudio, startMenuBed, stopMenuBed, unlockAudio } from '../audio/audioManager.js';
+import { setLanguage } from '../i18n/language.js';
+import { applyDocumentLanguage } from '../i18n/translate.js';
 
 function SceneFade({ active }) {
   const previous = useRef(active);
@@ -62,6 +64,8 @@ export default function App() {
   }, [menuVisible, settings.soundEnabled]);
 
   function updateSettings(next) {
+    setLanguage(next.language);
+    applyDocumentLanguage();
     setSettings(next);
     saveSettings(next);
   }

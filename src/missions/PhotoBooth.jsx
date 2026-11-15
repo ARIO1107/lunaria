@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { PHOTO_ANSWER, frameStatus, photoMiss } from '../game/photoShot.js';
 import { playSound } from '../audio/audioManager.js';
+import { t } from '../i18n/translate.js';
 
 const empty = { ok: false, reason: 'fuera', names: [] };
 
@@ -51,15 +52,15 @@ export default function PhotoBooth({ onAnswer }) {
   }
 
   return <div className="tour">
-    <p className="eclss-speech" role="status"><b>Titus. </b>{line}</p>
+    <p className="eclss-speech" role="status"><b>Titus. </b>{t(line)}</p>
     <div className="photo-sky" data-framed={grade.ok ? 'si' : 'no'}>
       {failed
-        ? <p>La ventana no pudo abrirse. Cierra la consola y vuelve a inspeccionar la mira.</p>
-        : <canvas ref={canvasRef} aria-label="Ventana hacia los astros" />}
+        ? <p>{t('La ventana no pudo abrirse. Cierra la consola y vuelve a inspeccionar la mira.')}</p>
+        : <canvas ref={canvasRef} aria-label={t('Ventana hacia los astros')} />}
       <div className="photo-reticle" aria-hidden="true" />
     </div>
-    <p>{ready ? frameStatus(grade) : 'Abriendo la ventana…'}</p>
-    <button className="primary-button" type="button" disabled={!ready || failed} onClick={shoot}>Tomar foto</button>
-    <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noreferrer">Mapas planetarios de la NASA</a>
+    <p>{ready ? t(frameStatus(grade)) : t('Abriendo la ventana…')}</p>
+    <button className="primary-button" type="button" disabled={!ready || failed} onClick={shoot}>{t('Tomar foto')}</button>
+    <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noreferrer">{t('Mapas planetarios de la NASA')}</a>
   </div>;
 }

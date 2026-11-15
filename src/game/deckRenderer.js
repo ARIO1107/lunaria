@@ -1,3 +1,5 @@
+import { t } from '../i18n/translate.js';
+
 /** Canvas compositing of true 3D renders. Navigation remains in ground-plane units. */
 export const projectFloor = (deck, actor) => ({
   x: deck.origin.x + actor.x * deck.axisX.x + actor.y * deck.axisY.x,
@@ -127,7 +129,7 @@ export function drawDeck(ctx, width, height, state, art, zoom = 1) {
     const p = projectFloor(deck, { x: near.x + near.w / 2, y: near.y + near.h });
     ctx.strokeStyle = '#efd18c'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.ellipse(p.x, p.y + 5, near.w / 2 + 9, 10, 0, 0, Math.PI * 2); ctx.stroke();
-    const label = `E · ${near.short}`; ctx.font = '600 13px Segoe UI, sans-serif';
+    const label = t(`E · ${near.short}`); ctx.font = '600 13px Segoe UI, sans-serif';
     const labelW = ctx.measureText(label).width + 24;
     ctx.fillStyle = '#e9c989'; ctx.beginPath(); ctx.roundRect(pos.x - labelW / 2, pos.y - 105, labelW, 28, 4); ctx.fill();
     ctx.fillStyle = '#17252c'; ctx.textAlign = 'center'; ctx.fillText(label, pos.x, pos.y - 86);

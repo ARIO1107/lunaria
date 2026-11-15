@@ -1,4 +1,5 @@
-﻿import { canOccupy } from './world.js';
+﻿import { languageFromSettings } from '../i18n/language.js';
+import { canOccupy } from './world.js';
 
 const saveKey = 'lunaria.exploration';
 const settingsKey = 'lunaria.settings';
@@ -45,6 +46,7 @@ export function readSettings() {
     reducedMotion: data?.reducedMotion === true,
     soundEnabled: data?.soundEnabled !== false,
     graphics: data?.graphics === 'ajustado' ? 'ajustado' : 'alto',
+    language: languageFromSettings(data),
   };
 }
 
