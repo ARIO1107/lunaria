@@ -69,6 +69,27 @@
 .eclss-meter-co2 i { background: #2f6fbe; }
 .eclss-controls { display: flex; flex-wrap: wrap; gap: 8px; }
 @keyframes eclss-flow { to { stroke-dashoffset: -36; } }
+.tour { display: grid; gap: 12px; }
+.tour-sight { display: grid; justify-items: center; gap: 6px; }
+.tour-sight svg { width: min(240px, 100%); height: auto; }
+.tour-sight p, .tour p { margin: 0; }
+.tour-well { fill: #101820; stroke: #3d5360; }
+.tour-arc { fill: none; stroke: #3fbe86; stroke-width: 10; stroke-linecap: round; }
+.tour-path { stroke: #d7b15a; stroke-width: 3; stroke-dasharray: 6 4; }
+.tour-nose { fill: #e7f2ee; }
+.tour-hub { fill: #9be8f2; }
+.tour-sight text { fill: #d7b15a; font-size: 12px; font-family: "Segoe UI", sans-serif; }
+.tour-shelf, .tour-loads { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tour-shelf li, .tour-loads li { display: grid; gap: 4px; background: #121c22; border-radius: 8px; padding: 8px; }
+.tour-shelf button, .tour-loads button { justify-content: flex-start; text-align: left; }
+.tour-shelf button[aria-pressed="true"], .tour-loads button[aria-pressed="true"] { background: #1d6b52; color: #f4f7f6; }
+.tour-shelf span, .tour-loads b { color: var(--muted); font-size: 12px; font-weight: 500; }
+.tour-loads li { grid-template-columns: 1fr auto; align-items: center; }
+.tour-loads button { grid-column: 1 / -1; }
+.tour-loads li[data-on="false"] b { color: #e7b2a4; }
+.tour-gauges { display: flex; gap: 16px; }
+.tour-low { border-color: #d24b3a; }
+.tour-low span { color: #e7b2a4; }
 @media (max-width: 760px) {
   .eclss-layout { grid-template-columns: 1fr; }
 }

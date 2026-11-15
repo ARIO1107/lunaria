@@ -77,9 +77,9 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const seenGoals = useRef(campaign.completedObjectives.length);
   const alarmed = useRef(false);
   const reportRoom = useCallback(name => setRoom(name), []);
-  const oxygen = STATIONS.find(station => station.id === 'oxygen');
-  const guidePoint = campaign.currentLevel === 1 && task?.id === 'air'
-    ? { x: oxygen.x + oxygen.w / 2, y: oxygen.y + oxygen.h / 2 }
+  const targetStation = STATIONS.find(station => station.id === task?.stationId);
+  const guidePoint = targetStation
+    ? { x: targetStation.x + targetStation.w / 2, y: targetStation.y + targetStation.h / 2 }
     : null;
 
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);

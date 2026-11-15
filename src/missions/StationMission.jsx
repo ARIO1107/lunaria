@@ -4,22 +4,8 @@ import { stationDescriptions } from '../data/stationDescriptions.js';
 import LaunchPanel from '../components/LaunchPanel.jsx';
 import LifeSupportConsole from './LifeSupportConsole.jsx';
 import LandingPanel from './LandingPanel.jsx';
+import { BackupBoard, CabinAir, CoasSight, SignalRadio, SupplyLocker } from './ShipTour.jsx';
 import { playSound } from '../audio/audioManager.js';
-
-function Signal({ onAnswer }) {
-  const [channel, setChannel] = useState(1);
-  const [waiting, setWaiting] = useState(false);
-  const [message, setMessage] = useState('');
-  useEffect(() => {
-    if (!waiting) return;
-    const timer = setTimeout(() => { setWaiting(false); setMessage('Respuesta recibida. Señal registrada en la bitácora ficticia.'); onAnswer(channel); }, 2600);
-    return () => clearTimeout(timer);
-  }, [waiting]);
-  return <><label>Canal ficticio {channel}<input aria-label="Canal de señal" type="range" min="1" max="10" value={channel} disabled={waiting} onChange={e => setChannel(Number(e.target.value))} /></label>
-    <div className="signal-bars" aria-label={channel === 7 ? 'Señal fuerte' : 'Ruido'}>{channel === 7 ? '▂ ▆ ▂ ▆ ▂ ▆' : '▁ ▂ ▁ ▁ ▂ ▁'}</div>
-    <p>Modelo de ida y vuelta: 2 × 384.400 km / 299.792 km/s ≈ 2,6 s, sin demora humana. Es una aproximación con distancia media.</p>
-    <button className="primary-button" disabled={waiting} onClick={() => setWaiting(true)}>{waiting ? 'Esperando respuesta…' : 'Enviar y registrar'}</button><p role="status">{message}</p></>;
-}
 function Challenge({ task, state, dispatch, onClose }) {
   const [checks, setChecks] = useState([]);
   const [value, setValue] = useState(task.kind === 'alignment' ? 0 : '');
@@ -37,6 +23,11 @@ function Challenge({ task, state, dispatch, onClose }) {
     dispatch({ type: 'answer', id: task.id, stationId: task.stationId, value: payload });
   }
   if (task.kind === 'eclss') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><LifeSupportConsole onAnswer={answer} /></div>;
+  if (task.id === 'navigation') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><CoasSight onAnswer={answer} /></div>;
+  if (task.id === 'supplies') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><SupplyLocker onAnswer={answer} /></div>;
+  if (task.id === 'atmosphere') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><CabinAir onAnswer={answer} /></div>;
+  if (task.id === 'energy-tour') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><BackupBoard onAnswer={answer} /></div>;
+  if (task.id === 'signal') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><SignalRadio onAnswer={answer} /></div>;
   if (task.kind === 'launch') return <div className="beta-panel"><p>Centro de control ficticio: autorización concedida. Este simulador cubre la primera etapa, todavía en la plataforma. Al separarla, una película resume el ascenso hasta la órbita terrestre.</p>
     {state.flight.status === 'ready' && <button className="secondary-button" disabled={countdown !== null} onClick={() => setCountdown(3)}>{countdown !== null ? 'Cuenta regresiva ' + countdown : 'Cuenta regresiva de control'}</button>}
     <LaunchPanel flight={state.flight} setFlight={value => dispatch({ type: 'flight', value })} onFinish={() => answer(true)} onClose={onClose} />
@@ -48,7 +39,7 @@ function Challenge({ task, state, dispatch, onClose }) {
     {task.kind === 'alignment' && <><div className="orbit-diagram"><span>TIERRA</span><i style={{ transform: 'rotate(' + value + 'deg)' }}>↑</i><span>LUNA</span></div><label>Orientación {value}°<input type="range" aria-label="Orientación" min="0" max="180" value={value} onChange={e => setValue(Number(e.target.value))} /></label><p>Referencia objetivo: {task.answer}° · trayectoria esquemática.</p></>}
     {task.kind === 'allocation' && <>{Object.entries(allocation).map(([key, amount]) => <label key={key}>{({ life: 'Soporte vital', navigation: 'Navegación', propulsion: 'Propulsión', communication: 'Comunicaciones', research: 'Investigación' })[key]} <output>{amount}</output><input type="range" min="0" max="30" step="5" aria-label={key} value={amount} onChange={e => setAllocation(a => ({ ...a, [key]: Number(e.target.value) }))} /></label>)}<p>Total {Object.values(allocation).reduce((a,b) => a+b,0)} / 60 unidades de juego.</p></>}
     {stationDescriptions[task.stationId] && <a href={stationDescriptions[task.stationId].source} target="_blank" rel="noreferrer">Consultar referencia NASA</a>}
-    {task.kind === 'signal' ? <Signal onAnswer={answer} /> : <button className="primary-button" onClick={() => answer(task.kind === 'checks' ? checks : task.kind === 'allocation' ? allocation : task.kind === 'collect' ? true : value)}>{task.kind === 'collect' ? 'Recoger muestra etiquetada' : 'Confirmar decisión'}</button>}
+    <button className="primary-button" onClick={() => answer(task.kind === 'checks' ? checks : task.kind === 'allocation' ? allocation : task.kind === 'collect' ? true : value)}>{task.kind === 'collect' ? 'Recoger muestra etiquetada' : 'Confirmar decisión'}</button>
   </div>;
 }
 function FieldSample({ station, state, dispatch, onClose }) {
