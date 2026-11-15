@@ -1,4 +1,6 @@
-﻿const task = (id, stationId, title, kind, prompt, answer, options = []) => ({
+﻿import { PHOTO_ANSWER } from '../game/photoShot.js';
+
+const task = (id, stationId, title, kind, prompt, answer, options = []) => ({
   id, stationId, title, kind, prompt, answer, options,
   hint: prompt,
   why: 'Cada comprobación protege a la tripulación y prepara el siguiente paso.',
@@ -20,13 +22,14 @@ export const levels = [
   {
     id: 2, title: 'Conoce tu nave', subtitle: 'Preparando el viaje',
     intro: 'Estamos en vuelo hacia la Luna. Explora los sistemas, revisa el inventario y aprende a orientar la nave. Titus detecta una señal intermitente ficticia.',
-    summary: 'Orientación y trayectoria son conceptos diferentes. Registraste una señal ficticia de origen desconocido. Una advertencia independiente indica que el circuito de propulsión necesita mantenimiento.',
+    summary: 'Orientación y trayectoria son conceptos diferentes. Registraste una señal ficticia de origen desconocido. La foto de la Tierra quedó encuadrada. Una advertencia independiente indica que el circuito de propulsión necesita mantenimiento.',
     tasks: [
       task('navigation', 'coas', 'Orientar la referencia de navegación', 'alignment', 'Gira la mira hasta meter la proa en el arco verde, cerca de 45°. La flecha de trayectoria no se mueve.', 45),
       task('supplies', 'suit', 'Revisar suministros de emergencia', 'checks', 'Mete en la bolsa el agua, el botiquín y las herramientas. Deja fuera lo que no sea un suministro de emergencia.', ['Agua y alimentos', 'Botiquín', 'Herramientas y equipo científico'], ['Agua y alimentos', 'Botiquín', 'Herramientas y equipo científico']),
       task('atmosphere', 'oxygen', 'Distinguir presión y oxígeno', 'choice', 'La presión se mantiene, pero la reserva de oxígeno está baja. Abre la reserva y registra la lectura.', 'Reserva de oxígeno y composición del aire', ['Solo el indicador de presión', 'Reserva de oxígeno y composición del aire', 'El combustible del motor']),
       task('energy-tour', 'breakers', 'Revisar suministro eléctrico', 'choice', 'Da respaldo al aire y a la navegación. Corta el bus principal y comprueba qué sigue encendido.', 'Los sistemas esenciales', ['Solo la iluminación decorativa', 'Los sistemas esenciales', 'Ningún sistema']),
       task('signal', 'propulsion', 'Sintonizar y registrar la señal', 'signal', 'Busca el canal ficticio 7, envía y espera. Anota el mensaje y el aviso de mantenimiento, que es independiente.', 7),
+      task('photos', 'coas', 'Fotografiar la Tierra', 'photo', 'Por la ventana del puente pasan la Tierra, la Luna, Marte, Júpiter y una estrella, cada uno a su velocidad. Encuadra la Tierra sola en el marco y toma la foto.', PHOTO_ANSWER),
     ],
   },
   {

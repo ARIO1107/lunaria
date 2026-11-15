@@ -33,8 +33,8 @@ test('the ship tour tells orientation, supplies, air, power and signal apart', (
 
 test('Titus walks Alex through every level 2 station', () => {
   const tasks = levels[1].tasks;
-  assert.deepEqual(tasks.map(task => task.id), ['navigation', 'supplies', 'atmosphere', 'energy-tour', 'signal']);
-  const places = [/COAS/, /traje A7L/, /soporte vital/, /estación de energía/, /canal ficticio 7/];
+  assert.deepEqual(tasks.map(task => task.id), ['navigation', 'supplies', 'atmosphere', 'energy-tour', 'signal', 'photos']);
+  const places = [/COAS/, /traje A7L/, /soporte vital/, /estación de energía/, /canal ficticio 7/, /marco/];
   tasks.forEach((task, index) => {
     assert.match(titusBrief(task), /capitán Alex/);
     assert.match(titusBrief(task), places[index]);

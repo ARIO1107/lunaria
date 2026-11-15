@@ -38,6 +38,12 @@
   .fp-bay { height: 200px; }
   .fp-speech { font-size: 12px; }
 }
+.photo-sky { position: relative; height: 240px; background: #070b14; border-radius: 8px; overflow: hidden; }
+.photo-sky canvas { width: 100%; height: 100%; display: block; }
+.photo-sky p { margin: 0; padding: 16px; }
+.photo-reticle { position: absolute; left: 31%; top: 24%; width: 38%; height: 52%; border: 2px solid #d7b15a; pointer-events: none; }
+.photo-sky[data-framed="si"] .photo-reticle { border-color: #3fbe86; }
+@media (max-width: 760px) { .photo-sky { height: 180px; } }
 .system-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .system-pills span { font-size: 12px; padding: 5px 8px; border-radius: 99px; border: 1px solid #3d4c46; color: var(--muted); }
 .system-pills span[data-ready="true"] { color: #d7f3e4; border-color: #3f7d64; background: #173028; }

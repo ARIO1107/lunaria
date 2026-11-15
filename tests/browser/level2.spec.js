@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { skipSiteIntro } from './siteIntro.js';
 import { campaignAtLevel, campaignKey, campaignReducer } from '../../src/game/campaign.js';
 import { levels } from '../../src/data/levelDefinitions.js';
 
@@ -8,6 +9,7 @@ const spots = {
   atmosphere: { x: 480, y: 360 },
   'energy-tour': { x: 445, y: 120 },
   signal: { x: 230, y: 170 },
+  photos: { x: 860, y: 169 },
 };
 
 function readyFor(taskId) {
@@ -22,8 +24,10 @@ function readyFor(taskId) {
 
 async function openLevel(page, taskId) {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.evaluate(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), { key: campaignKey, value: readyFor(taskId) });
   await page.reload();
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0, { timeout: 30000 });
   const inspect = page.getByRole('button', { name: 'Inspeccionar equipo' });
@@ -32,6 +36,7 @@ async function openLevel(page, taskId) {
 }
 
 test('level 2 consoles guide Alex from the sight to the signal', async ({ page }) => {
+  test.setTimeout(180000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
 
@@ -76,7 +81,41 @@ test('level 2 consoles guide Alex from the sight to the signal', async ({ page }
   await page.getByRole('button', { name: 'Enviar y esperar' }).click();
   await expect(page.getByText(/Origen desconocido/)).toBeVisible({ timeout: 8000 });
   await page.getByRole('button', { name: 'Anotar en la bitácora' }).click();
+  await expect(page.locator('.crew-card')).toContainText('marco');
+
+  await openLevel(page, 'photos');
+  await expect(page.locator('.crew-card')).toContainText('Mira de alineación COAS');
+  await expect(page.locator('.crew-card')).toContainText('Tomar foto');
+  await expect(page.locator('.fp-bay canvas')).toHaveAttribute('data-vista', 'space');
+  await expect(page.locator('.photo-sky canvas')).toHaveAttribute('data-ready', 'si', { timeout: 20000 });
+  await page.screenshot({ path: 'test-results/photo-1440.png' });
+  const shoot = page.locator('.beta-panel').getByRole('button', { name: 'Tomar foto' });
+  if (await page.locator('.photo-sky').getAttribute('data-framed') !== 'si') {
+    await shoot.click();
+    await expect(page.locator('.eclss-speech')).toContainText(/no está entera|también salió|salieron/);
+  }
+  await expect(page.locator('.photo-sky')).toHaveAttribute('data-framed', 'si', { timeout: 20000 });
+  await shoot.click();
   await expect(page.getByRole('heading', { name: 'Conoce tu nave' })).toBeVisible();
   await expect(page.getByText(/señal ficticia/)).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test('the photo window stays usable on a narrow deck', async ({ page }) => {
+  await page.setViewportSize({ width: 760, height: 900 });
+  await openLevel(page, 'photos');
+  const sky = page.locator('.photo-sky');
+  await expect(sky.locator('canvas')).toHaveAttribute('data-ready', 'si', { timeout: 20000 });
+  const shoot = page.locator('.beta-panel').getByRole('button', { name: 'Tomar foto' });
+  await expect(shoot).toBeEnabled();
+  const box = await sky.boundingBox();
+  expect(box.height).toBeGreaterThan(140);
+  await page.screenshot({ path: 'test-results/photo-760.png' });
+  if (await sky.getAttribute('data-framed') !== 'si') {
+    await shoot.click();
+    await expect(page.locator('.eclss-speech')).toContainText(/no está entera|también salió|salieron/);
+  }
+  await expect(sky).toHaveAttribute('data-framed', 'si', { timeout: 20000 });
+  await shoot.click();
+  await expect(page.getByRole('heading', { name: 'Conoce tu nave' })).toBeVisible();
 });

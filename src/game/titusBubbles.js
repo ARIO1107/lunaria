@@ -11,6 +11,7 @@ const shorts = {
   atmosphere: 'Capitán Alex, volvamos a soporte vital. Mira la reserva de oxígeno, no solo la presión.',
   'energy-tour': 'Capitán Alex, a la estación de energía: respaldo para el aire y la navegación.',
   signal: 'Capitán Alex, al panel de propulsión. Busca el canal ficticio 7.',
+  photos: 'Capitán Alex, volvamos a la mira COAS. Encuadra la Tierra sola en el marco y pulsa Tomar foto.',
   diagnose: 'Capitán Alex, a la estación de energía. La lámpara roja marca el circuito averiado.',
   isolate: 'Capitán Alex, sigue en energía. Baja el disyuntor antes de tocar la pieza.',
   replace: 'Capitán Alex, al traje. En la bandeja está el fusible compatible.',
