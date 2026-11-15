@@ -45,7 +45,7 @@ test('preferences and exploration progress survive a reload', async ({ page }) =
   await page.keyboard.down('ArrowRight');
   await page.clock.runFor(2400);
   await page.keyboard.up('ArrowRight');
-  await expect(page.locator('.map-toolbar')).toContainText('Cabina de mando');
+  await expect(page.locator('.map-toolbar')).toContainText('Puente de mando');
   await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
   await page.reload();
   await page.getByRole('button', { name: 'Configuración' }).click();
@@ -53,7 +53,7 @@ test('preferences and exploration progress survive a reload', async ({ page }) =
   await expect(page.getByRole('slider', { name: 'Volumen general' })).toHaveValue('100');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
-  await expect(page.locator('.map-toolbar')).toContainText('Cabina de mando', { timeout: 30000 });
+  await expect(page.locator('.map-toolbar')).toContainText('Puente de mando', { timeout: 30000 });
   await expect(page.locator('.zoom-controls')).toContainText('130 %');
 });
 

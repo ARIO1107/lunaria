@@ -6,7 +6,7 @@ import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 
 const MOVEMENT = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
-export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false }) {
+export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false, grounded = false, guidePoint = null }) {
   const canvasRef = useRef(null);
   const keys = useRef(new Set());
   const state = useRef(null);
@@ -70,7 +70,8 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
       if (canOccupy(candidate.x, candidate.y, 12)) s.titus = candidate;
       else s.titus = moveActor(s.titus, s.player.x - s.titus.x, s.player.y - s.titus.y, dt * .8);
       const distance = Math.hypot(s.player.x - s.titus.x, s.player.y - s.titus.y);
-      if (distance > 35) s.titus.angle = Math.atan2(s.player.x - s.titus.x, s.player.y - s.titus.y);
+      if (guidePoint) s.titus.angle = Math.atan2(guidePoint.x - s.titus.x, guidePoint.y - s.titus.y);
+      else if (distance > 35) s.titus.angle = Math.atan2(s.player.x - s.titus.x, s.player.y - s.titus.y);
     }
     const near = nearestStation(s.player);
     const room = roomAt(s.player);
@@ -78,7 +79,8 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
     if (room !== s.room) { s.room = room; onRoom(room); }
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: !reduced && Boolean(dx || dy), titusMood, emergency }, art, zoom);
+    canvas.dataset.sky = grounded ? 'pad' : 'space';
+    drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: !reduced && Boolean(dx || dy), titusMood, emergency, grounded }, art, zoom);
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>{!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>Reintentar carga</button></> : <p>Preparando la cubierta y la tripulación…</p>}</div>}</div>;
 }

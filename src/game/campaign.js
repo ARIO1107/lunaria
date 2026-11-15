@@ -1,4 +1,5 @@
 ﻿import { levelById, nextObjective } from '../data/levelDefinitions.js';
+import { howTo, titusBrief } from './titusGuide.js';
 import { newBase, applyOperation, advanceCycle } from './resourceEngine.js';
 import { createLaunch } from './launchSimulation.js';
 import { createLanding } from './landingSimulation.js';
@@ -46,7 +47,7 @@ export function readCampaign() {
 export function validateCampaign(data) {
   if (!data || data.version !== 1 || !Number.isInteger(data.currentLevel) || data.currentLevel < 1 || data.currentLevel > 6) return null;
   const base = createCampaign();
-  const phases = ['cinematic', 'briefing', 'active', 'complete', 'failed'];
+  const phases = ['cinematic', 'launchCinematic', 'briefing', 'active', 'complete', 'failed'];
   if (!phases.includes(data.phase) || !Array.isArray(data.completedLevels) || !Array.isArray(data.completedObjectives)) return null;
   if (data.currentLevel > 1 && !Array.from({ length: data.currentLevel - 1 }, (_, i) => i + 1).every(id => data.completedLevels.includes(id))) return null;
   for (const group of ['ship', 'lander', 'base']) {
@@ -81,6 +82,7 @@ export function saveCampaign(state) {
 }
 function correct(task, value) {
   if (task.kind === 'checks') return Array.isArray(value) && task.answer.every(item => value.includes(item));
+  if (task.kind === 'eclss') return value === task.answer;
   if (task.kind === 'alignment') return Number.isFinite(value) && Math.abs(value - task.answer) <= 5;
   if (task.kind === 'allocation') return value && Object.values(value).every(v => Number.isFinite(v) && v >= 0) &&
     Object.values(value).reduce((a, b) => a + b, 0) <= 60 && value.life >= 20 && value.navigation >= 15 && value.propulsion >= 20;
@@ -93,11 +95,17 @@ export function campaignReducer(state, action) {
   if (!state) return state;
   if (action.type === 'cinematicDone' && state.phase === 'cinematic') {
     const next = { ...state, phase: 'active', flags: { ...state.flags, boarded: true },
-      message: 'Titus: Buenos días, comandante. Empieza por el monitor de soporte vital y comprueba el aire.' };
+      message: 'Titus: ¡Alex! Antes del lanzamiento tenemos que preparar los sistemas de la nave. Comencemos por soporte vital.' };
     return { ...next, checkpoint: cloneCheckpoint(next) };
   }
+  if (action.type === 'launchCinematicDone' && state.phase === 'launchCinematic') {
+    return { ...state, phase: 'complete', completedLevels: [...new Set([...state.completedLevels, state.currentLevel])],
+      message: 'Titus: Primera misión completa. Estamos en órbita terrestre.' };
+  }
   if (action.type === 'begin' && state.phase === 'briefing') {
-    const next = { ...state, phase: 'active', message: '' };
+    const active = { ...state, phase: 'active' };
+    const task = nextObjective(active);
+    const next = { ...active, message: titusBrief(task) };
     return { ...next, checkpoint: cloneCheckpoint(next) };
   }
   if (action.type === 'continueOps' && state.phase === 'complete' && state.currentLevel === 6) {
@@ -138,12 +146,17 @@ export function campaignReducer(state, action) {
       resources: { ...state.resources, base: { ...state.resources.base, energy: state.resources.base.energy - 8, science: state.resources.base.science + 1 } },
       message: 'Análisis registrado. Consulta la bitácora científica.' };
   }
+  if (action.type === 'guide' && state.phase === 'active' && typeof action.id === 'string' && typeof action.message === 'string') {
+    const seen = Array.isArray(state.flags.guides) ? state.flags.guides : [];
+    if (seen.includes(action.id)) return state;
+    return { ...state, message: action.message, flags: { ...state.flags, guides: [...seen, action.id] } };
+  }
   if (action.type !== 'answer') return state;
   const task = nextObjective(state);
   if (!task || action.id !== task.id || action.stationId !== task.stationId) return { ...state, message: 'Completa primero el objetivo activo en su estación.' };
   const valid = task.kind === 'launch' ? state.flight.status === 'success' :
     task.kind === 'landing' ? state.landing.status === 'success' : correct(task, action.value);
-  if (!valid) return { ...state, message: 'Titus: revisa las pistas del panel. Esa decisión no cumple los requisitos. Puedes volver a intentarlo.', flags: { ...state.flags, lastError: task.id } };
+  if (!valid) return { ...state, message: 'Titus: Esa decisión no cumple el procedimiento. ' + howTo(task), flags: { ...state.flags, lastError: task.id } };
   let next = { ...state, completedObjectives: [...state.completedObjectives, task.id], message: 'Objetivo completado: ' + task.title, flags: { ...state.flags, lastError: null } };
   if (task.id === 'site') next = { ...next, site: action.value, landing: createLanding(action.value), resources: { ...next.resources, base: newBase(action.value) } };
   if (task.id === 'allocation') next = { ...next, resources: { ...next.resources, ship: { ...next.resources.ship, energy: 60 - Object.values(action.value).reduce((a,b) => a+b,0) } }, flags: { ...next.flags, allocation: action.value } };
@@ -154,6 +167,17 @@ export function campaignReducer(state, action) {
   if (task.id === 'water') next = { ...next, resources: { ...next.resources, base: { ...next.resources.base, energy: Math.max(0, next.resources.base.energy - 6), water: Math.min(100, next.resources.base.water + 10), wasteWater: Math.max(0, next.resources.base.wasteWater - 10) } } };
   if (task.id === 'sample') next = { ...next, collectedSamples: [{ id: 'regolith', analyzed: false, location: 'Zona de regolito' }] };
   if (task.id === 'analysis') next = { ...next, collectedSamples: next.collectedSamples.map(s => ({ ...s, analyzed: true })), resources: { ...next.resources, base: { ...next.resources.base, energy: next.resources.base.energy - 8, science: 1 } } };
+  if (task.id === 'launch' && state.currentLevel === 1) {
+    return { ...next, phase: 'launchCinematic', message: 'Titus: Sistemas listos. Empieza la secuencia de lanzamiento.' };
+  }
+  if (task.id === 'air') next = { ...next, message: 'Titus: ¡Excelente! El soporte vital está preparado. Ahora iremos a comprobar la energía.' };
+  else {
+    const upcoming = nextObjective(next);
+    if (upcoming) {
+      const brief = titusBrief(upcoming);
+      next = { ...next, message: state.currentLevel === 1 ? 'Titus: La nave sigue en la plataforma. ' + brief.replace(/^Titus:\s*/, '') : brief };
+    } else if (state.currentLevel === 1) next = { ...next, message: 'Titus: Listo. La nave sigue en la plataforma. Seguimos preparando el despegue.' };
+  }
   if (!nextObjective(next)) next = { ...next, phase: 'complete', completedLevels: [...new Set([...next.completedLevels, state.currentLevel])] };
   return next;
 }

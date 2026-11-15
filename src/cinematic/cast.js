@@ -114,7 +114,7 @@ export function yawToward(from, to) {
   return Math.atan2(-(to[0] - from[0]), -(to[2] - from[2]));
 }
 
-export function applyCast(astronaut, titus, state, time) {
+export function applyCast(astronaut, titus, state, time, sequence = 'opening') {
   const alex = state.astronaut;
   astronaut.root.position.set(alex.x, alex.y, alex.z);
   astronaut.root.rotation.y = 0;
@@ -127,17 +127,17 @@ export function applyCast(astronaut, titus, state, time) {
   astronaut.legR.rotation.x = sit * 1.15 - (1 - sit) * swing * .4;
   astronaut.legL.joint.rotation.x = -sit * 1.45 - (1 - sit) * Math.max(0, -swing) * .5;
   astronaut.legR.joint.rotation.x = -sit * 1.45 - (1 - sit) * Math.max(0, swing) * .5;
-  const reach = time > 68 && time < 80;
+  const reach = sequence === 'opening' && time > 68 && time < 76;
   astronaut.armL.rotation.z = .15;
   astronaut.armR.rotation.z = -.15;
   astronaut.armL.rotation.x = sit * .55;
   astronaut.armR.rotation.x = reach ? .9 : sit * .5;
   astronaut.armL.joint.rotation.x = sit * -1.05;
   astronaut.armR.joint.rotation.x = reach ? -0.35 : sit * -1.05;
-  const lookTitus = time >= 24 && time < 40;
-  const lookMoon = time > 42 && time < 64;
-  astronaut.head.rotation.y = lookTitus ? .55 : 0;
-  astronaut.head.rotation.x = lookMoon ? .08 : sit * .06;
+  const lookTitus = sequence === 'opening' && time >= 24 && time < 40;
+  const lookWindow = sequence === 'opening' && time >= 58 && time < 68;
+  astronaut.head.rotation.y = lookTitus ? .55 : lookWindow ? -0.35 : 0;
+  astronaut.head.rotation.x = sequence === 'launch' && time >= 22 && time < 36 ? -0.08 : sit * .06;
 
   const spot = state.titus.p;
   titus.root.position.set(spot[0], spot[1] + Math.sin(time * 1.6) * .045, spot[2]);

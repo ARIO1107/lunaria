@@ -2,6 +2,7 @@
 import { nextObjective } from '../data/levelDefinitions.js';
 import { stationDescriptions } from '../data/stationDescriptions.js';
 import LaunchPanel from '../components/LaunchPanel.jsx';
+import LifeSupportConsole from './LifeSupportConsole.jsx';
 import LandingPanel from './LandingPanel.jsx';
 import { playSound } from '../audio/audioManager.js';
 
@@ -35,7 +36,8 @@ function Challenge({ task, state, dispatch, onClose }) {
     playSound('click');
     dispatch({ type: 'answer', id: task.id, stationId: task.stationId, value: payload });
   }
-  if (task.kind === 'launch') return <div className="beta-panel"><p>Centro de control ficticio: autorización concedida. Las etapas superiores y la partida lunar se resumen después de separar la primera etapa.</p>
+  if (task.kind === 'eclss') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><LifeSupportConsole onAnswer={answer} /></div>;
+  if (task.kind === 'launch') return <div className="beta-panel"><p>Centro de control ficticio: autorización concedida. Este simulador cubre la primera etapa, todavía en la plataforma. Al separarla, una película resume el ascenso hasta la órbita terrestre.</p>
     {state.flight.status === 'ready' && <button className="secondary-button" disabled={countdown !== null} onClick={() => setCountdown(3)}>{countdown !== null ? 'Cuenta regresiva ' + countdown : 'Cuenta regresiva de control'}</button>}
     <LaunchPanel flight={state.flight} setFlight={value => dispatch({ type: 'flight', value })} onFinish={() => answer(true)} onClose={onClose} />
   </div>;

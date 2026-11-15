@@ -54,7 +54,7 @@ export function stepLaunch(state, dt) {
 export function launchGuidance(s) {
   if (s.status === 'ready') return { mood: 'normal', text: '¡Comandante! Enciende los cinco motores. En Max Q baja la potencia a 60 %: menos empuje significa menos presión sobre el cohete.' };
   if (s.status === 'failed') return { mood: 'danger', text: s.reason };
-  if (s.status === 'success') return { mood: 'normal', text: '¡Etapa separada! Ya sabes equilibrar empuje y carga. En el vuelo real aún faltaban las etapas S-II y S-IVB para alcanzar la órbita.' };
+  if (s.status === 'success') return { mood: 'normal', text: '¡Etapa separada! El simulador de la primera etapa termina aquí. Pulsa «Ver el despegue» para la película del ascenso hasta la órbita terrestre.' };
   if (s.heat > 70) return { mood: 'danger', text: s.centerOff || s.time < H.centerEngineCutoffTimeS ? '¡Carga crítica! Baja el acelerador a 60 % durante Max Q.' : '¡Apaga el motor central ahora! La carga sigue aumentando.' };
   if (s.time >= H.separationTimeS) return { mood: 'alert', text: '¡Ventana abierta! Pulsa SEPARAR ETAPA. Descartar la etapa vacía reduce el peso del vehículo.' };
   if (s.time >= H.centerEngineCutoffTimeS && !s.centerOff) return { mood: 'alert', text: 'T+02:15. ¡Apaga el motor central! Así reducimos la aceleración mientras el cohete pierde masa.' };

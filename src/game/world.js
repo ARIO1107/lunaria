@@ -1,26 +1,31 @@
 import { GAME_TUNING } from '../data/nasaTelemetry.js';
 
 export const WORLD = { width: 1000, height: 590 };
+// Cutaway deck. A straight spine joins the compartments so later levels
+// still reach every console. Room order matters: roomAt uses the first match.
 export const ROOMS = [
-  { id: 'airlock', name: 'Esclusa de aire', x: 70, y: 170, w: 220, h: 260 },
-  { id: 'systems', name: 'Sistemas y soporte vital', x: 330, y: 130, w: 270, h: 340 },
-  { id: 'cockpit', name: 'Cabina de mando', x: 640, y: 90, w: 290, h: 420 },
+  { id: 'engines', name: 'Propulsión', x: 70, y: 70, w: 210, h: 198 },
+  { id: 'power', name: 'Sistemas eléctricos', x: 340, y: 36, w: 270, h: 114 },
+  { id: 'airlock', name: 'EVA / Esclusa', x: 70, y: 338, w: 200, h: 160 },
+  { id: 'life', name: 'Soporte vital', x: 390, y: 338, w: 230, h: 170 },
+  { id: 'bridge', name: 'Puente de mando', x: 640, y: 60, w: 300, h: 450 },
+  { id: 'habitat', name: 'Hábitat', x: 300, y: 150, w: 340, h: 188 },
 ];
-export const CORRIDORS = [{ x: 280, y: 265, w: 60, h: 80 }, { x: 590, y: 265, w: 60, h: 80 }];
+export const CORRIDORS = [{ x: 70, y: 268, w: 860, h: 70 }];
 export const FURNITURE = [
-  { id: 'air-tanks', x: 355, y: 425, w: 70, h: 20 },
-  { id: 'electrical-racks', x: 530, y: 164, w: 30, h: 60 },
-  { id: 'pilot-seat', x: 658, y: 222, w: 35, h: 40 },
-  { id: 'navigator-seat', x: 658, y: 355, w: 35, h: 40 },
+  { id: 'air-tanks', x: 400, y: 455, w: 36, h: 28 },
+  { id: 'electrical-racks', x: 560, y: 52, w: 28, h: 46 },
+  { id: 'pilot-seat', x: 680, y: 150, w: 34, h: 40 },
+  { id: 'navigator-seat', x: 680, y: 210, w: 34, h: 40 },
 ];
 export const STATIONS = [
-  { id: 'propulsion', name: 'Panel de propulsión', short: 'Propulsión', x: 700, y: 125, w: 120, h: 52 },
-  { id: 'coas', name: 'Mira de alineación COAS', short: 'COAS', x: 838, y: 220, w: 65, h: 100 },
-  { id: 'lander', name: 'Control de descenso lunar', short: 'Descenso', x: 720, y: 425, w: 115, h: 52 },
-  { id: 'breakers', name: 'Disyuntores y DSKY', short: 'DSKY', x: 365, y: 165, w: 95, h: 50 },
-  { id: 'oxygen', name: 'Monitor de soporte vital', short: 'Soporte vital', x: 490, y: 370, w: 80, h: 55 },
-  { id: 'suit', name: 'Traje A7L y mochila PLSS', short: 'A7L / PLSS', x: 120, y: 200, w: 85, h: 50 },
-  { id: 'eva', name: 'Compuerta EVA', short: 'EVA', x: 120, y: 365, w: 85, h: 40 },
+  { id: 'propulsion', name: 'Panel de propulsión', short: 'Propulsión', x: 90, y: 100, w: 120, h: 52 },
+  { id: 'coas', name: 'Mira de alineación COAS', short: 'COAS', x: 880, y: 90, w: 50, h: 55 },
+  { id: 'lander', name: 'Control de descenso lunar', short: 'Descenso', x: 720, y: 400, w: 110, h: 48 },
+  { id: 'breakers', name: 'Disyuntores y DSKY', short: 'Energía', x: 390, y: 55, w: 110, h: 48 },
+  { id: 'oxygen', name: 'Monitor de soporte vital', short: 'Soporte vital', x: 450, y: 400, w: 100, h: 52 },
+  { id: 'suit', name: 'Traje A7L y mochila PLSS', short: 'Traje', x: 90, y: 370, w: 80, h: 46 },
+  { id: 'eva', name: 'Compuerta EVA', short: 'Esclusa', x: 90, y: 440, w: 80, h: 40 },
 ];
 const inside = (x, y, r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 export function canOccupy(x, y, radius = 16) {

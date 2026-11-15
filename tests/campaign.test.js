@@ -14,7 +14,9 @@ function answer(state, task) {
     : task.kind === 'site' ? 'B'
     : task.kind === 'collect' ? true
     : task.answer;
-  return campaignReducer(next, { type: 'answer', id: task.id, stationId: task.stationId, value });
+  let result = campaignReducer(next, { type: 'answer', id: task.id, stationId: task.stationId, value });
+  if (result.phase === 'launchCinematic') result = campaignReducer(result, { type: 'launchCinematicDone' });
+  return result;
 }
 
 test('a new game plays the opening once and a saved game stays out of it', () => {
@@ -28,6 +30,30 @@ test('a new game plays the opening once and a saved game stays out of it', () =>
   const saved = validateCampaign(JSON.parse(JSON.stringify(playing)));
   assert.equal(saved.phase, 'active');
   assert.equal(saved.flags.boarded, true);
+});
+
+test('level 1 stays on the pad until the ascent succeeds, then waits for the launch film', () => {
+  let state = campaignReducer(createCampaign(), { type: 'cinematicDone' });
+  state = answer(state, state && levels[0].tasks[0]);
+  assert.equal(state.phase, 'active');
+  assert.match(state.message, /soporte vital está preparado/);
+  for (const task of levels[0].tasks.slice(1, 4)) state = answer(state, task);
+  assert.equal(state.phase, 'active');
+  assert.equal(state.completedLevels.includes(1), false);
+  const denied = campaignReducer(state, { type: 'answer', id: 'launch', stationId: 'propulsion', value: true });
+  assert.equal(denied.phase, 'active');
+  assert.equal(denied.completedObjectives.includes('launch'), false);
+  const flying = campaignReducer(state, { type: 'flight', value: { ...state.flight, status: 'success' } });
+  const filmed = campaignReducer(flying, { type: 'answer', id: 'launch', stationId: 'propulsion', value: true });
+  assert.equal(filmed.phase, 'launchCinematic');
+  assert.equal(filmed.completedLevels.includes(1), false);
+  assert.equal(validateCampaign(JSON.parse(JSON.stringify(filmed))).phase, 'launchCinematic');
+  const done = campaignReducer(filmed, { type: 'launchCinematicDone' });
+  assert.equal(done.phase, 'complete');
+  assert.equal(done.completedLevels.includes(1), true);
+  const level2 = campaignReducer(campaignReducer(done, { type: 'advance' }), { type: 'begin' });
+  assert.equal(level2.currentLevel, 2);
+  assert.match(levels[1].intro, /vuelo hacia la Luna/);
 });
 
 test('wrong checks and skipped stations do not complete an objective', () => {

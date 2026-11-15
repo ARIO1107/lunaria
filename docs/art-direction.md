@@ -12,14 +12,13 @@ archivada en sus módulos, fuera de la experiencia de exploración.
   mochila y controles de pecho. Anatomía compacta y articulaciones animables.
 - Titus: cabeza rectangular redondeada, pantalla oscura, dos ojos luminosos,
   cuerpo pequeño, carcasa grafito, flotación y propulsores.
-- Fondos espaciales y planeta ilustrativos. No se presentan como vistas reales
-  de una misión ni como mediciones NASA.
+- Fondos ilustrativos. En el nivel 1 las ventanas muestran la plataforma de lanzamiento. Desde el nivel 2, el fondo vuelve a ser el espacio. No se presentan como vistas reales de una misión ni como mediciones NASA.
 
 ## Producción reproducible
 Modelos originales procedurales Three.js en `art/`, basados en las referencias
 visuales aportadas, sin copiar texturas ni descargar modelos. Se prerenderizan
 con cámara ortográfica y luces comunes mediante `npm run assets:bake`.
-El navegador del jugador sólo carga PNG locales; Three.js no entra al juego.
+El navegador del jugador carga PNG locales en la exploración. Three.js entra solo en las dos cinemáticas del nivel 1.
 
 Entregables: cubierta, objetos independientes con profundidad, spritesheets de
 astronauta/Titus en ocho direcciones, marcha y flotación, retratos de presentación,

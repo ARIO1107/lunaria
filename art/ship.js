@@ -1,5 +1,31 @@
 import * as THREE from 'three';
 import { ROOMS, CORRIDORS, STATIONS, FURNITURE } from '../src/game/world.js';
+
+const FLOOR = {
+  engines: '#8d8472',
+  power: '#c6a15a',
+  airlock: '#8ea0ad',
+  life: '#7eb8ae',
+  bridge: '#d9d3c4',
+  habitat: '#cbb89a',
+};
+const ROOM_LABEL = {
+  engines: 'PROPULSIÓN',
+  power: 'ELÉCTRICO',
+  airlock: 'ESCLUSA',
+  life: 'SOPORTE VITAL',
+  bridge: 'PUENTE',
+  habitat: 'HÁBITAT',
+};
+const BEACON = {
+  propulsion: '#e07a32',
+  coas: '#7eb6e8',
+  lander: '#d7c27a',
+  breakers: '#e2b34a',
+  oxygen: '#3ecf8e',
+  suit: '#9ad0c8',
+  eva: '#f0f3f4',
+};
 import { materials } from './palette.js';
 import { rounded, cylinder, ellipsoid } from './models.js';
 
@@ -22,11 +48,13 @@ export function createShip() {
   const root = new THREE.Group(); root.name = 'Lunaria_Deck'; const m = materials();
   for (const r of ROOMS) {
     rounded(root, [r.w + 18, 18, r.h + 18], [r.x + r.w / 2, -12, r.y + r.h / 2], m.dark, 7);
-    rounded(root, [r.w, 4, r.h], [r.x + r.w / 2, -2, r.y + r.h / 2], m.floor, 5);
+    const deckFloor = new THREE.MeshStandardMaterial({ color: FLOOR[r.id] || '#50636b', roughness: .68, metalness: .28 });
+    const deckTile = new THREE.MeshStandardMaterial({ color: FLOOR[r.id] || '#62757b', roughness: .55, metalness: .22 });
+    rounded(root, [r.w, 4, r.h], [r.x + r.w / 2, -2, r.y + r.h / 2], deckFloor, 5);
     // Panel seams, raised thresholds and fasteners are actual geometry, not painted shadows.
     for (let x = r.x + 4; x < r.x + r.w - 12; x += 32) for (let z = r.y + 4; z < r.y + r.h - 12; z += 32) {
       const w = Math.min(29, r.x + r.w - 4 - x), h = Math.min(29, r.y + r.h - 4 - z);
-      rounded(root, [w, .7, h], [x + w / 2, .1, z + h / 2], m.tile, .8);
+      rounded(root, [w, .7, h], [x + w / 2, .1, z + h / 2], deckTile, .8);
       if ((Math.round(x) + Math.round(z)) % 3 === 0) rounded(root, [7, .3, 1], [x + 6, .6, z + 3], m.frame, .1);
     }
     // Rear wall is a real open window assembly; the background shows through it.
@@ -39,7 +67,7 @@ export function createShip() {
     rounded(root, [r.w - 10, 49, 1], [r.x + r.w / 2, 37, r.y - 4], m.glass, .2);
     // Side walls stop at the corridor openings; front walls are intentionally cut away.
     for (const x of [r.x - 3, r.x + r.w + 3]) {
-      for (const [start, end] of [[r.y, 263], [347, r.y + r.h]]) {
+      for (const [start, end] of [[r.y, CORRIDORS[0].y], [CORRIDORS[0].y + CORRIDORS[0].h, r.y + r.h]]) {
         if (end <= start) continue;
         rounded(root, [8, 26, end - start], [x, 13, (start + end) / 2], m.hull, 2);
         rounded(root, [2, 3, end - start - 6], [x, 28, (start + end) / 2], m.light, .6);
@@ -48,9 +76,8 @@ export function createShip() {
     rounded(root, [r.w + 8, 9, 8], [r.x + r.w / 2, 4.5, r.y + r.h + 3], m.frame, 2);
     rounded(root, [r.w - 12, 1.5, 2], [r.x + r.w / 2, 9.5, r.y + r.h + 3], m.light, .3);
     pipe(root, [r.x + 14, 73, r.y - 10], [r.x + r.w - 14, 73, r.y - 10], 2.4, m.gold);
-    label(root, r.id === 'cockpit' ? 'COMMAND' : r.id === 'systems' ? 'LIFE SUPPORT' : 'AIRLOCK', [r.x + r.w / 2, 67, r.y + 3.2], 90, 8, '#273c42', '#b1bcba');
-    // Floor wayfinding plates.
-    const floorLabel = label(root, r.id === 'cockpit' ? 'CABINA' : r.id === 'systems' ? 'SISTEMAS' : 'ESCLUSA', [r.x + r.w / 2, 1, r.y + r.h - 34], 100, 19, '#d4e3df', '#50636b');
+    label(root, ROOM_LABEL[r.id] || r.name, [r.x + r.w / 2, 67, r.y + 3.2], 110, 8, '#273c42', '#b1bcba');
+    const floorLabel = label(root, ROOM_LABEL[r.id] || r.name, [r.x + r.w / 2, 1.2, r.y + Math.min(46, r.h / 2)], 108, 16, '#17242a', '#e7e4da');
     floorLabel.rotation.x = -Math.PI / 2;
   }
   for (const r of CORRIDORS) {
@@ -67,10 +94,9 @@ export function createShip() {
     }
   }
   // Equipment along room edges, clear of the navigation corridor.
-  for (let i = 0; i < 3; i++) {
-    cylinder(root, 8, 37, [365 + i * 24, 20, 435], m.trim);
-    cylinder(root, 8.5, 5, [365 + i * 24, 34, 435], m.green);
-    cylinder(root, 3, 5, [365 + i * 24, 42, 435], m.gold);
+  for (let i = 0; i < 2; i++) {
+    cylinder(root, 7, 16, [430 + i * 28, 10, 470], m.trim);
+    cylinder(root, 7.4, 3, [430 + i * 28, 18, 470], m.green);
   }
   for (let i = 0; i < 2; i++) {
     rounded(root, [29, 35, 22], [545 + i * 0, 18, 175 + i * 34], m.hull, 2);
@@ -92,6 +118,10 @@ export function createShip() {
   pipe(root, [93, 30, 190], [93, 30, 245], 2, m.gold);
   pipe(root, [93, 8, 190], [93, 30, 190], 2, m.frame);
   pipe(root, [93, 8, 245], [93, 30, 245], 2, m.frame);
+  // Service run for the life-support bay: visible duct, not a walk blocker.
+  pipe(root, [410, 14, 360], [590, 14, 360], 1.8, m.gold);
+  pipe(root, [410, 14, 360], [410, 14, 490], 1.8, m.trim);
+  for (let z = 370; z <= 470; z += 25) rounded(root, [18, 2, 4], [520, 8, z], m.frame, .4);
   return root;
 }
 
@@ -106,6 +136,18 @@ export function createStation(s) {
       rounded(root, [2, 11, 2], [cx + x + 5, 28, cz + s.h / 2 + 6], m.gold, .5);
     }
     label(root, 'A7L / PLSS', [cx, 48, cz + s.h / 2 + 3], 55, 7);
+  } else if (s.id === 'oxygen') {
+    rounded(root, [s.w, 8, s.h], [cx, 4, cz], m.frame, 3);
+    for (const side of [-1, 1]) {
+      const tank = new THREE.MeshStandardMaterial({ color: '#2aa7b8', roughness: .35, metalness: .25 });
+      cylinder(root, 6, 8, [cx + side * 14, 7, cz - 12], tank);
+      rounded(root, [6, 16, 8], [cx + side * 16, 24, cz + 4], m.red, 1);
+    }
+    label(root, 'O2', [cx, 40, cz - 6], 40, 8, '#e7fbff', '#14707c');
+    rounded(root, [s.w - 16, 16, 8], [cx, 14, cz + 10], m.graphite, 2);
+    rounded(root, [s.w - 24, 10, 1], [cx, 16, cz + 14], m.screen, 1);
+    rounded(root, [s.w - 28, 2, .4], [cx, 16, cz + 15], m.green, .1);
+    cylinder(root, 3, 2, [cx, 10, cz], new THREE.MeshStandardMaterial({ color: BEACON.oxygen, emissive: BEACON.oxygen, emissiveIntensity: .8 }));
   } else if (s.id === 'eva') {
     rounded(root, [s.w, 9, s.h], [cx, 4, cz], m.frame, 4);
     const hatch = cylinder(root, 15, 3, [cx, 10, cz], m.hull);
@@ -125,6 +167,7 @@ export function createStation(s) {
       cylinder(root, 1.7, 1.5, [s.x + 8 + i * 11, 30, cz + s.h / 2 - 8], i % 3 === 0 ? m.amber : m.trim);
     }
     label(root, s.short.toUpperCase(), [cx, 18, cz + s.h / 2 - 1], s.w - 12, 7);
+    cylinder(root, 2.4, 2, [cx, 31, cz - s.h / 4], new THREE.MeshStandardMaterial({ color: BEACON[s.id] || '#9be8f2', emissive: BEACON[s.id] || '#9be8f2', emissiveIntensity: .7 }));
     for (const x of [-1, 1]) rounded(root, [3, 12, 2], [cx + x * (s.w / 2 - 7), 13, cz + s.h / 2], m.gold, .5);
   }
   return root;

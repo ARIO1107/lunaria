@@ -3,6 +3,7 @@ import { scienceFacts, factsForLevel } from '../data/scienceFacts.js';
 import { STATIONS } from '../game/world.js';
 import { SURFACE_OBJECTS } from '../game/surfaceWorld.js';
 import { stationDescriptions } from '../data/stationDescriptions.js';
+import { howTo } from '../game/titusGuide.js';
 
 export function ScienceFact({ fact }) {
   if (!fact) return null;
@@ -27,7 +28,7 @@ export default function TitusAssistant({level=1,objective,station,emergency=fals
   function help() {
     const count=hint.id===objective?.id?hint.count+1:1;
     setHint({id:objective?.id,count});
-    const hints=['Observa el objetivo pendiente y los indicadores del equipo.',objective?.hint||'Busca '+destination+' y revisa qué requisito falta.', 'Acércate a '+destination+', pulsa E o Inspeccionar y completa «'+instruction+'».'];
+    const hints=[objective ? howTo(objective) : 'Observa el objetivo pendiente.', 'Ve a '+destination+' y pulsa E o Inspeccionar.', 'Acércate a '+destination+' y completa «'+instruction+'».'];
     respond(hints[Math.min(count-1,2)]);
   }
   function curious() {

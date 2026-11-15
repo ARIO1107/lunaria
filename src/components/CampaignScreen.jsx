@@ -15,6 +15,8 @@ import { stationDescriptions } from '../data/stationDescriptions.js';
 import { operationsActions } from '../game/resourceEngine.js';
 import { assetUrl } from '../game/assets.js';
 import { playSound, suspendAudio } from '../audio/audioManager.js';
+import { titusAtStation } from '../game/titusGuide.js';
+import FirstPersonBay from '../view/FirstPersonBay.jsx';
 
 registerCampaignStations(StationMission);
 
@@ -75,6 +77,10 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const seenGoals = useRef(campaign.completedObjectives.length);
   const alarmed = useRef(false);
   const reportRoom = useCallback(name => setRoom(name), []);
+  const oxygen = STATIONS.find(station => station.id === 'oxygen');
+  const guidePoint = campaign.currentLevel === 1 && task?.id === 'air'
+    ? { x: oxygen.x + oxygen.w / 2, y: oxygen.y + oxygen.h / 2 }
+    : null;
 
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   useEffect(() => {
@@ -91,6 +97,10 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     const timer = window.setInterval(() => dispatch({ type: 'position', position: shipPos.current, surfacePosition: surfacePos.current, zoom: zoomRef.current }), 1500);
     return () => window.clearInterval(timer);
   }, [dispatch]);
+  useEffect(() => {
+    if (campaign.phase !== 'active' || !task || near?.id !== task.stationId) return;
+    dispatch({ type: 'guide', id: 'at-' + task.id, message: titusAtStation(task) });
+  }, [campaign.phase, task, near?.id, dispatch]);
   useEffect(() => {
     if (campaign.phase !== 'active' || modal) return;
     function onKey(event) {
@@ -123,8 +133,9 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const direction = (event, x, y) => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); inputRef.current = { x, y }; };
   const release = () => { inputRef.current = { x: 0, y: 0 }; };
 
-  if (campaign.phase === 'cinematic' && campaign.currentLevel === 1) {
-    return <CinematicPlayer onComplete={() => dispatch({ type: 'cinematicDone' })} reducedMotion={settings.reducedMotion}
+  if ((campaign.phase === 'cinematic' || campaign.phase === 'launchCinematic') && campaign.currentLevel === 1) {
+    const launchFilm = campaign.phase === 'launchCinematic';
+    return <CinematicPlayer sequence={launchFilm ? 'launch' : 'opening'} onComplete={() => dispatch({ type: launchFilm ? 'launchCinematicDone' : 'cinematicDone' })} reducedMotion={settings.reducedMotion}
       volume={settings.volume} soundEnabled={settings.soundEnabled !== false} quality={settings.graphics || 'alto'} />;
   }
   if (campaign.phase === 'briefing') {
@@ -161,7 +172,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   return <div className={'app-shell exploration-shell' + (emergency ? ' emergency-deck' : '')}>
     <header className="app-header">
       <div className="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M29 5A16 16 0 1 0 35 28 15 15 0 0 1 29 5Z" fill="currentColor" /></svg><div><h1>Lunaria</h1><span>Nivel {level.id} · {level.title}</span></div></div>
-      <div className="deck-mode">{campaign.flags.demo && <span className="demo-flag">Demostración · </span>}{onSurface ? 'Superficie lunar' : 'Cubierta de Lunaria'}</div>
+      <div className="deck-mode">{campaign.flags.demo && <span className="demo-flag">Demostración · </span>}{onSurface ? 'Superficie lunar' : campaign.currentLevel === 1 ? 'Cubierta de Lunaria · en tierra' : 'Cubierta de Lunaria'}</div>
       <nav aria-label="Controles de la misión">
         <button className="quiet-button" onClick={leave}>Menú principal</button>
         <button className="quiet-button" onClick={() => setModal({ type: 'pause' })}>Pausa</button>
@@ -172,7 +183,11 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
       </nav>
     </header>
     <main>
-      <div className="deck-heading"><div><h2>{task ? task.title : level.title}</h2><p>{task ? 'Ve a ' + (placeName[task.stationId] || task.stationId) + '.' : 'Objetivos de este tramo completados.'}</p></div><Resources campaign={campaign} /></div>
+      <div className="deck-heading"><div><h2>{task ? task.title : level.title}</h2><p>{task ? 'Ve a ' + (placeName[task.stationId] || task.stationId) + '.' : 'Objetivos de este tramo completados.'}</p></div>
+        {campaign.currentLevel === 1 && <div className="system-pills" aria-label="Estado de los sistemas de lanzamiento">
+          {[['air', 'Soporte vital'], ['power', 'Energía'], ['fuel', 'Propulsión'], ['clearance', 'Autorización']].map(([id, label]) => <span key={id} data-ready={campaign.completedObjectives.includes(id)}>{label}</span>)}
+        </div>}
+        <Resources campaign={campaign} /></div>
       {(emergency || solarAlert) && <p className="emergency-banner" role="alert">{emergency
         ? 'Emergencia eléctrica ficticia. Titus: la señal desconocida no explica esta avería. Repara, protege el aire y prepara el frenado orbital.'
         : 'Ejercicio de meteorología espacial. No es una dosis calculada. Suspende las salidas, pulsa Preparar refugio y después cierra el ciclo.'}</p>}
@@ -181,7 +196,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
           <div className="map-toolbar"><span><i className="status-light" /> {room}</span><div className="zoom-controls"><button aria-label="Alejar cámara" disabled={zoom <= .8} onClick={() => changeZoom(-.15)}>−</button><span>{Math.round(zoom * 100)} %</span><button aria-label="Acercar cámara" disabled={zoom >= 1.75} onClick={() => changeZoom(.15)}>+</button></div></div>
           {onSurface
             ? <SurfaceCanvas positionRef={surfacePos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={solarAlert ? 'danger' : 'normal'} />
-            : <ShipCanvas positionRef={shipPos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={emergency ? 'danger' : undefined} emergency={emergency} />}
+            : <ShipCanvas positionRef={shipPos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={emergency ? 'danger' : undefined} emergency={emergency} grounded={campaign.currentLevel === 1} guidePoint={guidePoint} />}
           <div className="map-footer"><span><kbd>W A S D</kbd> / Flechas · Moverse</span><span><kbd>E</kbd> / Espacio · Inspeccionar</span></div>
           <div className="touch-controls" aria-label="Controles táctiles de movimiento">
             {[['↑', 0, -1, 'arriba'], ['←', -1, 0, 'izquierda'], ['↓', 0, 1, 'abajo'], ['→', 1, 0, 'derecha']].map(([label, x, y, name]) => <button key={name} aria-label={'Mover ' + name} onPointerDown={event => direction(event, x, y)} onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}>{label}</button>)}
@@ -211,7 +226,10 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
         </aside>
       </div>
     </main>
-    {modal?.type === 'station' && <Modal title={modal.station.name} wide onClose={close}><StationMission station={modal.station} state={campaign} dispatch={dispatch} onClose={close} /></Modal>}
+    {modal?.type === 'station' && <Modal title={modal.station.name} wide className="fp-dialog" onClose={close}>
+      <FirstPersonBay stationId={modal.station.id} vista={onSurface ? 'surface' : campaign.currentLevel === 1 ? 'pad' : 'space'} reduced={settings.reducedMotion} quality={settings.graphics || 'alto'} caption={campaign.message} />
+      <StationMission station={modal.station} state={campaign} dispatch={dispatch} onClose={close} />
+    </Modal>}
     {modal?.type === 'titus' && <Modal title="Titus" onClose={close}><TitusAssistant level={campaign.currentLevel} objective={task} station={near} emergency={emergency || solarAlert} discoveredFacts={campaign.discoveredFacts} onDiscover={id => dispatch({ type: 'discover', id })} /></Modal>}
     {modal?.type === 'log' && <Modal title="Bitácora científica" onClose={close}><ScienceLogbook discoveredFacts={campaign.discoveredFacts} /></Modal>}
     {modal?.type === 'crew' && <Modal title="La tripulación de Lunaria" wide onClose={close}><CrewGallery /></Modal>}

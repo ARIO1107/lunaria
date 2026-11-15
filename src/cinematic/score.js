@@ -1,8 +1,30 @@
-const tones = { wake: [520, 780], console: [360, 540, 720], ready: [392, 523, 659] };
+const tones = {
+  wake: [520, 780], console: [360, 540, 720], ready: [392, 523, 659],
+  tick: [880], ignite: [140, 90, 70], triumph: [392, 494, 587, 784],
+};
+const moods = {
+  pad: { drone: 62, fifth: 93, lfo: 0.07, bed: 0.7 },
+  tension: { drone: 49, fifth: 73, lfo: 0.35, bed: 0.95 },
+  ascent: { drone: 55, fifth: 82, lfo: 0.18, bed: 1 },
+  triumph: { drone: 78, fifth: 117, lfo: 0.12, bed: 0.85 },
+};
+
+function noiseBuffer(context) {
+  const length = context.sampleRate * 2;
+  const buffer = context.createBuffer(1, length, context.sampleRate);
+  const data = buffer.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < length; i += 1) {
+    const white = Math.random() * 2 - 1;
+    last = last * 0.96 + white * 0.04;
+    data[i] = last * 3;
+  }
+  return buffer;
+}
 
 export function createScore({ volume = .7, enabled = true }) {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx || !enabled) return { cue() {}, setInterior() {}, dispose() {} };
+  if (!AudioCtx || !enabled) return { cue() {}, setInterior() {}, setBurn() {}, setMood() {}, dispose() {} };
   const context = new AudioCtx();
   context.__lunariaCinematic = true;
   const master = context.createGain();
@@ -31,12 +53,49 @@ export function createScore({ volume = .7, enabled = true }) {
   hum.type = 'sine';
   humGain.gain.value = 0;
   hum.connect(humGain); humGain.connect(master); hum.start();
+  const burnSource = context.createBufferSource();
+  const burnGain = context.createGain();
+  const burnFilter = context.createBiquadFilter();
+  burnSource.buffer = noiseBuffer(context);
+  burnSource.loop = true;
+  burnFilter.type = 'lowpass';
+  burnFilter.frequency.value = 420;
+  burnGain.gain.value = 0;
+  burnSource.connect(burnFilter); burnFilter.connect(burnGain); burnGain.connect(master);
+  burnSource.start();
+  const rumble = context.createOscillator();
+  const rumbleGain = context.createGain();
+  rumble.frequency.value = 38;
+  rumble.type = 'sawtooth';
+  rumbleGain.gain.value = 0;
+  rumble.connect(rumbleGain); rumbleGain.connect(master);
+  rumble.start();
+  let burn = 0;
+  let mood = 'pad';
   if (context.state === 'suspended') context.resume().catch(() => {});
   return {
     setInterior(on) {
       if (on === interior) return;
       interior = on;
       humGain.gain.setTargetAtTime(on ? .04 : 0, context.currentTime, .2);
+    },
+    setMood(name) {
+      const next = moods[name];
+      if (!next || name === mood || context.state !== 'running') return;
+      mood = name;
+      const now = context.currentTime;
+      drone.frequency.setTargetAtTime(next.drone, now, .4);
+      fifth.frequency.setTargetAtTime(next.fifth, now, .4);
+      lfo.frequency.setTargetAtTime(next.lfo, now, .3);
+      bed.gain.setTargetAtTime(next.bed, now, .4);
+    },
+    setBurn(amount) {
+      const level = Math.max(0, Math.min(1, amount || 0));
+      if (Math.abs(level - burn) < .02 || context.state !== 'running') return;
+      burn = level;
+      const now = context.currentTime;
+      burnGain.gain.setTargetAtTime(level * .55, now, .08);
+      rumbleGain.gain.setTargetAtTime(level * .12, now, .08);
     },
     cue(name) {
       const notes = tones[name];
@@ -56,7 +115,7 @@ export function createScore({ volume = .7, enabled = true }) {
       });
     },
     dispose() {
-      [drone, fifth, lfo, hum].forEach(node => { try { node.stop(); } catch { /* already stopped */ } });
+      [drone, fifth, lfo, hum, burnSource, rumble].forEach(node => { try { node.stop(); } catch { /* already stopped */ } });
       context.close().catch(() => {});
     },
   };

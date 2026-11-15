@@ -29,7 +29,7 @@ botones +/− para acercar la cámara. En móvil hay controles bajo la nave.
 
 ## Qué incluye
 
-- Nave ortográfica inclinada: tres salas, ventanas al espacio, suelo modular,
+- Nave ortográfica inclinada: tres salas, suelo modular, ventanas a la plataforma en el nivel 1 y al espacio después,
   consolas, equipos, asientos, tuberías, luces y paredes recortadas.
 - Astronauta modelado con traje marfil/naranja, visor azul, mochila y guantes.
 - Titus modelado en grafito, con pantalla facial, flotación y seguimiento.
@@ -37,7 +37,7 @@ botones +/− para acercar la cámara. En móvil hay controles bajo la nave.
 - Profundidad por posición: personajes y consolas se ocultan unos a otros.
 - Colisiones, cámara con zoom, interacción y recuperación de fallos de carga.
 - Fichas educativas con enlaces NASA. Los indicadores de la cinemática se nombran como indicadores de juego, no como telemetría NASA.
-- Campaña jugable de cinco niveles y un modo de operaciones. El objetivo del nivel 1 es revisar el soporte vital.
+- Campaña jugable de cinco niveles y un modo de operaciones. El nivel 1 prepara el lanzamiento en tierra: soporte vital, energía, propulsión, autorización y el simulador de ascenso.
 
 ## Modelos editables y pipeline
 
@@ -73,19 +73,24 @@ Necesita Microsoft Edge instalado. El script inicia su propio servidor Vite y lo
 cierra al terminar. El taller interactivo, con Vite iniciado, está en
 `http://localhost:5173/tools/asset-studio.html`.
 
-**Three.js entra en el juego solo con la cinemática de apertura**, en un chunk
-aparte que se descarga al pulsar Jugar. La exploración sigue en Canvas 2D.
-Los GLB de `art/exports` no se descargan durante la partida. La cinemática
-construye el casco, a Alex y a Titus con mallas propias y puede cargar un GLB
-si se le pasa una ruta. No hay voces grabadas: los diálogos van en subtítulos
-y la música es original, generada en el navegador.
+**Three.js entra solo en dos cinemáticas del nivel 1**, en un chunk aparte:
+la apertura en la plataforma y el despegue tras superar el simulador de ascenso.
+La exploración sigue en Canvas 2D. Los GLB de `art/exports` no se descargan
+durante la partida. Las cinemáticas construyen el lanzador, la torre, a Alex
+y a Titus con mallas propias y pueden cargar un GLB si se les pasa una ruta.
+No hay voces grabadas: los diálogos van en subtítulos. La música es original,
+generada en el navegador. En órbita, los motores no suenan: la música no
+representa sonido en el vacío.
 
 ## Campaña
 
 La partida jugable está en `src/components/CampaignScreen.jsx` y
 `src/data/levelDefinitions.js`. Jugar, si no hay partida, reproduce la
-cinemática y entra al nivel 1. Continuar no la repite. Esc u «Omitir cinemática»
-también entran al nivel 1. El diseño y las fuentes están en
+cinemática de la plataforma y entra al nivel 1. Continuar no la repite.
+Esc u «Omitir cinemática» también entran al nivel 1. Tras separar la primera
+etapa en el simulador, otra cinemática resume el despegue hasta la órbita
+terrestre. Omitirla, si el ascenso ya tuvo éxito, abre el resumen y permite
+pasar al nivel 2. El diseño y las fuentes están en
 [docs/game-design.md](docs/game-design.md) y
 [docs/scientific-sources.md](docs/scientific-sources.md).
 

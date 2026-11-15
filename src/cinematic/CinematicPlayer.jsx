@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { cardAt, lineAt } from './script.js';
+import { cardAt, fadeAt, lineAt } from './script.js';
 import './cinematic.css';
 
-export default function CinematicPlayer({ onComplete, reducedMotion = false, volume = 70, soundEnabled = true, quality = 'alto' }) {
+export default function CinematicPlayer({ sequence = 'opening', onComplete, reducedMotion = false, volume = 70, soundEnabled = true, quality = 'alto' }) {
   const canvasRef = useRef(null);
   const ended = useRef(false);
   const handle = useRef(null);
@@ -33,14 +33,14 @@ export default function CinematicPlayer({ onComplete, reducedMotion = false, vol
     import('./runtime.js').then(mod => {
       if (dead || ended.current || !canvasRef.current) return;
       handle.current = mod.startCinematic(canvasRef.current, {
-        quality, reducedMotion, volume: volume / 100, soundEnabled,
+        sequence, quality, reducedMotion, volume: volume / 100, soundEnabled,
         initialTime: Number.isFinite(requested) && requested > 0 ? requested : 0,
         models: modelo ? { hull: modelo } : null,
         onFrame: frame => {
           if (dead) return;
-          const line = lineAt(frame.time);
-          const card = cardAt(frame.time);
-          const fade = (frame.time > 16.8 && frame.time < 21.2) || (frame.time > 88.2 && frame.time < 91.4);
+          const line = lineAt(frame.time, sequence);
+          const card = cardAt(frame.time, sequence);
+          const fade = fadeAt(frame.time, sequence);
           const lost = Boolean(frame.lost);
           setUi(previous => {
             const error = frame.loadError || previous.error;
@@ -58,17 +58,18 @@ export default function CinematicPlayer({ onComplete, reducedMotion = false, vol
       handle.current?.dispose();
       if (window.__lunariaCinematic === handle.current) delete window.__lunariaCinematic;
     };
-  }, [quality, reducedMotion, volume, soundEnabled]);
+  }, [sequence, quality, reducedMotion, volume, soundEnabled]);
 
-  return <div className="cinematic-root" data-cinematic-root>
-    <canvas ref={canvasRef} aria-label="Cinemática tridimensional de apertura" />
+  const launchFilm = sequence === 'launch';
+  return <div className="cinematic-root" data-cinematic-root data-sequence={sequence}>
+    <canvas ref={canvasRef} aria-label={launchFilm ? 'Cinemática tridimensional del despegue' : 'Cinemática tridimensional de apertura'} />
     <div className={ui.fade ? 'cinematic-fade show' : 'cinematic-fade'} />
     {!ui.ready && !ui.error && <p className="cinematic-loading" role="status">Preparando la cinemática…</p>}
-    {ui.error && <p className="cinematic-loading" role="alert">{ui.error} Puedes entrar directo a la nave.</p>}
+    {ui.error && <p className="cinematic-loading" role="alert">{ui.error} {launchFilm ? 'Puedes ver el resumen de la misión.' : 'Puedes entrar directo a la nave.'}</p>}
     {ui.lost && <p className="cinematic-loading" role="alert">El navegador perdió la imagen 3D.</p>}
     {ui.card && <div className="cinematic-title"><p>{ui.card.kicker}</p><h1>{ui.card.title}</h1>{ui.card.detail && <span>{ui.card.detail}</span>}</div>}
     {ui.line && <p className="cinematic-subtitle" role="status"><strong>{ui.line.speaker}</strong> {ui.line.text}</p>}
-    <p className="cinematic-note">La música es de la película. En el vacío no hay sonido.</p>
+    <p className="cinematic-note">{launchFilm ? 'La música es de la película. En el vacío no hay sonido de motores.' : 'Música y efectos de la película, en la plataforma de lanzamiento.'}</p>
     <button className="secondary-button cinematic-skip" onClick={skip}>Omitir cinemática</button>
     <span className="cinematic-hint">Esc · Omitir</span>
   </div>;

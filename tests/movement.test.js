@@ -4,7 +4,7 @@ import { moveActor, canOccupy, nearestStation } from '../src/game/world.js';
 
 test('astronaut cannot leave the hull or walk through a console', () => {
   assert.equal(canOccupy(10, 10), false);
-  assert.equal(canOccupy(730, 150), false);
+  assert.equal(canOccupy(140, 120), false);
   const actor = { x: 120, y: 300 };
   for (let i = 0; i < 100; i++) Object.assign(actor, moveActor(actor, -1, 0, 0.016));
   assert.ok(actor.x >= 86);

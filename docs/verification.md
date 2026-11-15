@@ -41,9 +41,9 @@ intermedias de sala y consola para identificar futuras regresiones.
 
 Medición en Edge, headless, con Playwright sobre el build de producción:
 
-- Gráficos Alto, cabina ya estabilizada, en la pasada completa más reciente: 60 FPS en cuatro muestras. Pasadas anteriores en este mismo Edge se quedaron en 30 FPS cuando el navegador presentaba a 30 Hz.
+- Gráficos Alto, cabina de la plataforma ya estabilizada, en esta pasada: 60, 60, 60 y 60 FPS. Pasadas anteriores, con la cinemática espacial, también dieron 60 FPS cuando el navegador presentaba a 60 Hz, y 30 FPS cuando presentaba a 30 Hz.
 - Misma cabina, con el límite de refresco desactivado: 109, 212 y 387 FPS. El intervalo medio de `requestAnimationFrame` fue 4,9 ms. En este equipo la escena supera el objetivo de 60 FPS cuando el navegador no la recorta al refresco.
-- Gráficos Ajustado y CPU emulada a 4×, en la pasada completa más reciente: 18 FPS en la ventana del salto y después 59, 60, 59 y 60. Pasadas anteriores, con el navegador a 30 Hz, se quedaron en 24–31. Esa emulación no es un equipo modesto. 30 FPS estables en hardware modesto siguen sin medirse en otro aparato.
+- Gráficos Ajustado y CPU emulada a 4×, en la pasada completa de esta corrección: 38 FPS en la ventana del salto y después 62, 44, 60 y 60. Pasadas anteriores, con el navegador a 30 Hz, se quedaron en 24–31. Esa emulación no es un equipo modesto. 30 FPS estables en hardware modesto siguen sin medirse en otro aparato.
 - El contador cae al saltar el tiempo de la prueba. Esa caída no es la reproducción continua.
 - Three.js va en un chunk propio (`runtime`, 609 kB, 155 kB gzip). El bundle de la cubierta no lo incluye. El aviso de Vite por superar 500 kB sigue presente.
 - Una ruta de modelo que no existe deja el aviso en pantalla. La secuencia publicada usa mallas propias. Omitir entra en «Revisar soporte vital».
@@ -53,7 +53,9 @@ Medición en Edge, headless, con Playwright sobre el build de producción:
 - Three.js no se descarga en el menú. Entra en un chunk aparte al pulsar Jugar, y el bundle de la cubierta no contiene el renderizador WebGL.
 - Esc cierra la cinemática, suelta el reproductor y deja el nivel 1 jugable. Continuar, con partida guardada, no vuelve a montarla.
 - Jugar con una partida existente pide confirmación. Conservar la partida no la borra. Empezar de nuevo sí reproduce la cinemática, y al llegar al final entra en «Revisar soporte vital» con el reproductor ya liberado.
-- Lista de la cinemática, comprobada en la misma pasada: partida nueva abre la escena; el casco, Alex, Titus y el visor están en la escena con mallas propias; a los 24 s Alex está sentado y mira a Titus, a los 52 s Titus señala y a los 74 s Alex ha caminado; cada subtítulo coincide con su frase, incluida la de 384 400 km; la cámara pasa de exterior a cabina; Esc detiene el audio, congela el contador de fotogramas de la cinemática y abre el nivel 1; Continuar no la repite. El recorrido de la cubierta, la galería, el móvil y el menú siguieron pasando en esa misma ejecución.
+- La apertura dura 75 s y transcurre en la plataforma. A los 8 s el fondo es terrestre, sin la Luna cerca. A los 24 s Alex está sentado y mira a Titus. A los 44 s Titus señala el soporte vital. Desde los 69 s Alex ha caminado y aparece la tarjeta de la misión. Esc detiene el audio y abre el nivel 1, con las ventanas en tierra. Continuar no repite la apertura.
+- La cinemática de despegue (`level1_launch_cinematic`, 60 s) solo arranca si el simulador de ascenso terminó en éxito. La cuenta atrás, el encendido, el ascenso y la órbita son planos de esa película. Omitirla abre el resumen y el nivel 2 sigue en vuelo hacia la Luna. Repetir el entrenamiento no completa la misión.
+- El humo del despegue son partículas, no volumen real. La separación que se ve es la de la primera etapa, la misma que ya pide el simulador. La llegada a órbita es un salto de tiempo marcado en pantalla, no un segundo vuelo.
 
 ## Límites explícitos
 Los GLB son geometría editable con jerarquías, sin rig esquelético ni clips. La

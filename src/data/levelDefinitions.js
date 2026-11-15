@@ -7,14 +7,14 @@
 export const levels = [
   {
     id: 1, title: 'El lanzamiento', subtitle: 'Comienza la aventura',
-    intro: 'Alex Ríos y Titus embarcan. Antes de encender los motores, revisa los sistemas de Lunaria. El centro de control espera tu autorización.',
-    summary: 'Comprobaste aire, energía y propulsión. El ascenso descarta etapas vacías. Después, las etapas superiores alcanzan órbita y preparan la partida lunar en esta transición narrativa resumida.',
+    intro: 'La nave sigue en la plataforma de lanzamiento. Revisa soporte vital, energía y propulsión. El centro de control espera tu autorización antes del despegue.',
+    summary: 'Las comprobaciones se hicieron en tierra. La película muestra el despegue hasta la órbita terrestre. El viaje hacia la Luna empieza en el siguiente nivel.',
     tasks: [
-      task('air', 'oxygen', 'Revisar soporte vital', 'checks', 'Comprueba los tres sistemas necesarios para respirar.', ['Oxígeno disponible', 'Ventilación activa', 'Retirada de CO₂'], ['Oxígeno disponible', 'Ventilación activa', 'Retirada de CO₂']),
-      task('power', 'breakers', 'Conectar energía y respaldo', 'choice', 'Las cargas esenciales necesitan una alimentación principal y otra de respaldo.', 'Principal y respaldo independientes', ['Una única batería para todo', 'Principal y respaldo independientes', 'Apagar soporte vital']),
-      task('fuel', 'propulsion', 'Comprobar combustible y propulsión', 'checks', 'Depósito de lanzamiento al 100 % del indicador de juego. Revisa el circuito antes de autorizar.', ['Combustible disponible', 'Válvulas comprobadas', 'Motores preparados'], ['Combustible disponible', 'Válvulas comprobadas', 'Motores preparados']),
-      task('clearance', 'propulsion', 'Obtener autorización de control', 'choice', 'El centro de control ficticio pregunta si las tres revisiones están completas.', 'Solicitar autorización', ['Solicitar autorización', 'Encender sin autorización']),
-      task('launch', 'propulsion', 'Despegar y separar la primera etapa', 'launch', 'Gestiona el ascenso siguiendo las indicaciones de Titus.'),
+      task('air', 'oxygen', 'Revisar soporte vital', 'eclss', 'La nave sigue en tierra. Prepara la ventilación, el suministro de oxígeno y la retirada de CO₂ en la consola.', 'estable'),
+      task('power', 'breakers', 'Conectar energía y respaldo', 'choice', 'Antes del despegue, las cargas esenciales necesitan una alimentación principal y otra de respaldo.', 'Principal y respaldo independientes', ['Una única batería para todo', 'Principal y respaldo independientes', 'Apagar soporte vital']),
+      task('fuel', 'propulsion', 'Comprobar combustible y propulsión', 'checks', 'Seguimos en la plataforma. Depósito de lanzamiento al 100 % del indicador de juego. Revisa el circuito antes de autorizar.', ['Combustible disponible', 'Válvulas comprobadas', 'Motores preparados'], ['Combustible disponible', 'Válvulas comprobadas', 'Motores preparados']),
+      task('clearance', 'propulsion', 'Obtener autorización de control', 'choice', 'Todavía no hemos despegado. El centro de control ficticio pregunta si las tres revisiones están completas.', 'Solicitar autorización', ['Solicitar autorización', 'Encender sin autorización']),
+      task('launch', 'propulsion', 'Despegar y separar la primera etapa', 'launch', 'Gestiona el ascenso en el simulador. Al separar la etapa verás la película del despegue.'),
     ],
   },
   {

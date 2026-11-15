@@ -46,8 +46,8 @@ export default function LaunchPanel({ flight, setFlight, onFinish, onClose }) {
       <p>Máxima aceleración histórica: {H.peakAccelerationG} g. La carga y el calor del juego son indicadores normalizados, no mediciones históricas.</p>
       <a href={nasaTelemetry.launch.source.url} target="_blank" rel="noreferrer">Consultar cronología oficial NASA ↗</a>
     </section>
-    <div className="flex flex-wrap gap-3"><button className="primary-button" onClick={() => { if (flight.status === 'success') onFinish(); onClose(); }}>Volver a la nave</button>
-      <button className="secondary-button" onClick={() => { if (flight.status === 'success') onFinish(); action('reset'); setPaused(false); }}>Repetir entrenamiento</button></div>
+    <div className="flex flex-wrap gap-3"><button className="primary-button" onClick={() => { if (flight.status === 'success') onFinish(); else onClose(); }}>{flight.status === 'success' ? 'Ver el despegue' : 'Volver a la nave'}</button>
+      <button className="secondary-button" onClick={() => { action('reset'); setPaused(false); }}>Repetir entrenamiento</button></div>
   </div>;
 
   const inMaxQ = flight.time >= GAME_TUNING.maxQStartS && flight.time <= GAME_TUNING.maxQEndS;

@@ -4,6 +4,34 @@ export const projectFloor = (deck, actor) => ({
   y: deck.origin.y + actor.x * deck.axisX.y + actor.y * deck.axisY.y,
 });
 
+function drawPad(ctx, w, h, time, reduced) {
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, '#6eabd8');
+  sky.addColorStop(.42, '#c5e2f6');
+  sky.addColorStop(.7, '#e7f3ea');
+  sky.addColorStop(1, '#8b9874');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#ffe1a8';
+  ctx.beginPath();
+  ctx.arc(w * .16, h * .2, Math.min(w, h) * .055, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.88)';
+  for (let i = 0; i < 6; i += 1) {
+    const drift = reduced ? 80 + i * 90 : ((time * 12 + i * 140) % (w + 220)) - 80;
+    const y = h * (.1 + (i % 3) * .09);
+    ctx.beginPath();
+    ctx.ellipse(drift, y, 78, 22, 0, 0, Math.PI * 2);
+    ctx.ellipse(drift + 46, y + 8, 48, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#5e6e76';
+  ctx.fillRect(w * .72, h * .34, 14, h * .3);
+  ctx.fillRect(w * .62, h * .48, w * .12, 8);
+  ctx.fillStyle = '#3d4c44';
+  ctx.fillRect(0, h * .76, w, h * .24);
+}
+
 function drawSpace(ctx, w, h, time, reduced) {
   ctx.fillStyle = '#080e19'; ctx.fillRect(0, 0, w, h);
   for (let i = 0; i < 200; i++) {
@@ -45,7 +73,8 @@ function drawActor(ctx, art, name, actor, time, moving, mood, reduced) {
 
 export function drawDeck(ctx, width, height, state, art, zoom = 1) {
   const { player, titus, time, near, reduced, moving } = state;
-  drawSpace(ctx, width, height, time, reduced);
+  if (state.grounded) drawPad(ctx, width, height, time, reduced);
+  else drawSpace(ctx, width, height, time, reduced);
   const deck = art.manifest.deck;
   // Fit the full ship on large screens; small screens follow the astronaut.
   const scale = Math.min(width / 780, height / 620) * zoom;
