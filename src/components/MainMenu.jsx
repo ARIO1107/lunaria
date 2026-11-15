@@ -69,7 +69,7 @@ function Settings({ settings, onSettings }) {
       <option value="alto">Alto</option>
       <option value="ajustado">Ajustado</option>
     </select>
-    <p className="terminal-muted">Música: todavía no se incluye una pista; esta opción se activará cuando exista.</p>
+    <p className="terminal-muted">El menú tiene un fondo suave sintetizado. La película usa su propia música. No hay voces grabadas.</p>
     <label className="terminal-setting"><span>Silenciar efectos</span>
       <input type="checkbox" checked={settings.soundEnabled === false}
         onChange={event => onSettings({ ...settings, soundEnabled: !event.target.checked })} />

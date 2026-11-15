@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-const suit = () => new THREE.MeshStandardMaterial({ color: '#e5dfcc', roughness: .55, metalness: .12, emissive: '#3a3832', emissiveIntensity: .22 });
+const suit = () => new THREE.MeshStandardMaterial({ color: '#efe8d6', roughness: .46, metalness: .08, emissive: '#4a463c', emissiveIntensity: .18 });
 const orange = () => new THREE.MeshStandardMaterial({ color: '#d77926', roughness: .46, metalness: .16 });
 const graphite = () => new THREE.MeshStandardMaterial({ color: '#323d42', roughness: .4, metalness: .38 });
 const trim = () => new THREE.MeshStandardMaterial({ color: '#c5c6bb', roughness: .32, metalness: .62 });
-const visorMat = () => new THREE.MeshPhysicalMaterial({ color: '#14344a', roughness: .12, metalness: .35, clearcoat: 1, emissive: '#0e3a52', emissiveIntensity: .45 });
+const visorMat = () => new THREE.MeshPhysicalMaterial({ color: '#14344a', roughness: .06, metalness: .55, clearcoat: 1, clearcoatRoughness: .08, emissive: '#0e3a52', emissiveIntensity: .35 });
 const robot = () => new THREE.MeshStandardMaterial({ color: '#475456', roughness: .32, metalness: .62 });
 const screen = () => new THREE.MeshStandardMaterial({ color: '#07141a', roughness: .28, metalness: .45 });
 const eyeMat = () => new THREE.MeshStandardMaterial({ color: '#d8faff', emissive: '#9be8f2', emissiveIntensity: 1.4 });
@@ -61,7 +61,8 @@ export function createCinematicAstronaut() {
   const visor = mesh(new THREE.SphereGeometry(.12, 24, 16), visorMat(), head, [0, .015, -.15]);
   visor.scale.set(1.2, .55, .22);
   visor.name = 'visor';
-  const rim = mesh(new THREE.TorusGeometry(.145, .012, 8, 24), metal, head, [0, .015, -.15]);
+  const goldRim = new THREE.MeshStandardMaterial({ color: '#e0b45a', roughness: .28, metalness: .76 });
+  const rim = mesh(new THREE.TorusGeometry(.145, .014, 8, 24), goldRim, head, [0, .015, -.15]);
   rim.scale.set(1.05, .48, 1);
   mesh(new THREE.BoxGeometry(.07, .035, .04), metal, head, [-.11, .1, -.1]);
   mesh(new THREE.BoxGeometry(.07, .035, .04), metal, head, [.11, .1, -.1]);

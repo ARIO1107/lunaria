@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color: #e7e9df;
   background: #111414;
   font-synthesis: none;
@@ -23,8 +24,8 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 button:focus-visible, a:focus-visible, canvas:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
-button { transition: background-color .15s, transform .15s; }
-button:not(:disabled):active { transform: translateY(1px); }
+button { transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out), border-color 160ms var(--ease-out); }
+button:not(:disabled):active { transform: scale(0.98); }
 a { color: var(--green); text-underline-offset: 4px; }
 button:disabled { background: #303630; color: #b1b8ac; border-color: #3a4239; }
 h1, h2, h3, p { margin: 0; }
@@ -38,9 +39,11 @@ h1, h2, h3, p { margin: 0; }
 .header-mission strong { display: block; color: var(--text); font-size: 14px; font-weight: 500; }
 .primary-button, .secondary-button, .quiet-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 10px 16px; border-radius: 5px; font-size: 14px; font-weight: 600; border: 1px solid transparent; }
 .primary-button { color: #17201b; background: var(--accent); }
-.primary-button:hover:not(:disabled) { background: #f2d391; }
 .secondary-button { background: #252c27; color: var(--text); border-color: #485047; }
-.secondary-button:hover:not(:disabled), .quiet-button:hover { background: #354035; }
+@media (hover: hover) and (pointer: fine) {
+  .primary-button:hover:not(:disabled) { background: #f2d391; }
+  .secondary-button:hover:not(:disabled), .quiet-button:hover { background: #354035; }
+}
 .quiet-button { color: var(--muted); background: transparent; }
 .mission-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 30px 0 26px; }
 .mission-heading h2 { font-size: clamp(22px, 2vw, 28px); font-weight: 500; letter-spacing: -.6px; }
@@ -59,7 +62,7 @@ h1, h2, h3, p { margin: 0; }
 .lock-mark { color: var(--muted); margin-left: auto; }
 /* Main grid arithmetic: remaining map width + 24px gutter + 280px mission panel. */
 .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; }
-.ship-section { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #101719; }
+.ship-section { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #101719; box-shadow: 0 16px 40px #00000038; }
 .map-toolbar, .map-footer { padding: 15px 18px; display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted); background: #1b2321; }
 .map-toolbar > span:first-child { color: var(--text); }
 .status-light { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 7px; }
@@ -69,7 +72,7 @@ h1, h2, h3, p { margin: 0; }
 .legend-player, .legend-target { width: 7px; height: 7px; display: inline-block; border-radius: 2px; background: var(--text); }
 .legend-target { background: var(--accent); margin-left: 12px; }
 .mission-sidebar { display: flex; flex-direction: column; gap: 20px; }
-.objective { background: var(--surface); padding: 22px; border-radius: 6px; }
+.objective { background: var(--surface); padding: 22px; border-radius: 8px; border: 1px solid var(--line); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
 h3 { font-size: 17px; font-weight: 600; }
 .section-heading > span { font-size: 12px; color: var(--muted); }
@@ -100,7 +103,7 @@ kbd { font: inherit; display: inline-flex; justify-content: center; align-items:
 .text-button { color: var(--green); background: transparent; border: none; text-decoration: underline; text-underline-offset: 4px; padding: 6px; font-size: inherit; }
 .touch-controls { display: none; }
 .result-symbol svg { width: 36px; height: 36px; }
-.modal { position: fixed; inset: 0; margin: auto; width: min(660px, calc(100% - 32px)); max-height: calc(100dvh - 32px); background: #1b211e; color: var(--text); border: 1px solid #566050; border-radius: 8px; padding: 0; overflow: auto; }
+.modal { position: fixed; inset: 0; margin: auto; width: min(660px, calc(100% - 32px)); max-height: calc(100dvh - 32px); background: #1b211e; color: var(--text); border: 1px solid #566050; border-radius: 10px; padding: 0; overflow: auto; box-shadow: 0 24px 60px #00000066; }
 .modal-wide { width: min(880px, calc(100% - 32px)); }
 .modal::backdrop { background: #050b0bd9; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--line); }

@@ -1,5 +1,5 @@
 .story-screen { min-height: 100dvh; display: grid; place-items: center; padding: 32px 16px; background: #070d12; }
-.story-card { width: min(720px, 100%); background: #162026; border: 1px solid #3d4c46; border-radius: 8px; padding: 28px; display: grid; gap: 14px; }
+.story-card { width: min(720px, 100%); background: #162026; border: 1px solid #3d4c46; border-radius: 10px; padding: 28px; display: grid; gap: 14px; box-shadow: 0 24px 60px #00000055; }
 .story-card h1 { font-size: 28px; font-weight: 600; letter-spacing: -.4px; }
 .story-card p { color: var(--muted); line-height: 1.6; }
 .story-kicker { color: var(--accent); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }

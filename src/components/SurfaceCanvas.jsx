@@ -123,10 +123,14 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     ctx.save();
     ctx.translate(spotOrigin.x, spotOrigin.y);
     ctx.scale(scale, scale);
-    ctx.fillStyle = '#626970'; ctx.fillRect(0, 0, 1000, 650);
+    const ground = ctx.createLinearGradient(0, 0, 0, 650);
+    ground.addColorStop(0, '#8d8478');
+    ground.addColorStop(1, '#5a534c');
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, 0, 1000, 650);
     for (let index = 0; index < 80; index++) {
       const x = (index * 131.71) % 1000, y = (index * 87.3) % 650;
-      ctx.strokeStyle = '#333e4740'; ctx.lineWidth = 3;
+      ctx.strokeStyle = '#3a322c55'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.ellipse(x, y, 8 + index % 30, 4 + index % 15, -.2, 0, Math.PI * 2); ctx.stroke();
     }
     ctx.strokeStyle = '#c1c9a855'; ctx.setLineDash([8, 8]); ctx.strokeRect(45, 45, 910, 560); ctx.setLineDash([]);
@@ -135,8 +139,14 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     items.push({ depth: state.titus.y, draw: () => sprite(ctx, art, 'titus', state.titus, time, false, titusMood, reduced) });
     items.sort((a, b) => a.depth - b.depth).forEach(item => item.draw());
     if (near) {
-      ctx.fillStyle = '#09251c'; ctx.fillRect(state.player.x - 110, state.player.y - 105, 220, 26);
-      ctx.fillStyle = '#a2ff92'; ctx.textAlign = 'center'; ctx.font = '13px Segoe UI'; ctx.fillText('E · ' + near.short, state.player.x, state.player.y - 87);
+      ctx.fillStyle = '#e9c989';
+      ctx.beginPath();
+      ctx.roundRect(state.player.x - 110, state.player.y - 108, 220, 26, 4);
+      ctx.fill();
+      ctx.fillStyle = '#17252c';
+      ctx.textAlign = 'center';
+      ctx.font = '600 13px Segoe UI, sans-serif';
+      ctx.fillText('E · ' + near.short, state.player.x, state.player.y - 90);
     }
     ctx.restore();
     const bubble = bubbleRef.current;

@@ -32,9 +32,17 @@ function drawPad(ctx, w, h, time, reduced) {
   sky.addColorStop(1, '#8b9874');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = '#ffe1a8';
+  const sunX = w * .16;
+  const sunY = h * .2;
+  const sunR = Math.min(w, h) * .055;
+  const glow = ctx.createRadialGradient(sunX, sunY, sunR * .2, sunX, sunY, sunR * 7);
+  glow.addColorStop(0, 'rgba(255, 236, 196, .62)');
+  glow.addColorStop(1, 'rgba(255, 236, 196, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#ffe7bc';
   ctx.beginPath();
-  ctx.arc(w * .16, h * .2, Math.min(w, h) * .055, 0, Math.PI * 2);
+  ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,.88)';
   for (let i = 0; i < 6; i += 1) {
@@ -53,7 +61,12 @@ function drawPad(ctx, w, h, time, reduced) {
 }
 
 function drawSpace(ctx, w, h, time, reduced) {
-  ctx.fillStyle = '#080e19'; ctx.fillRect(0, 0, w, h);
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, '#050814');
+  sky.addColorStop(.55, '#0c1524');
+  sky.addColorStop(1, '#101820');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
   for (let i = 0; i < 200; i++) {
     const x = (i * 127.71) % w, y = (i * 91.17) % h;
     ctx.globalAlpha = .2 + (i % 7) / 10;
@@ -120,6 +133,11 @@ export function drawDeck(ctx, width, height, state, art, zoom = 1) {
     ctx.fillStyle = '#17252c'; ctx.textAlign = 'center'; ctx.fillText(label, pos.x, pos.y - 86);
   }
   ctx.restore();
+  const vignette = ctx.createRadialGradient(width / 2, height / 2, Math.min(width, height) * .42, width / 2, height * .55, Math.max(width, height) * .72);
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(0,0,0,.22)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, width, height);
   if (state.emergency) {
     ctx.fillStyle = '#ff5a3224';
     ctx.fillRect(0, 0, width, height);

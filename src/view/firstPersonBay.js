@@ -93,6 +93,7 @@ export function startFirstPerson(canvas, { stationId = 'oxygen', vista = 'pad', 
   renderer.setPixelRatio(quality === 'ajustado' ? 1 : Math.min(devicePixelRatio || 1, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = vista === 'space' ? 1.16 : 1.08;
   renderer.shadowMap.enabled = quality !== 'ajustado';
   canvas.dataset.vista = vista;
   canvas.dataset.station = stationId;

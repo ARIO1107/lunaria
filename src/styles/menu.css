@@ -98,7 +98,7 @@
   color: var(--lime);
   text-align: left;
   font-size: clamp(16px, 1.7vw, 29px);
-  transition: color .15s, background .15s;
+  transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out);
 }
 .terminal-option svg, .terminal-event svg { width: 1.25em; height: 1.25em; }
 .terminal-option small { font-size: .49em; color: #b4ceb9; white-space: nowrap; }
@@ -180,7 +180,7 @@
 @keyframes terminal-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
 @keyframes terminal-glow {
   0%, 100% { filter: drop-shadow(0 0 0 transparent); }
-  50% { filter: drop-shadow(0 0 9px #39ff14aa); }
+  50% { filter: drop-shadow(0 0 6px #39ff1466); }
 }
 @keyframes terminal-blink { 0%, 64% { opacity: 1; } 65%, 100% { opacity: .25; } }
 

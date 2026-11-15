@@ -37,8 +37,11 @@ export function createScore({ volume = .7, enabled = true }) {
   drone.frequency.value = 55;
   fifth.frequency.value = 82.5;
   drone.type = 'sine';
-  fifth.type = 'triangle';
-  drone.connect(bed); fifth.connect(bed); bed.connect(master);
+  fifth.type = 'sine';
+  const warmth = context.createBiquadFilter();
+  warmth.type = 'lowpass';
+  warmth.frequency.value = 740;
+  drone.connect(warmth); fifth.connect(warmth); warmth.connect(bed); bed.connect(master);
   drone.start(); fifth.start();
   const lfo = context.createOscillator();
   const lfoGain = context.createGain();
@@ -46,6 +49,12 @@ export function createScore({ volume = .7, enabled = true }) {
   lfoGain.gain.value = .25;
   lfo.connect(lfoGain); lfoGain.connect(bed.gain);
   lfo.start();
+  const air = context.createOscillator();
+  const airGain = context.createGain();
+  air.type = 'sine';
+  air.frequency.value = 248;
+  airGain.gain.value = 0.035;
+  air.connect(airGain); airGain.connect(master); air.start();
   let interior = false;
   const hum = context.createOscillator();
   const humGain = context.createGain();
@@ -66,7 +75,7 @@ export function createScore({ volume = .7, enabled = true }) {
   const rumble = context.createOscillator();
   const rumbleGain = context.createGain();
   rumble.frequency.value = 38;
-  rumble.type = 'sawtooth';
+  rumble.type = 'sine';
   rumbleGain.gain.value = 0;
   rumble.connect(rumbleGain); rumbleGain.connect(master);
   rumble.start();
@@ -86,6 +95,7 @@ export function createScore({ volume = .7, enabled = true }) {
       const now = context.currentTime;
       drone.frequency.setTargetAtTime(next.drone, now, .4);
       fifth.frequency.setTargetAtTime(next.fifth, now, .4);
+      air.frequency.setTargetAtTime(next.drone * 4, now, .5);
       lfo.frequency.setTargetAtTime(next.lfo, now, .3);
       bed.gain.setTargetAtTime(next.bed, now, .4);
     },
@@ -107,15 +117,18 @@ export function createScore({ volume = .7, enabled = true }) {
         const start = now + index * .08;
         oscillator.frequency.value = frequency;
         oscillator.type = 'sine';
+        const filter = context.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2200;
         envelope.gain.setValueAtTime(0, start);
-        envelope.gain.linearRampToValueAtTime(.5, start + .02);
-        envelope.gain.exponentialRampToValueAtTime(.001, start + .22);
-        oscillator.connect(envelope); envelope.connect(master);
-        oscillator.start(start); oscillator.stop(start + .24);
+        envelope.gain.linearRampToValueAtTime(.42, start + .02);
+        envelope.gain.exponentialRampToValueAtTime(.001, start + .32);
+        oscillator.connect(filter); filter.connect(envelope); envelope.connect(master);
+        oscillator.start(start); oscillator.stop(start + .34);
       });
     },
     dispose() {
-      [drone, fifth, lfo, hum, burnSource, rumble].forEach(node => { try { node.stop(); } catch { /* already stopped */ } });
+      [drone, fifth, lfo, air, hum, burnSource, rumble].forEach(node => { try { node.stop(); } catch { /* already stopped */ } });
       context.close().catch(() => {});
     },
   };
