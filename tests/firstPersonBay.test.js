@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { createCinematicTitus } from '../src/cinematic/cast.js';
-import { CABIN_CAMERA, TITUS_YAW } from '../src/view/firstPersonBay.js';
+import { CABIN_CAMERA, TITUS_YAW, paintCabinTitus } from '../src/view/firstPersonBay.js';
 
 test('the cabin camera looks down the deck and Titus faces it', () => {
   const camera = new THREE.PerspectiveCamera(58, 16 / 9, 0.08, 40);
@@ -23,4 +23,17 @@ test('the cabin camera looks down the deck and Titus faces it', () => {
   titus.body.getWorldPosition(body);
   const face = eye.sub(body);
   assert.ok(face.z > 0.05, 'eyes on local -Z must point toward the camera on +Z');
+});
+
+test('cabin Titus is gray instead of the dark cinematic shell', () => {
+  const titus = createCinematicTitus();
+  paintCabinTitus(titus);
+  const colors = new Set();
+  titus.root.traverse(object => {
+    if (object.isMesh && object.material?.color) colors.add(object.material.color.getHexString());
+  });
+  assert.ok(colors.has('9aa3a8'));
+  assert.equal(colors.has('475456'), false);
+  assert.equal(colors.has('07141a'), false);
+  assert.ok(colors.has('d8faff'));
 });

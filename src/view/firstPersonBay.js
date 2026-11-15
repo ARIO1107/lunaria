@@ -55,6 +55,33 @@ function buildVista(scene, vista) {
 export const CABIN_CAMERA = { position: [0, 1.55, 1.15], lookAt: [0, 1.18, -0.8] };
 export const TITUS_YAW = Math.PI;
 
+// The cinematic shell is a dark metal. In this cabin it falls to black, so the
+// mission view uses a flat gray and keeps the glowing eyes.
+export function paintCabinTitus(titus) {
+  titus.root.traverse(object => {
+    if (!object.isMesh || !object.material) return;
+    object.castShadow = false;
+    object.receiveShadow = false;
+    for (const material of [].concat(object.material)) {
+      if (!material.color) continue;
+      const hex = material.color.getHexString();
+      if (hex === '07141a') {
+        material.color.set('#8b9498');
+        material.emissive?.set('#5c6569');
+        material.emissiveIntensity = 0.2;
+        material.metalness = 0.2;
+        material.roughness = 0.55;
+      } else if (hex === '475456' || hex === '323d42') {
+        material.color.set('#9aa3a8');
+        material.emissive?.set('#6a7378');
+        material.emissiveIntensity = 0.22;
+        material.metalness = 0.22;
+        material.roughness = 0.5;
+      }
+    }
+  });
+}
+
 export function startFirstPerson(canvas, { stationId = 'oxygen', vista = 'pad', reduced = false, quality = 'alto' } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: quality !== 'ajustado', alpha: false, powerPreference: 'high-performance' });
   let frame = 0;
@@ -109,9 +136,13 @@ export function startFirstPerson(canvas, { stationId = 'oxygen', vista = 'pad', 
   gloveL.rotation.z = 0.3;
 
   const titus = createCinematicTitus();
+  paintCabinTitus(titus);
   titus.root.position.set(0.72, 1.02, -0.2);
   titus.root.rotation.y = TITUS_YAW;
   scene.add(titus.root);
+  const fill = new THREE.PointLight('#f4f7f8', 1.5, 5);
+  fill.position.set(0.35, 1.45, 0.55);
+  scene.add(fill);
 
   canvas.addEventListener('webglcontextlost', onLost);
   canvas.addEventListener('webglcontextrestored', onRestored);

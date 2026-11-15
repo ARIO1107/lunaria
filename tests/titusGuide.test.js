@@ -8,8 +8,7 @@ test('Titus tells every mission where to go and how to do it', () => {
     for (const task of level.tasks) {
       const brief = titusBrief(task);
       assert.match(brief, /^Titus: /, task.id);
-      assert.match(brief, /Ve a /, task.id);
-      assert.doesNotMatch(brief, new RegExp('Ve a ' + task.stationId + '\\.'), task.id);
+      assert.match(brief, /capitán Alex/, task.id);
       assert.ok(howTo(task).length > 20, task.id);
       assert.match(titusAtStation(task), /^Titus: /);
     }
@@ -18,4 +17,6 @@ test('Titus tells every mission where to go and how to do it', () => {
   assert.match(titusBrief(launch), /despega/i);
   assert.match(titusAtStation(launch), /despega la nave/);
   assert.match(titusAtStation(levels[0].tasks[0]), /condiciones adecuadas para respirar/);
+  assert.match(titusBrief(levels[0].tasks[0]), /soporte vital para verificar los parámetros/);
+  assert.match(titusBrief(levels[0].tasks[1]), /estación de energía/);
 });

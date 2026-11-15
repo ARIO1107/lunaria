@@ -57,14 +57,48 @@ export function howTo(task) {
   return steps[task.id] || byKind[task.kind] || task.prompt;
 }
 
+const walks = {
+  air: 'Perfecto, capitán Alex. La misión empezó. Lo primero que debemos hacer es dirigirnos a soporte vital para verificar los parámetros del aire.',
+  power: 'Perfecto, capitán Alex. Ahora lo que sigue es ir a la estación de energía y comprobar que haya alimentación principal y de respaldo.',
+  fuel: 'Perfecto, capitán Alex. Ahora lo que sigue es ir a propulsión. Revisemos el combustible y que los motores estén preparados. La nave sigue en la plataforma.',
+  clearance: 'Perfecto, capitán Alex. Volvamos a propulsión. Falta pedir autorización a control antes de encender los motores.',
+  launch: 'Perfecto, capitán Alex. Ya estamos en propulsión. Desde esta consola despega la nave: haz la cuenta regresiva, controla el empuje, corta el motor central y separa la primera etapa.',
+  navigation: 'Perfecto, capitán Alex. La misión empezó. Lo primero es ir a la mira de alineación COAS y orientar la referencia a 45°.',
+  supplies: 'Perfecto, capitán Alex. Ahora lo que sigue es ir al traje A7L y la mochila para revisar agua, alimentos y el botiquín.',
+  atmosphere: 'Perfecto, capitán Alex. Volvamos al monitor de soporte vital. Hay que mirar la reserva de oxígeno, no solo la presión.',
+  'energy-tour': 'Perfecto, capitán Alex. Ahora lo que sigue es ir a la estación de energía. El respaldo es para los sistemas esenciales, no para la luz decorativa.',
+  signal: 'Perfecto, capitán Alex. Vamos al panel de propulsión. Sintoniza el canal ficticio 7, envía y espera la respuesta.',
+  diagnose: 'Perfecto, capitán Alex. La misión empezó. Lo primero es ir a la estación de energía: el fallo está en propulsión, con el circuito abierto y el fusible quemado.',
+  isolate: 'Perfecto, capitán Alex. Seguimos en la estación de energía. Desconecta propulsión antes de tocar la pieza.',
+  replace: 'Perfecto, capitán Alex. Ahora lo que sigue es ir al traje, donde está el repuesto. Instala el fusible compatible.',
+  'repair-test': 'Perfecto, capitán Alex. Regresa a la estación de energía. Cierra la cubierta, comprueba la continuidad y reconecta el circuito.',
+  allocation: 'Perfecto, capitán Alex. En la misma estación de energía reparte como máximo 60. Aire al menos 20, navegación 15 y propulsión 20.',
+  stabilize: 'Perfecto, capitán Alex. Ahora lo que sigue es ir a la mira de alineación COAS y dejar la orientación en 90°.',
+  orbit: 'Perfecto, capitán Alex. Vamos al panel de propulsión. Enciende para reducir la velocidad y así entramos en órbita lunar.',
+  site: 'Perfecto, capitán Alex. La misión empezó. Lo primero es ir al control de descenso lunar y elegir una zona de aterrizaje.',
+  module: 'Perfecto, capitán Alex. Seguimos en el control de descenso. Marca propulsión, comunicaciones y el equipo de superficie.',
+  landing: 'Perfecto, capitán Alex. Desde el control de descenso baja despacio. Llega con poca velocidad y sobre la zona marcada.',
+  'eva-check': 'Perfecto, capitán Alex. Ahora lo que sigue es ir al módulo de descenso. Revisa el traje y despresuriza la esclusa antes de salir.',
+  observe: 'Perfecto, capitán Alex. Camina hasta la muestra de regolito. Describe la textura y registra el lugar. El color no dice la composición.',
+  return: 'Perfecto, capitán Alex. Regresa al módulo de descenso. Cierra la esclusa y recupera la presión. No abras las dos puertas a la vez.',
+  habitat: 'Perfecto, capitán Alex. La misión empezó. Lo primero es ir al hábitat prefabricado y revisar la estructura, los sensores y la carga.',
+  solar: 'Perfecto, capitán Alex. Ahora lo que sigue es ir a los paneles solares y conectarlos a las baterías para la sombra.',
+  life: 'Perfecto, capitán Alex. Vamos al soporte vital de la base. Activa el aire, el oxígeno y la temperatura. Gasta 10 de energía.',
+  water: 'Perfecto, capitán Alex. Ahora lo que sigue es ir al almacén de suministros. Prioriza el agua de la tripulación y una recuperación controlada.',
+  'surface-suit': 'Perfecto, capitán Alex. Volvamos al módulo de descenso. Comprueba el aire del traje, los sellos y la ruta de regreso.',
+  sample: 'Perfecto, capitán Alex. Camina hasta la muestra de regolito y recógela. Queda etiquetada en este sitio ficticio.',
+  analysis: 'Perfecto, capitán Alex. Ahora lo que sigue es ir al laboratorio de análisis y clasificar la muestra como regolito.',
+};
+
 export function titusBrief(task) {
-  if (!task) return 'Titus: En operaciones, cierra tres ciclos y haz tres actividades. Lee el costo de cada botón antes de pulsarlo.';
-  return `Titus: ${task.title}. Ve a ${placeName(task.stationId)}. ${howTo(task)}`;
+  if (!task) return 'Titus: Perfecto, capitán Alex. En operaciones, cierra tres ciclos y haz tres actividades. Lee el costo de cada botón antes de pulsarlo.';
+  const line = walks[task.id] || `Perfecto, capitán Alex. Ahora lo que sigue es ir a ${placeName(task.stationId)}. ${howTo(task)}`;
+  return `Titus: ${line}`;
 }
 
 export function titusAtStation(task) {
-  if (!task) return 'Titus: Explora con calma.';
-  if (task.id === 'air') return 'Titus: ¡Aquí estamos! Este sistema nos ayuda a mantener condiciones adecuadas para respirar. ' + howTo(task);
-  if (task.id === 'launch') return 'Titus: Desde esta consola despega la nave. ' + howTo(task);
-  return `Titus: Aquí es, en ${placeName(task.stationId)}. ${howTo(task)}`;
+  if (!task) return 'Titus: Explora con calma, capitán Alex.';
+  if (task.id === 'air') return 'Titus: Perfecto, capitán Alex. ¡Aquí estamos! Este sistema nos ayuda a mantener condiciones adecuadas para respirar. ' + howTo(task);
+  if (task.id === 'launch') return 'Titus: Perfecto, capitán Alex. Desde esta consola despega la nave. ' + howTo(task);
+  return `Titus: Perfecto, capitán Alex. Ya llegamos a ${placeName(task.stationId)}. ${howTo(task)}`;
 }

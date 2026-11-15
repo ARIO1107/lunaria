@@ -95,7 +95,7 @@ export function campaignReducer(state, action) {
   if (!state) return state;
   if (action.type === 'cinematicDone' && state.phase === 'cinematic') {
     const next = { ...state, phase: 'active', flags: { ...state.flags, boarded: true },
-      message: 'Titus: ¡Alex! Antes del lanzamiento tenemos que preparar los sistemas de la nave. Comencemos por soporte vital.' };
+      message: titusBrief(nextObjective(state)).replace(/\s*$/, ' Comencemos por soporte vital.') };
     return { ...next, checkpoint: cloneCheckpoint(next) };
   }
   if (action.type === 'launchCinematicDone' && state.phase === 'launchCinematic') {
@@ -170,13 +170,14 @@ export function campaignReducer(state, action) {
   if (task.id === 'launch' && state.currentLevel === 1) {
     return { ...next, phase: 'launchCinematic', message: 'Titus: Sistemas listos. Empieza la secuencia de lanzamiento.' };
   }
-  if (task.id === 'air') next = { ...next, message: 'Titus: ¡Excelente! El soporte vital está preparado. Ahora iremos a comprobar la energía.' };
-  else {
+  if (task.id === 'air') {
     const upcoming = nextObjective(next);
-    if (upcoming) {
-      const brief = titusBrief(upcoming);
-      next = { ...next, message: state.currentLevel === 1 ? 'Titus: La nave sigue en la plataforma. ' + brief.replace(/^Titus:\s*/, '') : brief };
-    } else if (state.currentLevel === 1) next = { ...next, message: 'Titus: Listo. La nave sigue en la plataforma. Seguimos preparando el despegue.' };
+    const follow = upcoming ? ' ' + titusBrief(upcoming).replace(/^Titus:\s*/, '') : '';
+    next = { ...next, message: 'Titus: ¡Excelente! El soporte vital está preparado. Ahora iremos a comprobar la energía.' + follow };
+  } else {
+    const upcoming = nextObjective(next);
+    if (upcoming) next = { ...next, message: titusBrief(upcoming) };
+    else if (state.currentLevel === 1) next = { ...next, message: 'Titus: Perfecto, capitán Alex. La nave sigue en la plataforma. Seguimos preparando el despegue.' };
   }
   if (!nextObjective(next)) next = { ...next, phase: 'complete', completedLevels: [...new Set([...next.completedLevels, state.currentLevel])] };
   return next;
