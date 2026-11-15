@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "generator": "art/models.js + art/ship.js",
+  "actors": {
+    "astronaut": {
+      "frameW": 160,
+      "frameH": 200,
+      "cols": 9,
+      "directions": 8,
+      "moods": [
+        "normal"
+      ],
+      "logicalW": 96,
+      "logicalH": 120,
+      "anchor": {
+        "x": 48,
+        "y": 83.93124143888666
+      },
+      "file": "astronaut.png"
+    },
+    "titus": {
+      "frameW": 160,
+      "frameH": 200,
+      "cols": 8,
+      "directions": 8,
+      "moods": [
+        "normal",
+        "alert",
+        "danger"
+      ],
+      "logicalW": 96,
+      "logicalH": 120,
+      "anchor": {
+        "x": 48,
+        "y": 83.93124143888666
+      },
+      "file": "titus.png"
+    }
+  },
+  "props": [
+    {
+      "id": "propulsion",
+      "depth": 177,
+      "x": 759,
+      "y": 183,
+      "w": 165.5,
+      "h": 81,
+      "file": "station-propulsion.png"
+    },
+    {
+      "id": "coas",
+      "depth": 320,
+      "x": 897,
+      "y": 277.5,
+      "w": 110.5,
+      "h": 104,
+      "file": "station-coas.png"
+    },
+    {
+      "id": "lander",
+      "depth": 477,
+      "x": 779,
+      "y": 428.5,
+      "w": 160,
+      "h": 81.5,
+      "file": "station-lander.png"
+    },
+    {
+      "id": "breakers",
+      "depth": 215,
+      "x": 424,
+      "y": 215,
+      "w": 140.5,
+      "h": 80,
+      "file": "station-breakers.png"
+    },
+    {
+      "id": "oxygen",
+      "depth": 425,
+      "x": 549,
+      "y": 385,
+      "w": 125.5,
+      "h": 82.5,
+      "file": "station-oxygen.png"
+    },
+    {
+      "id": "suit",
+      "depth": 250,
+      "x": 180,
+      "y": 248.5,
+      "w": 129.5,
+      "h": 81,
+      "file": "station-suit.png"
+    },
+    {
+      "id": "eva",
+      "depth": 405,
+      "x": 180,
+      "y": 410,
+      "w": 91,
+      "h": 37.5,
+      "file": "station-eva.png"
+    },
+    {
+      "id": "pilot-seat",
+      "depth": 262,
+      "x": 718.5,
+      "y": 286,
+      "w": 72,
+      "h": 45.5,
+      "file": "station-pilot-seat.png"
+    },
+    {
+      "id": "navigator-seat",
+      "depth": 395,
+      "x": 718.5,
+      "y": 394.5,
+      "w": 72.5,
+      "h": 46,
+      "file": "station-navigator-seat.png"
+    }
+  ],
+  "deck": {
+    "width": 1120,
+    "height": 720,
+    "origin": {
+      "x": 60.000000000000036,
+      "y": 114.23042384428761
+    },
+    "axisX": {
+      "x": 0.9999999999999929,
+      "y": 0
+    },
+    "axisY": {
+      "x": 0,
+      "y": 0.8192319205189875
+    },
+    "file": "deck.png"
+  }
+}

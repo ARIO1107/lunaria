@@ -1,0 +1,93 @@
+/* The artwork carries depth; the HUD stays quiet and leaves the deck in charge. */
+.exploration-shell { max-width: 1760px; padding: 0 32px; }
+.exploration-shell .app-header { min-height: 84px; }
+.exploration-shell .app-header nav { display: flex; gap: 8px; }
+.deck-mode { color: var(--muted); font-size: 13px; }
+.deck-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 0; }
+.deck-heading h2 { font-size: 26px; font-weight: 500; letter-spacing: -.5px; }
+.deck-heading p { color: var(--muted); margin-top: 6px; font-size: 14px; }
+.development-note { font-size: 12px; color: var(--muted); }
+.exploration-layout { grid-template-columns: minmax(0, 1fr) 248px; gap: 20px; }
+.exploration-shell .ship-section { background: #080e19; }
+.exploration-shell .map-toolbar { padding: 10px 16px; align-items: center; background: #182124; }
+.exploration-shell .map-footer { background: #182124; padding: 12px 16px; }
+.deck-viewport { position: relative; flex: 1; display: flex; min-height: 520px; }
+.exploration-shell .ship-canvas { height: clamp(520px, 62vh, 740px); min-height: 520px; flex: 1; }
+.zoom-controls { display: flex; gap: 12px; align-items: center; }
+.zoom-controls button { border: 1px solid #53615d; background: #273430; color: var(--text); width: 34px; height: 32px; border-radius: 4px; font-size: 20px; }
+.zoom-controls span { min-width: 40px; text-align: center; }
+.asset-loading { position: absolute; inset: 0; background: #111b23; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px; color: var(--muted); }
+.exploration-sidebar { gap: 20px; }
+.crew-card, .station-card { background: var(--surface); padding: 20px; border-radius: 6px; }
+.crew-card .section-heading h3, .station-card h3 { font-size: 16px; }
+.portrait-button { background: #253133; border: 0; display: flex; align-items: end; justify-content: center; width: 100%; height: 165px; margin: 16px 0; border-radius: 4px; overflow: hidden; }
+.portrait-button:hover { background: #304146; }
+.portrait-button img:first-child { width: 138px; margin-right: -48px; position: relative; z-index: 1; }
+.portrait-button img:last-child { width: 120px; margin-bottom: 10px; }
+.crew-card > strong { font-size: 14px; font-weight: 500; }
+.crew-card p, .station-card p { font-size: 13px; line-height: 1.7; color: var(--muted); margin-top: 8px; }
+.station-card p { margin-bottom: 18px; }
+.deck-key { display: grid; gap: 13px; padding: 0 12px; font-size: 12px; color: var(--muted); }
+.deck-key span { display: flex; align-items: center; gap: 9px; }
+.deck-key i { width: 5px; height: 5px; border: 1px solid #a5bcb8; }
+.crew-radio { margin-top: 18px; padding: 8px 24px 8px 8px; display: flex; gap: 12px; align-items: center; background: #1d2928; border-radius: 6px; }
+.crew-radio img { width: 90px; height: 90px; object-fit: contain; flex-shrink: 0; }
+.crew-radio strong { font-size: 14px; font-weight: 600; }
+.crew-radio strong span { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 14px; }
+.crew-radio p { margin-top: 7px; font-size: 14px; line-height: 1.6; }
+.radio-bars { color: var(--green); white-space: nowrap; margin-left: auto; font-size: 18px; }
+.crew-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; }
+.portrait-stage { background: #2b393d; border-radius: 6px; margin-bottom: 20px; }
+.portrait-stage img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; }
+.crew-gallery h3 { font-size: 22px; font-weight: 500; }
+.crew-gallery article p { color: var(--muted); font-size: 14px; line-height: 1.7; margin: 12px 0; }
+.crew-gallery a { font-size: 13px; }
+.gallery-note { grid-column: 1 / -1; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.station-id { display: block; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.science-note { background: #293a34; padding: 20px; border-radius: 4px; margin: 20px 0; }
+.science-note p { margin-top: 10px; }
+.station-details .mission-placeholder { font-size: 13px; color: var(--muted); }
+@media (max-width: 1100px) {
+  .exploration-shell { padding: 0 20px; }
+  .deck-mode { display: none; }
+  .development-note { max-width: 180px; text-align: right; line-height: 1.6; }
+  .exploration-layout { grid-template-columns: minmax(0, 1fr) 210px; gap: 16px; }
+  .crew-card, .station-card { padding: 16px; }
+  .portrait-button { height: 140px; }
+  .portrait-button img:first-child { width: 120px; }
+  .portrait-button img:last-child { width: 105px; }
+  .station-card p { min-height: 0; }
+  .radio-bars { display: none; }
+}
+@media (max-width: 760px) {
+  .exploration-shell { padding: 0 16px; }
+  .exploration-shell .app-header { min-height: 78px; gap: 8px; }
+  .exploration-shell .brand { gap: 8px; }
+  .exploration-shell .brand h1 { font-size: 23px; }
+  .exploration-shell .brand span { font-size: 10px; }
+  .exploration-shell .app-header nav { gap: 2px; }
+  .exploration-shell .app-header nav button { font-size: 12px; padding: 8px; }
+  .deck-heading { padding: 18px 0; flex-wrap: wrap; gap: 10px; }
+  .deck-heading h2 { font-size: 23px; }
+  .deck-heading p { font-size: 13px; }
+  .development-note { max-width: none; text-align: left; font-size: 11px; }
+  .exploration-layout { display: flex; flex-direction: column; }
+  .exploration-shell .map-toolbar { flex-direction: row; gap: 4px; padding: 8px 12px; }
+  .exploration-shell .map-toolbar > span { font-size: 11px; max-width: 50%; }
+  .zoom-controls { gap: 6px; }
+  .zoom-controls button { width: 38px; height: 40px; }
+  .deck-viewport { min-height: 390px; }
+  .exploration-shell .ship-canvas { height: 390px; min-height: 390px; }
+  .exploration-shell .map-footer { display: none; }
+  .exploration-shell .touch-controls { margin: 0; padding: 10px 6px; background: #182124; }
+  .exploration-sidebar { display: block; margin-top: 0; }
+  .crew-card, .deck-key { display: none; }
+  .station-card { padding: 16px; }
+  .station-card p { margin-bottom: 12px; }
+  .crew-radio { padding: 10px 14px 10px 0; gap: 2px; }
+  .crew-radio img { width: 75px; height: 75px; }
+  .crew-radio p { font-size: 13px; }
+  .crew-radio strong span { display: block; margin: 4px 0; }
+  .crew-gallery { grid-template-columns: 1fr; padding: 16px; }
+  .crew-gallery .portrait-stage { max-width: 360px; margin: 0 auto 16px; }
+}
