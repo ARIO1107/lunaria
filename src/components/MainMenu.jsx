@@ -63,14 +63,14 @@ function Settings({ settings, onSettings }) {
     <label className="terminal-setting" htmlFor="master-volume">Volumen general <output>{settings.volume} %</output></label>
     <input id="master-volume" type="range" min="0" max="100" value={settings.volume}
       onChange={event => onSettings({ ...settings, volume: Number(event.target.value) })} />
-    <p className="terminal-muted">Los efectos suenan después del primer clic. El volumen y el silencio se guardan en este navegador. La cinemática no incluye voces grabadas: los diálogos van en subtítulos.</p>
+    <p className="terminal-muted">La música y los efectos se activan al pulsar o tocar la pantalla. El volumen y el silencio se guardan en este navegador. La cinemática no incluye voces grabadas: los diálogos van en subtítulos.</p>
     <label className="terminal-setting" htmlFor="graphics-quality">Gráficos de la cinemática</label>
     <select id="graphics-quality" value={settings.graphics || 'alto'} onChange={event => onSettings({ ...settings, graphics: event.target.value })}>
       <option value="alto">Alto</option>
       <option value="ajustado">Ajustado</option>
     </select>
     <p className="terminal-muted">El menú tiene un fondo suave sintetizado. La película usa su propia música. No hay voces grabadas.</p>
-    <label className="terminal-setting"><span>Silenciar efectos</span>
+    <label className="terminal-setting"><span>Silenciar música y efectos</span>
       <input type="checkbox" checked={settings.soundEnabled === false}
         onChange={event => onSettings({ ...settings, soundEnabled: !event.target.checked })} />
     </label>

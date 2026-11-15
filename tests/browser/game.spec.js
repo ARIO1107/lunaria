@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { skipSiteIntro } from './siteIntro.js';
 import { campaignKey, campaignReducer, createCampaign } from '../../src/game/campaign.js';
 import { levels } from '../../src/data/levelDefinitions.js';
 
@@ -14,6 +15,7 @@ function levelOneReadyToFilm() {
 
 async function ready(page) {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   await page.getByRole('button', { name: 'Omitir cinemática' }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0, { timeout: 30000 });
@@ -61,6 +63,7 @@ test('asset loading failure has a working retry', async ({ page }) => {
   let allow = false;
   await page.route('**/generated/titus.png', route => allow ? route.continue() : route.abort());
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   await page.getByRole('button', { name: 'Omitir cinemática' }).click();
   await expect(page.getByRole('button', { name: 'Reintentar carga' })).toBeVisible();
@@ -103,6 +106,7 @@ for (const width of [1440, 768, 390]) {
 
 test('the opening cinematic renders and can be skipped into level 1', async ({ page }) => {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
@@ -141,6 +145,7 @@ test('the opening cinematic renders and can be skipped into level 1', async ({ p
 
 test('skipping the opening fades through black into the deck', async ({ page }) => {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   await expect(page.locator('[data-cinematic-root] canvas')).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
   await page.getByRole('button', { name: 'Omitir cinemática' }).click();
@@ -168,6 +173,7 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
     window.__audioContexts = contexts;
   });
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
@@ -244,6 +250,7 @@ test('the cinematic leaves the deck stable and a saved game does not replay it',
     if (path.includes('/assets/') && path.endsWith('.js')) bundles.push(path);
   });
   await page.goto('/');
+  await skipSiteIntro(page);
   expect(bundles.some(path => path.includes('runtime'))).toBe(false);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
@@ -284,6 +291,7 @@ test('the cinematic leaves the deck stable and a saved game does not replay it',
 
 test('the cinematic reports a missing model, follows the screen, and recovers WebGL', async ({ page }) => {
   await page.goto('/?modelo=/no-existe.glb');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Jugar', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
@@ -316,6 +324,7 @@ test('the cinematic reports a missing model, follows the screen, and recovers We
 
 test('adjusted graphics stay measurable under CPU load', async ({ page }) => {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Configuración' }).click();
   await page.locator('#graphics-quality').selectOption('ajustado');
   await page.getByRole('button', { name: 'Cerrar panel' }).click();
@@ -362,6 +371,7 @@ test('the launch film plays only after ascent success and can be skipped to the 
   expect(saved.completedLevels.includes(1)).toBe(false);
   await page.addInitScript(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), { key: campaignKey, value: saved });
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   const canvas = page.locator('[data-cinematic-root] canvas');
   await expect(canvas).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });

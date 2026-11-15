@@ -1,3 +1,5 @@
+import { createMenuLoop } from './menuMusic.js';
+
 let context;
 let master;
 let enabled = true;
@@ -5,8 +7,9 @@ let volume = .35;
 let lastSound = -Infinity;
 let noise;
 const active = new Set();
-const bed = [];
-let bedStarting = false;
+let menuLoop;
+let menuTrack;
+let menuRequest;
 
 const voices = {
   click: { notes: [660, 880], dur: 0.04, type: 'square', peak: 0.26 },
@@ -88,51 +91,43 @@ export function suspendAudio() {
   active.clear();
 }
 
-function armMenuBed() {
-  if (!enabled || !context || context.state !== 'running' || bed.length) return;
-  const now = context.currentTime;
-  const filter = context.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 480;
-  filter.connect(master);
-  bed.push(filter);
-  for (const [frequency, level] of [[82.4, 0.07], [123.5, 0.035]]) {
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = frequency;
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(level, now + 0.9);
-    osc.connect(gain);
-    gain.connect(filter);
-    osc.start();
-    bed.push(osc);
-  }
-}
-
 export function startMenuBed() {
-  if (!enabled || !context || bed.length || bedStarting) return;
-  if (context.state === 'running') {
-    armMenuBed();
+  if (!enabled || !context || menuTrack || menuRequest) return;
+  if (context.state !== 'running') {
+    const request = Symbol();
+    menuRequest = request;
+    context.resume().then(() => {
+      if (menuRequest !== request) return;
+      menuRequest = undefined;
+      if (context.state === 'running') startMenuBed();
+    }).catch(() => {
+      if (menuRequest === request) menuRequest = undefined;
+    });
     return;
   }
-  bedStarting = true;
-  context.resume().then(() => {
-    bedStarting = false;
-    armMenuBed();
-  }).catch(() => { bedStarting = false; });
+  menuLoop ??= createMenuLoop(context);
+  const source = context.createBufferSource();
+  const gain = context.createGain();
+  const now = context.currentTime;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(.55, now + .3);
+  source.buffer = menuLoop;
+  source.loop = true;
+  source.connect(gain).connect(master);
+  source.onended = () => { source.disconnect(); gain.disconnect(); };
+  menuTrack = { source, gain };
+  source.start();
 }
 
 export function stopMenuBed() {
-  const now = context?.currentTime ?? 0;
-  for (const node of bed) {
-    try {
-      if (typeof node.stop === 'function') node.stop(now + 0.15);
-      node.disconnect();
-    } catch { /* already stopped */ }
-  }
-  bed.length = 0;
-  bedStarting = false;
+  menuRequest = undefined;
+  if (!menuTrack) return;
+  const { source, gain } = menuTrack;
+  menuTrack = undefined;
+  const now = context.currentTime;
+  gain.gain.cancelScheduledValues(now);
+  gain.gain.setTargetAtTime(0, now, .035);
+  source.stop(now + .16);
 }
 
 function tone(frequency, type, start, dur, peak) {

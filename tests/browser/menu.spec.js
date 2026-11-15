@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { skipSiteIntro } from './siteIntro.js';
 
 test('the terminal keeps its layout and supports keyboard navigation', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const lunar = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/assets/menu/lunar.png'));
   await page.goto('/');
+  await skipSiteIntro(page);
   expect((await lunar).ok()).toBe(true);
   const menu = page.getByRole('navigation', { name: 'Menú principal' });
   await expect(menu.getByRole('button', { name: /^Continuar/ })).toBeDisabled();
@@ -30,6 +32,7 @@ test('the terminal keeps its layout and supports keyboard navigation', async ({ 
 test('preferences and exploration progress survive a reload', async ({ page }) => {
   await page.clock.install();
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Configuración' }).click();
   await page.getByRole('checkbox', { name: 'Reducir animaciones' }).check();
   const volume = page.getByRole('slider', { name: 'Volumen general' });
@@ -48,6 +51,7 @@ test('preferences and exploration progress survive a reload', async ({ page }) =
   await expect(page.locator('.map-toolbar')).toContainText('Puente de mando');
   await page.getByRole('button', { name: 'Menú principal', exact: true }).click();
   await page.reload();
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Configuración' }).click();
   await expect(page.getByRole('checkbox', { name: 'Reducir animaciones' })).toBeChecked();
   await expect(page.getByRole('slider', { name: 'Volumen general' })).toHaveValue('100');

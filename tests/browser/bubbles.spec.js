@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { skipSiteIntro } from './siteIntro.js';
 import { campaignAtLevel, campaignKey, campaignReducer } from '../../src/game/campaign.js';
 
 async function continueSaved(page, state) {
   await page.goto('/');
+  await skipSiteIntro(page);
   await page.evaluate(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), { key: campaignKey, value: state });
   await page.reload();
+  await skipSiteIntro(page);
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   await expect(page.locator('.asset-loading')).toHaveCount(0, { timeout: 30000 });
 }
