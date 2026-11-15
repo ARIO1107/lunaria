@@ -96,8 +96,9 @@ export function cardAt(time, sequence = 'opening') {
 }
 
 export function fadeAt(time, sequence = 'opening') {
-  if (sequence === 'launch') return (time > 9.4 && time < 11.4) || (time > 30.6 && time < 32.4) || (time > 35.4 && time < 37.2) || (time > 44.2 && time < 47.4);
-  return (time > 17.4 && time < 20.8) || (time > 67.4 && time < 69.6);
+  const outro = time > durationOf(sequence) - 0.9;
+  if (sequence === 'launch') return outro || (time > 9.4 && time < 11.4) || (time > 30.6 && time < 32.4) || (time > 35.4 && time < 37.2) || (time > 44.2 && time < 47.4);
+  return outro || (time > 17.4 && time < 20.8) || (time > 67.4 && time < 69.6);
 }
 
 function sequencePoints() {

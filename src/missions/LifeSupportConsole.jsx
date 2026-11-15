@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { stationDescriptions } from '../data/stationDescriptions.js';
 import { createLifeSupport, lifeProblem, lifeReadout, LIFE_READY } from '../game/lifeSupport.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import { playSound } from '../audio/audioManager.js';
 
 const INTRO = 'Observa el diagrama. ¿Qué sucede si el aire no circula?';
 
@@ -26,6 +27,7 @@ export default function LifeSupportConsole({ onAnswer }) {
   const description = stationDescriptions.oxygen;
 
   function toggle(key) {
+    playSound('click');
     setTesting(false);
     setRig(current => ({ ...current, [key]: !current[key], stable: false }));
   }
@@ -33,6 +35,7 @@ export default function LifeSupportConsole({ onAnswer }) {
   function testSystem() {
     const problem = lifeProblem(rig);
     if (problem) {
+      playSound('error');
       setSpeech(problem.line);
       setRig(current => ({ ...current, stable: false }));
       return;

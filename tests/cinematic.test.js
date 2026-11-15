@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CINEMATIC_DURATION, LAUNCH_DURATION, cameraAt, cardAt, castAt, launchAltitude, launchCameraLift, launchSky, lineAt, lines, launchLines } from '../src/cinematic/script.js';
+import { CINEMATIC_DURATION, LAUNCH_DURATION, cameraAt, cardAt, castAt, fadeAt, launchAltitude, launchCameraLift, launchSky, lineAt, lines, launchLines } from '../src/cinematic/script.js';
 import { applyCast, createCinematicAstronaut, createCinematicTitus } from '../src/cinematic/cast.js';
 import { createLauncherHull } from '../src/cinematic/sets.js';
 
@@ -16,6 +16,11 @@ test('the opening cinematic lasts between 60 and 90 seconds and stays on the pad
   assert.match(cardAt(70).detail, /despegue/);
   assert.equal(lineAt(40), null);
   assert.equal(castAt(8).interior, false);
+  assert.equal(fadeAt(28), false);
+  assert.equal(fadeAt(50), false);
+  assert.equal(fadeAt(71), false);
+  assert.equal(fadeAt(CINEMATIC_DURATION - 0.2), true);
+  assert.equal(fadeAt(LAUNCH_DURATION - 0.2, 'launch'), true);
 });
 
 test('dialogue stays in order and the crew moves during the story', () => {

@@ -6,6 +6,7 @@ import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import TitusDialogue from './TitusDialogue.jsx';
 import CheckIcon from './CheckIcon.jsx';
+import { playSound } from '../audio/audioManager.js';
 
 const H = nasaTelemetry.launch.verified;
 function Meter({ label, value, display, danger = false, safeLimit }) {
@@ -19,10 +20,15 @@ export default function LaunchPanel({ flight, setFlight, onFinish, onClose }) {
   const [paused, setPaused] = useState(false);
   const canvas = useRef(null);
   const reduced = useReducedMotion();
+  const thrustAt = useRef(0);
   const done = flight.status === 'success' || flight.status === 'failed';
   const guidance = launchGuidance(flight);
   const action = (name, value) => setFlight(s => launchAction(s, name, value));
   useAnimationFrame(dt => {
+    if (!paused && flight.status === 'flying') {
+      thrustAt.current += dt;
+      if (thrustAt.current > 0.36) { thrustAt.current = 0; playSound('thrust'); }
+    }
     if (!paused) setFlight(s => stepLaunch(s, dt));
     if (!canvas.current) return;
     const el = canvas.current;
@@ -66,9 +72,9 @@ export default function LaunchPanel({ flight, setFlight, onFinish, onClose }) {
         <input id="throttle" type="range" min="35" max="100" step="1" value={Math.round(flight.throttle * 100)} disabled={flight.status !== 'flying' || paused} onChange={e => action('throttle', Number(e.target.value) / 100)} />
         <div className="throttle-presets"><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', .6)}>60 % · Max Q</button><button disabled={flight.status !== 'flying' || paused} onClick={() => action('throttle', 1)}>100 % · Ascenso</button></div>
         <div className="launch-actions">
-          {flight.status === 'ready' ? <button className="primary-button" onClick={() => action('ignite')}>Encender motores</button> : <button className="secondary-button" onClick={() => setPaused(!paused)}>{paused ? 'Reanudar vuelo' : 'Pausar vuelo'}</button>}
-          <button className={canCut ? 'primary-button' : 'secondary-button'} disabled={!canCut} onClick={() => action('cutoff')}>{flight.centerOff ? 'Motor central apagado' : 'Apagar motor central'}</button>
-          <button className={canSeparate ? 'primary-button' : 'secondary-button'} disabled={!canSeparate} onClick={() => action('separate')}>Separar etapa</button>
+          {flight.status === 'ready' ? <button className="primary-button" onClick={() => { playSound('launch'); action('ignite'); }}>Encender motores</button> : <button className="secondary-button" onClick={() => { playSound('click'); setPaused(!paused); }}>{paused ? 'Reanudar vuelo' : 'Pausar vuelo'}</button>}
+          <button className={canCut ? 'primary-button' : 'secondary-button'} disabled={!canCut} onClick={() => { playSound('beep'); action('cutoff'); }}>{flight.centerOff ? 'Motor central apagado' : 'Apagar motor central'}</button>
+          <button className={canSeparate ? 'primary-button' : 'secondary-button'} disabled={!canSeparate} onClick={() => { playSound('stage'); action('separate'); }}>Separar etapa</button>
         </div>
         <small>Apagado desde 02:15 · Separación desde 02:42. Cerrar el panel pausa el vuelo.</small>
       </div>

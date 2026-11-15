@@ -207,4 +207,7 @@ th:first-child, td:first-child { text-align: left; }
   .result-panel > h3 { font-size: 22px; }
 }
 @media (pointer: coarse) and (min-width: 761px) { .touch-controls { display: flex; gap: 10px; padding-top: 16px; } .touch-controls button { min-width: 48px; min-height: 48px; background: var(--raised); border: 1px solid var(--line); padding: 12px; touch-action: none; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+.scene-veil { position: fixed; inset: 0; z-index: 80; background: #000; pointer-events: none; }
+.scene-veil.hold { opacity: 1; }
+.scene-veil.lift { opacity: 0; transition: opacity 0.8s linear !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } .cinematic-fade.handoff, .scene-veil.lift { transition: opacity 0.45s linear !important; } }

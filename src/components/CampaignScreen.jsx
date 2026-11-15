@@ -14,7 +14,7 @@ import { factsForLevel } from '../data/scienceFacts.js';
 import { stationDescriptions } from '../data/stationDescriptions.js';
 import { operationsActions } from '../game/resourceEngine.js';
 import { assetUrl } from '../game/assets.js';
-import { playSound, suspendAudio } from '../audio/audioManager.js';
+import { playSound, startGameBed, stopGameBed, suspendAudio } from '../audio/audioManager.js';
 import { titusAtStation } from '../game/titusGuide.js';
 import { bubbleSpeech } from '../game/titusBubbles.js';
 import FirstPersonBay from '../view/FirstPersonBay.jsx';
@@ -79,6 +79,10 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const [moment, setMoment] = useState('walk');
   const seenGoals = useRef(campaign.completedObjectives.length);
   const soundedGoals = useRef(campaign.completedObjectives.length);
+  const heardSpeech = useRef('');
+  const heardError = useRef(null);
+  const heardSamples = useRef(campaign.collectedSamples.length);
+  const errorsReady = useRef(false);
   const alarmed = useRef(false);
   const reportRoom = useCallback(name => setRoom(name), []);
   const targetStation = STATIONS.find(station => station.id === task?.stationId);
@@ -108,6 +112,23 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     if (campaign.phase === 'complete') playSound('levelComplete');
   }, [campaign.phase, campaign.currentLevel]);
   useEffect(() => {
+    const quiet = campaign.phase !== 'active' || settings.soundEnabled === false || modal?.type === 'pause';
+    if (quiet) stopGameBed();
+    else startGameBed();
+    return () => stopGameBed();
+  }, [campaign.phase, settings.soundEnabled, modal?.type]);
+  useEffect(() => {
+    const error = campaign.flags?.lastError || null;
+    if (errorsReady.current && error && error !== heardError.current) playSound('error');
+    heardError.current = error;
+    errorsReady.current = true;
+  }, [campaign.flags?.lastError]);
+  useEffect(() => {
+    const count = campaign.collectedSamples.length;
+    if (count > heardSamples.current) playSound('collect');
+    heardSamples.current = count;
+  }, [campaign.collectedSamples.length]);
+  useEffect(() => {
     if (emergency && !alarmed.current) { alarmed.current = true; playSound('alarm'); }
   }, [emergency]);
   useEffect(() => {
@@ -123,6 +144,11 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const speech = campaign.phase === 'active' && !modal
     ? bubbleSpeech(campaign.currentLevel, task, moment === 'done' ? campaign.completedObjectives.length : bubbleTick, moment)
     : '';
+  useEffect(() => {
+    if (!speech || speech === heardSpeech.current) return;
+    heardSpeech.current = speech;
+    playSound('robot');
+  }, [speech]);
   useEffect(() => {
     if (campaign.phase !== 'active' || !task || near?.id !== task.stationId) return;
     dispatch({ type: 'guide', id: 'at-' + task.id, message: titusAtStation(task) });
@@ -150,6 +176,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     setModal({ type: 'station', station });
   }
   function changeZoom(delta) {
+    playSound('click');
     setZoom(value => {
       const next = Math.min(1.75, Math.max(.8, +(value + delta).toFixed(2)));
       zoomRef.current = next;
@@ -201,7 +228,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
       <div className="deck-mode">{campaign.flags.demo && <span className="demo-flag">Demostración · </span>}{onSurface ? 'Superficie lunar' : campaign.currentLevel === 1 ? 'Cubierta de Lunaria · en tierra' : 'Cubierta de Lunaria'}</div>
       <nav aria-label="Controles de la misión">
         <button className="quiet-button" onClick={leave}>Menú principal</button>
-        <button className="quiet-button" onClick={() => setModal({ type: 'pause' })}>Pausa</button>
+        <button className="quiet-button" onClick={() => { playSound('close'); setModal({ type: 'pause' }); }}>Pausa</button>
         <button className="quiet-button" onClick={() => onSettings({ ...settings, soundEnabled: settings.soundEnabled === false })}>{settings.soundEnabled === false ? 'Activar sonido' : 'Silenciar'}</button>
         <button className="quiet-button" onClick={() => setModal({ type: 'titus' })}>Preguntar a Titus</button>
         <button className="quiet-button" onClick={() => setModal({ type: 'log' })}>Bitácora</button>

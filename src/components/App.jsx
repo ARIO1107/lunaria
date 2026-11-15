@@ -5,6 +5,25 @@ import { campaignAtLevel, campaignReducer, createCampaign, readCampaign, saveCam
 import { readSettings, saveSettings } from '../game/session.js';
 import { configureAudio, startMenuBed, stopMenuBed, unlockAudio } from '../audio/audioManager.js';
 
+function SceneFade({ active }) {
+  const previous = useRef(active);
+  const [cover, setCover] = useState(false);
+  const [lift, setLift] = useState(false);
+  const leftFilm = previous.current && !active;
+  if (active && cover) { setCover(false); setLift(false); }
+  else if (leftFilm && !cover) setCover(true);
+  useEffect(() => { previous.current = active; }, [active]);
+  useEffect(() => {
+    if (!cover) return undefined;
+    let next = 0;
+    const frame = requestAnimationFrame(() => { next = requestAnimationFrame(() => setLift(true)); });
+    const timer = window.setTimeout(() => { setCover(false); setLift(false); }, 920);
+    return () => { cancelAnimationFrame(frame); cancelAnimationFrame(next); window.clearTimeout(timer); };
+  }, [cover]);
+  if (!cover) return null;
+  return <div className={lift ? 'scene-veil lift' : 'scene-veil hold'} aria-hidden="true" />;
+}
+
 export default function App() {
   const [campaign, dispatch] = useReducer(campaignReducer, null, readCampaign);
   const [settings, setSettings] = useState(readSettings);
@@ -36,7 +55,9 @@ export default function App() {
     saveSettings(next);
   }
 
+  const filming = Boolean(playing && campaign && campaign.currentLevel === 1 && (campaign.phase === 'cinematic' || campaign.phase === 'launchCinematic'));
   return <div data-lunaria-reduced-motion={settings.reducedMotion}>
+    <SceneFade active={filming} />
     {playing && campaign
       ? <CampaignScreen campaign={campaign} dispatch={dispatch} settings={settings} onSettings={updateSettings} onExit={() => setPlaying(false)} />
       : <MainMenu progress={campaign} settings={settings} onSettings={updateSettings}

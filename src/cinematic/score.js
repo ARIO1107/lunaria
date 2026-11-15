@@ -1,6 +1,7 @@
 const tones = {
   wake: [520, 780], console: [360, 540, 720], ready: [392, 523, 659],
-  tick: [880], ignite: [140, 90, 70], triumph: [392, 494, 587, 784],
+  tick: [880], ignite: [110, 82, 55], triumph: [392, 494, 587, 784],
+  robot: [880, 1175],
 };
 const moods = {
   pad: { drone: 62, fifth: 93, lfo: 0.07, bed: 0.7 },
@@ -74,8 +75,8 @@ export function createScore({ volume = .7, enabled = true }) {
   burnSource.start();
   const rumble = context.createOscillator();
   const rumbleGain = context.createGain();
-  rumble.frequency.value = 38;
-  rumble.type = 'sine';
+  rumble.frequency.value = 55;
+  rumble.type = 'square';
   rumbleGain.gain.value = 0;
   rumble.connect(rumbleGain); rumbleGain.connect(master);
   rumble.start();
@@ -104,8 +105,11 @@ export function createScore({ volume = .7, enabled = true }) {
       if (Math.abs(level - burn) < .02 || context.state !== 'running') return;
       burn = level;
       const now = context.currentTime;
-      burnGain.gain.setTargetAtTime(level * .55, now, .08);
-      rumbleGain.gain.setTargetAtTime(level * .12, now, .08);
+      burnGain.gain.setTargetAtTime(level * .9, now, .08);
+      rumbleGain.gain.setTargetAtTime(level * .16, now, .08);
+    },
+    fadeOut() {
+      master.gain.setTargetAtTime(0, context.currentTime, .12);
     },
     cue(name) {
       const notes = tones[name];
@@ -114,17 +118,17 @@ export function createScore({ volume = .7, enabled = true }) {
       notes.forEach((frequency, index) => {
         const oscillator = context.createOscillator();
         const envelope = context.createGain();
-        const start = now + index * .08;
+        const start = now + index * .07;
         oscillator.frequency.value = frequency;
-        oscillator.type = 'sine';
+        oscillator.type = 'square';
         const filter = context.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.value = 2200;
+        filter.frequency.value = 2400;
         envelope.gain.setValueAtTime(0, start);
-        envelope.gain.linearRampToValueAtTime(.42, start + .02);
-        envelope.gain.exponentialRampToValueAtTime(.001, start + .32);
+        envelope.gain.linearRampToValueAtTime(name === 'ignite' ? .7 : .5, start + .015);
+        envelope.gain.exponentialRampToValueAtTime(.001, start + (name === 'ignite' ? .55 : .28));
         oscillator.connect(filter); filter.connect(envelope); envelope.connect(master);
-        oscillator.start(start); oscillator.stop(start + .34);
+        oscillator.start(start); oscillator.stop(start + .6);
       });
     },
     dispose() {

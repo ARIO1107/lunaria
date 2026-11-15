@@ -17,7 +17,7 @@ when-to-use: >
 - Menú, Jugar, película, nivel 1. Continuar no vuelve a pasar la película.
 - La apertura dura unos 75 segundos, se puede omitir y no dice «384 400 km». La nave sigue en la plataforma.
 - La película de despegue, de unos 60 segundos, empieza solo tras un ascenso logrado, en la fase `launchCinematic`. No hay un segundo lanzamiento jugable.
-- Omitir para animación, audio y temporizadores, libera recursos y entra al nivel. En escritorio vale Escape. En el móvil hay un botón.
+- Omitir para animación, audio y temporizadores, libera recursos y entra al nivel. Antes, la imagen funde a negro unos 0,7 s. Al entrar en la partida, un velo negro se abre sobre el juego. En escritorio vale Escape. En el móvil hay un botón.
 - No cambies los materiales del robot en `cast.js`. El gris de la cabina lo pinta `lunaria-characters`.
 
 ## Al tocar Three.js

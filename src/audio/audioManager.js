@@ -9,18 +9,29 @@ const bed = [];
 let bedStarting = false;
 
 const voices = {
-  click: { notes: [740], dur: 0.045, type: 'sine', peak: 0.34 },
-  open: { notes: [392, 587], dur: 0.08, type: 'sine', peak: 0.36 },
-  close: { notes: [494, 330], dur: 0.07, type: 'sine', peak: 0.32 },
-  success: { notes: [523, 659, 784], dur: 0.11, type: 'sine', peak: 0.34, harm: true },
-  error: { notes: [196, 155], dur: 0.13, type: 'triangle', peak: 0.32 },
-  alarm: { notes: [587, 440, 587], dur: 0.09, type: 'triangle', peak: 0.28 },
-  countdown: { notes: [880], dur: 0.055, type: 'sine', peak: 0.3 },
-  launch: { notes: [78, 104], dur: 0.22, type: 'sine', peak: 0.4, noise: true },
-  landing: { notes: [247, 330, 494], dur: 0.12, type: 'sine', peak: 0.3, harm: true },
-  collect: { notes: [784, 988], dur: 0.08, type: 'sine', peak: 0.3 },
-  levelComplete: { notes: [392, 523, 659, 784], dur: 0.14, type: 'sine', peak: 0.28, harm: true },
+  click: { notes: [660, 880], dur: 0.04, type: 'square', peak: 0.26 },
+  open: { notes: [392, 523, 784], dur: 0.07, type: 'square', peak: 0.28 },
+  close: { notes: [494, 330], dur: 0.06, type: 'square', peak: 0.24 },
+  success: { notes: [523, 659, 784], dur: 0.09, type: 'square', peak: 0.3, harm: true },
+  error: { notes: [196, 146], dur: 0.11, type: 'square', peak: 0.28 },
+  alarm: { notes: [587, 440, 587], dur: 0.08, type: 'square', peak: 0.26 },
+  countdown: { notes: [880], dur: 0.05, type: 'square', peak: 0.3 },
+  launch: { notes: [110, 82, 55], dur: 0.16, type: 'square', peak: 0.36, noise: true },
+  thrust: { notes: [73], dur: 0.08, type: 'square', peak: 0.22, noise: true, layer: true },
+  landing: { notes: [196, 262, 392], dur: 0.1, type: 'square', peak: 0.28, harm: true },
+  collect: { notes: [784, 988, 1318], dur: 0.06, type: 'square', peak: 0.26 },
+  levelComplete: { notes: [392, 523, 659, 784], dur: 0.12, type: 'square', peak: 0.26, harm: true },
+  step: { notes: [180], dur: 0.04, type: 'square', peak: 0.16, tick: true, layer: true },
+  motor: { notes: [146], dur: 0.045, type: 'square', peak: 0.12, layer: true },
+  robot: { notes: [880, 1175], dur: 0.055, type: 'square', peak: 0.2, layer: true },
+  beep: { notes: [988], dur: 0.045, type: 'square', peak: 0.22 },
+  stage: { notes: [220, 330, 494], dur: 0.07, type: 'square', peak: 0.26 },
 };
+const grooveNotes = [262, 330, 392, 494, 392, 330, 294, 349];
+let lastSoft = -Infinity;
+let grooveTimer = 0;
+let grooveIndex = 0;
+const groove = [];
 
 function noiseBuffer(ctx) {
   if (noise && noise.sampleRate === ctx.sampleRate) return noise;
@@ -51,7 +62,7 @@ export function configureAudio(settings = {}) {
   const candidate = Number(settings.volume);
   if (Number.isFinite(candidate)) volume = Math.max(0, Math.min(100, candidate)) / 100;
   if (master && context) master.gain.setTargetAtTime(enabled ? volume * .15 : 0, context.currentTime, .025);
-  if (!enabled) stopMenuBed();
+  if (!enabled) { stopMenuBed(); stopGameBed(); }
 }
 
 export function unlockAudio() {
@@ -131,7 +142,7 @@ function tone(frequency, type, start, dur, peak) {
   oscillator.type = type;
   oscillator.frequency.value = frequency;
   filter.type = 'lowpass';
-  filter.frequency.value = Math.max(900, frequency * 4);
+  filter.frequency.value = type === 'square' ? Math.max(2400, frequency * 8) : Math.max(900, frequency * 4);
   envelope.gain.setValueAtTime(0, start);
   envelope.gain.linearRampToValueAtTime(peak, start + 0.012);
   envelope.gain.exponentialRampToValueAtTime(0.001, start + dur);
@@ -141,6 +152,70 @@ function tone(frequency, type, start, dur, peak) {
   track(oscillator, envelope, filter);
   oscillator.start(start);
   oscillator.stop(start + dur + 0.02);
+}
+
+function hush(nodes) {
+  const now = context?.currentTime ?? 0;
+  for (const node of nodes) {
+    try {
+      if (typeof node.stop === 'function') node.stop(now + 0.05);
+      node.disconnect();
+    } catch { /* already stopped */ }
+  }
+  nodes.length = 0;
+}
+
+function armGameBed() {
+  if (!enabled || !context || context.state !== 'running' || grooveTimer) return;
+  const pulse = () => {
+    if (!enabled || !context || context.state !== 'running') return;
+    const frequency = grooveNotes[grooveIndex % grooveNotes.length];
+    grooveIndex += 1;
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const envelope = context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.exponentialRampToValueAtTime(0.045, now + 0.02);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+    oscillator.connect(envelope);
+    envelope.connect(master);
+    oscillator.start(now);
+    oscillator.stop(now + 0.18);
+    groove.push(oscillator);
+    oscillator.onended = () => {
+      const index = groove.indexOf(oscillator);
+      if (index >= 0) groove.splice(index, 1);
+      try { oscillator.disconnect(); envelope.disconnect(); } catch { /* already disconnected */ }
+    };
+  };
+  pulse();
+  grooveTimer = window.setInterval(pulse, 340);
+}
+
+export function startGameBed() {
+  if (!enabled || !context || grooveTimer) return;
+  if (context.state === 'running') { armGameBed(); return; }
+  context.resume().then(() => armGameBed()).catch(() => {});
+}
+
+export function stopGameBed() {
+  if (grooveTimer) window.clearInterval(grooveTimer);
+  grooveTimer = 0;
+  hush(groove);
+}
+
+export function tickCrew(moving, following, dt, clock) {
+  if (!clock || !dt) return;
+  if (moving) {
+    clock.step = (clock.step || 0) + dt;
+    if (clock.step > 0.34) { clock.step = 0; playSound('step'); }
+  } else clock.step = 0.16;
+  if (following) {
+    clock.motor = (clock.motor || 0) + dt;
+    if (clock.motor > 0.52) { clock.motor = 0; playSound('motor'); }
+  } else clock.motor = 0;
 }
 
 function thrust(start) {
@@ -161,17 +236,40 @@ function thrust(start) {
   source.stop(start + 0.44);
 }
 
+function tickNoise(start, peak) {
+  const source = context.createBufferSource();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  source.buffer = noiseBuffer(context);
+  filter.type = 'highpass';
+  filter.frequency.value = 700;
+  envelope.gain.setValueAtTime(peak, start);
+  envelope.gain.exponentialRampToValueAtTime(0.001, start + 0.045);
+  source.connect(filter);
+  filter.connect(envelope);
+  envelope.connect(master);
+  track(source, filter, envelope);
+  source.start(start);
+  source.stop(start + 0.05);
+}
+
 export function playSound(name = 'click') {
   if (!enabled || !context || context.state !== 'running' || document.hidden) return;
   const now = context.currentTime;
-  if (now - lastSound < .065) return;
-  lastSound = now;
-  suspendAudio();
   const voice = voices[name] || voices.click;
+  if (voice.layer) {
+    if (now - lastSoft < 0.1) return;
+    lastSoft = now;
+  } else {
+    if (now - lastSound < .065) return;
+    lastSound = now;
+    suspendAudio();
+  }
   if (voice.noise) thrust(now);
+  if (voice.tick) tickNoise(now, voice.peak);
   voice.notes.forEach((frequency, index) => {
     const start = now + index * voice.dur * 0.72;
     tone(frequency, voice.type, start, voice.dur, voice.peak);
-    if (voice.harm) tone(frequency * 2, 'sine', start, voice.dur * 0.8, voice.peak * 0.16);
+    if (voice.harm) tone(frequency * 2, 'square', start, voice.dur * 0.8, voice.peak * 0.12);
   });
 }

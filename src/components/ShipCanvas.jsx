@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { moveActor, nearestStation, roomAt, canOccupy } from '../game/world.js';
 import { actorScreen, deckView, drawDeck } from '../game/deckRenderer.js';
 import { placeCrewBubble } from '../game/bubblePlace.js';
+import { tickCrew } from '../audio/audioManager.js';
 import { loadArt } from '../game/assets.js';
 import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
@@ -74,6 +75,7 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
       const distance = Math.hypot(s.player.x - s.titus.x, s.player.y - s.titus.y);
       if (guidePoint) s.titus.angle = Math.atan2(guidePoint.x - s.titus.x, guidePoint.y - s.titus.y);
       else if (distance > 35) s.titus.angle = Math.atan2(s.player.x - s.titus.x, s.player.y - s.titus.y);
+      tickCrew(Boolean(dx || dy), distance > 26, dt, s);
     }
     const near = nearestStation(s.player);
     const room = roomAt(s.player);

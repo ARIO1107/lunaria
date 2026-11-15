@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { cardAt, fadeAt, lineAt } from './script.js';
+import { cardAt, durationOf, fadeAt, lineAt } from './script.js';
 import './cinematic.css';
 
 export default function CinematicPlayer({ sequence = 'opening', onComplete, reducedMotion = false, volume = 70, soundEnabled = true, quality = 'alto' }) {
   const canvasRef = useRef(null);
   const ended = useRef(false);
+  const closing = useRef(false);
   const handle = useRef(null);
-  const [ui, setUi] = useState({ ready: false, error: '', lost: false, line: null, card: null, fade: false });
+  const [ui, setUi] = useState({ ready: false, error: '', lost: false, line: null, card: null, fade: false, handoff: false });
 
   function complete() {
     if (ended.current) return;
@@ -15,8 +16,16 @@ export default function CinematicPlayer({ sequence = 'opening', onComplete, redu
   }
 
   function skip() {
-    if (handle.current) handle.current.finish();
-    else complete();
+    if (closing.current || ended.current) return;
+    closing.current = true;
+    handle.current?.fadeOut?.();
+    setUi(previous => ({ ...previous, handoff: true }));
+    window.setTimeout(() => setUi(previous => ({ ...previous, fade: true })), 40);
+    window.setTimeout(() => {
+      if (ended.current) return;
+      if (handle.current) handle.current.finish();
+      else complete();
+    }, reducedMotion ? 560 : 880);
   }
 
   useEffect(() => {
@@ -40,12 +49,13 @@ export default function CinematicPlayer({ sequence = 'opening', onComplete, redu
           if (dead) return;
           const line = lineAt(frame.time, sequence);
           const card = cardAt(frame.time, sequence);
-          const fade = fadeAt(frame.time, sequence);
+          const fade = closing.current || fadeAt(frame.time, sequence);
+          const handoff = closing.current || frame.time > durationOf(sequence) - 1.05;
           const lost = Boolean(frame.lost);
           setUi(previous => {
             const error = frame.loadError || previous.error;
-            if (previous.ready && previous.line?.id === line?.id && previous.card?.title === card?.title && previous.lost === lost && previous.fade === fade && previous.error === error) return previous;
-            return { ready: true, error, lost, line, card, fade };
+            if (previous.ready && previous.line?.id === line?.id && previous.card?.title === card?.title && previous.lost === lost && previous.fade === fade && previous.handoff === handoff && previous.error === error) return previous;
+            return { ready: true, error, lost, line, card, fade, handoff };
           });
         },
         onComplete: complete,
@@ -63,13 +73,13 @@ export default function CinematicPlayer({ sequence = 'opening', onComplete, redu
   const launchFilm = sequence === 'launch';
   return <div className="cinematic-root" data-cinematic-root data-sequence={sequence}>
     <canvas ref={canvasRef} aria-label={launchFilm ? 'Cinemática tridimensional del despegue' : 'Cinemática tridimensional de apertura'} />
-    <div className={ui.fade ? 'cinematic-fade show' : 'cinematic-fade'} />
+    <div className={'cinematic-fade' + (ui.fade ? ' show' : '') + (ui.handoff ? ' handoff' : '')} />
     {!ui.ready && !ui.error && <p className="cinematic-loading" role="status">Preparando la cinemática…</p>}
     {ui.error && <p className="cinematic-loading" role="alert">{ui.error} {launchFilm ? 'Puedes ver el resumen de la misión.' : 'Puedes entrar directo a la nave.'}</p>}
     {ui.lost && <p className="cinematic-loading" role="alert">El navegador perdió la imagen 3D.</p>}
     {ui.card && <div className="cinematic-title"><p>{ui.card.kicker}</p><h1>{ui.card.title}</h1>{ui.card.detail && <span>{ui.card.detail}</span>}</div>}
     {ui.line && <p className="cinematic-subtitle" role="status"><strong>{ui.line.speaker}</strong> {ui.line.text}</p>}
-    <p className="cinematic-note">{launchFilm ? 'La música es de la película. En el vacío no hay sonido de motores.' : 'Música y efectos de la película, en la plataforma de lanzamiento.'}</p>
+    <p className="cinematic-note">{launchFilm ? 'Música y efectos del juego. En el vacío real el motor no se oye.' : 'Música y efectos del juego, en la plataforma de lanzamiento.'}</p>
     <button className="secondary-button cinematic-skip" onClick={skip}>Omitir cinemática</button>
     <span className="cinematic-hint">Esc · Omitir</span>
   </div>;

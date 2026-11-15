@@ -17,7 +17,7 @@ El juego no descarga clips ni usa una voz de pago. Los efectos salen de oscilado
 - `unlockAudio` abre el contexto en el primer gesto. Sin eso el navegador deja el audio suspendido.
 - `configureAudio` obedece `soundEnabled` y el volumen de 0 a 100. `playSound` no suena si el sonido está apagado, si el contexto no está en marcha, si la pestaña está oculta o si otro sonido empezó hace menos de 65 ms.
 - `suspendAudio` corta los osciladores vivos. La pausa y el salto de la cinemática tienen que dejar el audio en silencio.
-- Nombres de juego: `click`, `open`, `close`, `success`, `error`, `alarm`, `countdown`, `launch`, `landing`, `collect`, `levelComplete`.
+- Nombres de juego: `click`, `open`, `close`, `success`, `error`, `alarm`, `countdown`, `launch`, `thrust`, `landing`, `collect`, `levelComplete`, `step`, `motor`, `robot`, `beep`, `stage`. `step`, `motor`, `robot` y `thrust` no cortan el motivo de la partida. Ese motivo suena en la fase `active` y se calla en pausa.
 - Cues de la película: `wake`, `console`, `ready`, `tick`, `ignite`, `triumph`. Ambientes: `pad`, `tension`, `ascent`, `triumph`.
 - El contexto de la película se marca con `__lunariaCinematic`. No abras un segundo contexto para el mismo gesto.
 

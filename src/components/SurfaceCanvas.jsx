@@ -4,6 +4,7 @@ import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { SURFACE_OBJECTS, surfaceSpawn, canOccupySurface, moveSurfaceActor, nearestSurfaceObject } from '../game/surfaceWorld.js';
 import { placeCrewBubble } from '../game/bubblePlace.js';
+import { tickCrew } from '../audio/audioManager.js';
 
 function sprite(ctx, art, name, actor, time, moving, mood, reduced) {
   const meta = art.manifest.actors[name];
@@ -113,6 +114,8 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
         if (distance < 4) state.trail.shift();
         else state.titus = moveSurfaceActor(state.titus, target.x - state.titus.x, target.y - state.titus.y, Math.min(dt * 1.3, distance / 145));
       }
+      const apart = Math.hypot(state.player.x - state.titus.x, state.player.y - state.titus.y);
+      tickCrew(Boolean(dx || dy), apart > 26, dt, state);
     }
     const near = nearestSurfaceObject(state.player);
     if (nearId.current !== near?.id) { nearId.current = near?.id ?? null; onNear(near); }

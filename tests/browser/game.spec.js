@@ -139,6 +139,16 @@ test('the opening cinematic renders and can be skipped into level 1', async ({ p
   await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
 });
 
+test('skipping the opening fades through black into the deck', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Jugar', exact: true }).click();
+  await expect(page.locator('[data-cinematic-root] canvas')).toHaveAttribute('data-cinematic', 'ready', { timeout: 30000 });
+  await page.getByRole('button', { name: 'Omitir cinemática' }).click();
+  await expect.poll(async () => Number(await page.locator('.cinematic-fade').evaluate(node => getComputedStyle(node).opacity)), { timeout: 2000 }).toBeGreaterThan(0.2);
+  await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
+  await expect(page.locator('.scene-veil')).toHaveCount(0, { timeout: 4000 });
+});
+
 test('checklist: new game, models, subtitles, skip, audio and saved continue', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));

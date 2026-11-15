@@ -7,6 +7,8 @@ export default function LandingPanel({ state, dispatch, onComplete }) {
   const flight = state.landing;
   const [paused, setPaused] = useState(false);
   const steering = useRef(0);
+  const thrustAt = useRef(0);
+  const statusWas = useRef(flight.status);
   const held = useRef(new Set());
   const site = landingSites[state.site];
   const update = value => dispatch({ type: 'landing', value });
@@ -23,7 +25,15 @@ export default function LandingPanel({ state, dispatch, onComplete }) {
     window.addEventListener('keydown', down); window.addEventListener('keyup', up); window.addEventListener('blur', clear);
     return () => { clear(); window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); window.removeEventListener('blur', clear); };
   }, []);
-  useAnimationFrame(dt => update(current => stepLanding({ ...current, steer: steering.current }, dt)), !paused && flight.status === 'flying');
+  useEffect(() => {
+    if (statusWas.current !== 'failed' && flight.status === 'failed') playSound('error');
+    statusWas.current = flight.status;
+  }, [flight.status]);
+  useAnimationFrame(dt => {
+    thrustAt.current += dt;
+    if (thrustAt.current > 0.4) { thrustAt.current = 0; playSound('thrust'); }
+    update(current => stepLanding({ ...current, steer: steering.current }, dt));
+  }, !paused && flight.status === 'flying');
   const padX = 50 + site.center / 2;
   return <div className="beta-panel">
     <p>Gravedad de referencia: 1,62 m/s². Empuje, combustible, masa y límites seguros son parámetros del simulador. Toca dentro de la zona con velocidad vertical ≤3 m/s y horizontal ≤2 m/s.</p>
@@ -39,7 +49,7 @@ export default function LandingPanel({ state, dispatch, onComplete }) {
       {[-1,1].map(dir => <button key={dir} className="secondary-button" disabled={paused || flight.status !== 'flying'}
         onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); steering.current = dir; }}
         onPointerUp={() => { steering.current = 0; }} onPointerCancel={() => { steering.current = 0; }} onLostPointerCapture={() => { steering.current = 0; }}>{dir < 0 ? '← Corregir' : 'Corregir →'}</button>)}
-      {flight.status === 'ready' && <button className="primary-button" onClick={() => update(f => ({ ...f, status: 'flying' }))}>Iniciar descenso</button>}
+      {flight.status === 'ready' && <button className="primary-button" onClick={() => { playSound('launch'); update(f => ({ ...f, status: 'flying' })); }}>Iniciar descenso</button>}
       {flight.status === 'flying' && <button className="secondary-button" onClick={() => { steering.current = 0; setPaused(!paused); }}>{paused ? 'Reanudar descenso' : 'Pausar descenso'}</button>}
       {flight.status === 'success' && <button className="primary-button" onClick={() => { playSound('landing'); onComplete(); }}>Aterrizaje seguro · salir a la superficie</button>}
       {flight.status === 'failed' && <><p role="alert">Contacto fuera de límites seguros. Titus: corrige antes y reduce la velocidad con el motor.</p><button className="primary-button" onClick={() => { update(createLanding(state.site)); setPaused(false); }}>Reintentar descenso</button></>}

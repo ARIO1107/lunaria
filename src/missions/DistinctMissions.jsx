@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { stationDescriptions } from '../data/stationDescriptions.js';
 import { airlockAdvance, burnReady, burnSpeed, repairAdvance, REPAIR_ORDER, shadowState } from '../game/laterMissions.js';
+import { playSound } from '../audio/audioManager.js';
 
 function Speech({ children }) {
   return <p className="eclss-speech" role="status"><b>Titus. </b>{children}</p>;
@@ -17,7 +18,7 @@ export function FaultLamps({ onAnswer }) {
   return <div className="tour">
     <Speech>{line}</Speech>
     <div className="tour-lamps">
-      {lamps.map(([name, fault]) => <button key={name} className="secondary-button" data-fault={fault} onClick={() => fault ? onAnswer(name) : setLine(name + ' está estable. Busca la lámpara roja.')}>{name}</button>)}
+      {lamps.map(([name, fault]) => <button key={name} className="secondary-button" data-fault={fault} onClick={() => fault ? onAnswer(name) : (playSound('error'), setLine(name + ' está estable. Busca la lámpara roja.'))}>{name}</button>)}
     </div>
     <Source id="breakers" />
   </div>;
@@ -29,8 +30,8 @@ export function BreakerPull({ onAnswer }) {
   return <div className="tour">
     <Speech>{line}</Speech>
     <div className="eclss-controls">
-      <button className="secondary-button" aria-pressed={down} onClick={() => { setDown(true); setLine('Disyuntor abajo. La pieza ya no tiene corriente. Confirma el aislamiento.'); }}>Bajar disyuntor de propulsión</button>
-      <button className="secondary-button" onClick={() => setLine('No toques la pieza con corriente. Primero baja el disyuntor.')}>Tocar la pieza ahora</button>
+      <button className="secondary-button" aria-pressed={down} onClick={() => { playSound('click'); setDown(true); setLine('Disyuntor abajo. La pieza ya no tiene corriente. Confirma el aislamiento.'); }}>Bajar disyuntor de propulsión</button>
+      <button className="secondary-button" onClick={() => { playSound('error'); setLine('No toques la pieza con corriente. Primero baja el disyuntor.'); }}>Tocar la pieza ahora</button>
       <button className="primary-button" disabled={!down} onClick={() => onAnswer('Desconectar propulsión')}>Confirmar aislamiento</button>
     </div>
     <Source id="breakers" />
@@ -43,7 +44,7 @@ export function PartsTray({ onAnswer }) {
   return <div className="tour">
     <Speech>{line}</Speech>
     <div className="tour-lamps">
-      {parts.map(([name, ok]) => <button key={name} className="secondary-button" onClick={() => ok ? onAnswer(name) : setLine('Esa pieza no repara el circuito. Elige el fusible compatible.')}>{name}</button>)}
+      {parts.map(([name, ok]) => <button key={name} className="secondary-button" onClick={() => ok ? onAnswer(name) : (playSound('error'), setLine('Esa pieza no repara el circuito. Elige el fusible compatible.'))}>{name}</button>)}
     </div>
     <Source id="suit" />
   </div>;
@@ -55,6 +56,7 @@ export function RepairSequence({ onAnswer }) {
   function press(step) {
     const result = repairAdvance(done, step);
     setDone(result.done);
+    if (!result.ready) playSound('error');
     setLine(result.line);
     if (result.ready) onAnswer(result.done);
   }
@@ -143,7 +145,7 @@ export function TextureLook({ onAnswer }) {
   const [line, setLine] = useState('Ves granos finos y trozos más gruesos. El color no dice de qué está hecho.');
   function pick(label, ok) {
     if (ok) onAnswer(label);
-    else setLine('Con la vista no se conoce la composición ni se puede beber. Describe la textura y el lugar.');
+    else { playSound('error'); setLine('Con la vista no se conoce la composición ni se puede beber. Describe la textura y el lugar.'); }
   }
   return <div className="tour">
     <Speech>{line}</Speech>
@@ -163,6 +165,7 @@ export function AirlockReturn({ onAnswer }) {
   function act(action) {
     const result = airlockAdvance(stage, action);
     setStage(result.stage);
+    if (!result.ready) playSound('error');
     setLine(result.line);
     if (result.ready) onAnswer('Cerrar esclusa y recuperar presión');
   }
@@ -197,7 +200,7 @@ export function WaterChoice({ onAnswer }) {
   const [line, setLine] = useState('Hay agua para beber y agua usada que el equipo puede recuperar. No se crea agua de la nada.');
   function pick(label, ok) {
     if (ok) onAnswer(label);
-    else setLine('Eso no cuida a la tripulación. Primero el consumo humano y una recuperación controlada.');
+    else { playSound('error'); setLine('Eso no cuida a la tripulación. Primero el consumo humano y una recuperación controlada.'); }
   }
   return <div className="tour">
     <Speech>{line}</Speech>
@@ -222,7 +225,7 @@ export function LabScope({ onAnswer }) {
   const [line, setLine] = useState('El visor muestra fragmentos de roca y polvo. Elige la clasificación que encaja.');
   function pick(label, ok) {
     if (ok) onAnswer(label);
-    else setLine('El instrumento no convierte el polvo en agua ni en metal puro.');
+    else { playSound('error'); setLine('El instrumento no convierte el polvo en agua ni en metal puro.'); }
   }
   return <div className="tour">
     <Speech>{line}</Speech>

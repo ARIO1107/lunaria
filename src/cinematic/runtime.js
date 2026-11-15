@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { cameraAt, castAt, durationOf, launchAltitude, launchCameraLift, launchSky } from './script.js';
+import { cameraAt, castAt, durationOf, launchAltitude, launchCameraLift, launchSky, lineAt } from './script.js';
 import { createCinematicWorld } from './sets.js';
 import { applyCast } from './cast.js';
 import { createScore } from './score.js';
@@ -189,6 +189,11 @@ export function startCinematic(canvas, { sequence = 'opening', quality = 'alto',
     world.engineLight.intensity = burning ? 36 + Math.sin(elapsed * 31) * 8 : 0;
     applyCast(world.astronaut, world.titus, cast, elapsed, sequence);
     score.setInterior(cast.interior);
+    const spoken = lineAt(elapsed, sequence);
+    if (spoken?.speaker === 'Titus' && !played.has('say-' + spoken.id)) {
+      played.add('say-' + spoken.id);
+      score.cue('robot');
+    }
     if (sequence === 'launch') {
       score.setMood(elapsed < 13 ? 'tension' : elapsed < 46 ? 'ascent' : 'triumph');
       const second = Math.floor(elapsed);
@@ -231,6 +236,7 @@ export function startCinematic(canvas, { sequence = 'opening', quality = 'alto',
   return {
     finish: () => finish(true),
     dispose: () => finish(false),
+    fadeOut: () => score.fadeOut?.(),
     seek(time) { elapsed = Math.min(duration - .05, Math.max(0, time)); },
   };
 }

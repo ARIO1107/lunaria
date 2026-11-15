@@ -1,6 +1,7 @@
 .cinematic-root { position: fixed; inset: 0; background: #000; z-index: 30; }
 .cinematic-fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
 .cinematic-fade.show { opacity: 1; }
+.cinematic-fade.handoff { transition: opacity 0.72s linear !important; }
 .cinematic-root canvas { width: 100%; height: 100%; display: block; }
 .cinematic-loading, .cinematic-note, .cinematic-hint { position: absolute; color: #d5e0dc; }
 .cinematic-loading { inset: 40% 10% auto; text-align: center; }
