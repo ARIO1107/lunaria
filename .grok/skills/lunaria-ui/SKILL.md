@@ -14,13 +14,13 @@ Hay dos idiomas visuales. Una pantalla nueva entra en uno de los dos. El públic
 
 ## Menú
 
-`MainMenu.jsx` y `src/styles/menu.css`. Foto lunar, marco recortado, IBM Plex Mono, verde `#39ff14` y texto `#75ff60`. Los dos recortes del logo salen del JPG original. Ese verde no sustituye al oro de la partida.
+`MainMenu.jsx` y `src/styles/menu.css`. Foto lunar, marco recortado, IBM Plex Mono, verde `#39ff14` y texto `#75ff60`. Los dos recortes del logo salen del JPG original.
 
 ## Partida
 
-Los tokens viven en `src/styles/index.css`: `--ground` `#111414`, `--surface` `#1b211f`, `--raised` `#252d29`, `--text` `#e7e9df`, `--muted` `#b0bbb2`, `--accent` `#e8bf69`, `--green` `#9be3b6`, `--danger` `#f18d7d`, `--line` `#343e38`. La fuente es Segoe UI. Los botones son `.primary-button`, `.secondary-button` y `.quiet-button`. El foco visible es un contorno oro.
+Los tokens viven en `src/styles/index.css`: `--ground` `#111414`, `--surface` `#1b211f`, `--raised` `#252d29`, `--text` `#e7e9df`, `--muted` `#b0bbb2`, `--accent` `#e8bf69`, `--green` `#9be3b6`, `--danger` `#f18d7d`, `--line` `#343e38`. La fuente es Segoe UI. Los botones son `.primary-button`, `.secondary-button` y `.quiet-button`. El foco visible es un contorno oro. Esos tokens siguen en los diálogos, la historia y las consolas.
 
-La exploración está en `CampaignScreen.jsx` y `exploration.css`: cabecera, mapa y lateral de 280 px. El centro del mapa queda libre. Por debajo de 760 px aparecen `.touch-controls`. El diálogo es `Modal.jsx` y se cierra con Escape. Las consolas están en `campaign.css`. El control y el valor que envían los guarda `lunaria-gameplay`. El cromo de la película lo trata `lunaria-cinematics`. El globo lo tratan `lunaria-animation` y `titus-voice`. Un icono nuevo se genera con `ui-icons.md` de `game-assets`.
+La cubierta, en tierra o en el espacio, y la superficie que comparte la misma pantalla, usan la clase `hud-deck` en `CampaignScreen.jsx` y `exploration.css`. El marco es el HUD verde de neón: barra superior, misión a la izquierda, mapa al centro y estado más Titus a la derecha. El centro es el canvas jugable. Los números y los objetivos salen de la campaña. Inspeccionar es E o Espacio. Por debajo de 760 px aparecen `.touch-controls`. El diálogo es `Modal.jsx` y se cierra con Escape. Las consolas están en `campaign.css`. El control y el valor que envían los guarda `lunaria-gameplay`. El cromo de la película lo trata `lunaria-cinematics`. El globo lo tratan `lunaria-animation` y `titus-voice`. Un icono nuevo se genera con `ui-icons.md` de `game-assets`.
 
 ## Al pulir
 

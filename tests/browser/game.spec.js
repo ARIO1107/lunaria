@@ -27,7 +27,7 @@ test('the first mission opens the life-support checks on the deck', async ({ pag
   await page.clock.install();
   await ready(page);
   await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
-  await expect(page.getByText('en tierra')).toBeVisible();
+  await expect(page.locator('.deck-mode')).toContainText('En tierra');
   await expect(page.locator('canvas.ship-canvas')).toHaveAttribute('data-sky', 'pad');
   await page.locator('canvas').focus();
   await walk(page, 'ArrowDown', 1400);
@@ -218,7 +218,7 @@ test('checklist: new game, models, subtitles, skip, audio and saved continue', a
   await page.keyboard.press('Escape');
   await expect(page.getByRole('heading', { name: 'Revisar soporte vital' })).toBeVisible();
   await expect(page.getByText('Comencemos por soporte vital.')).toBeVisible();
-  await expect(page.getByText('en tierra')).toBeVisible();
+  await expect(page.locator('.deck-mode')).toContainText('En tierra');
   await expect(page.locator('[data-cinematic-root]')).toHaveCount(0);
   await expect(page.locator('canvas.ship-canvas')).toHaveAttribute('data-sky', 'pad');
   await expect.poll(scores).toEqual(['closed']);

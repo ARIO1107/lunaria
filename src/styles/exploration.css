@@ -1,4 +1,4 @@
-/* The artwork carries depth; the HUD stays quiet and leaves the deck in charge. */
+/* The playable cutaway stays in the center frame. hud-deck is the green chrome around it. */
 .exploration-shell { max-width: 1760px; padding: 0 32px; }
 .exploration-shell .app-header { min-height: 84px; }
 .exploration-shell .app-header nav { display: flex; gap: 8px; }
@@ -99,4 +99,393 @@
   .crew-radio strong span { display: block; margin: 4px 0; }
   .crew-gallery { grid-template-columns: 1fr; padding: 16px; }
   .crew-gallery .portrait-stage { max-width: 360px; margin: 0 auto 16px; }
+}
+
+/* Green mission HUD. Scoped so the menu, the story screens, and the consoles keep their own colors. */
+body:has(.hud-deck) { background: #020806; }
+.hud-deck {
+  --hud: #7dff4a;
+  --hud-title: #d6ff3c;
+  --hud-ink: #e7ffe8;
+  --hud-dim: #b7d8c2;
+  --hud-line: #1b7a3c;
+  max-width: none;
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--hud-ink);
+  background:
+    radial-gradient(ellipse at 50% 42%, #062016 0%, #020806 68%),
+    repeating-linear-gradient(0deg, transparent 0 46px, #0c3a1c18 47px),
+    repeating-linear-gradient(90deg, transparent 0 46px, #0c3a1c18 47px);
+}
+.hud-frame {
+  position: relative;
+  background-color: #07160fe6;
+  background-image:
+    linear-gradient(var(--hud), var(--hud)), linear-gradient(var(--hud), var(--hud)),
+    linear-gradient(var(--hud), var(--hud)), linear-gradient(var(--hud), var(--hud)),
+    linear-gradient(var(--hud), var(--hud)), linear-gradient(var(--hud), var(--hud)),
+    linear-gradient(var(--hud), var(--hud)), linear-gradient(var(--hud), var(--hud));
+  background-repeat: no-repeat;
+  background-size: 14px 2px, 2px 14px, 14px 2px, 2px 14px, 14px 2px, 2px 14px, 14px 2px, 2px 14px;
+  background-position:
+    left 10px top 10px, left 10px top 10px,
+    right 10px top 10px, right 10px top 10px,
+    left 10px bottom 10px, left 10px bottom 10px,
+    right 10px bottom 10px, right 10px bottom 10px;
+  border: 1px solid var(--hud-line);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px #39ff1414, inset 0 0 24px #39ff140a;
+}
+.hud-deck .app-header {
+  min-height: 64px;
+  flex-shrink: 0;
+  gap: 14px;
+  padding: 8px 14px;
+  border-bottom: 0;
+}
+.hud-deck .brand { gap: 10px; color: var(--hud); }
+.hud-logo { width: 36px; height: 36px; flex: none; }
+.hud-deck .brand h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.hud-level {
+  margin: 0;
+  color: var(--hud);
+  border: 1px solid var(--hud);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 0 12px #39ff1433;
+}
+.hud-deck .deck-mode {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  color: var(--hud-ink);
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-deck .app-header nav { display: flex; gap: 8px; flex-wrap: nowrap; }
+.hud-nav {
+  color: var(--hud-ink);
+  background: #04140ce6;
+  border: 1px solid #2f9a48;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 6px 12px;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  box-shadow: 0 0 10px #39ff1414;
+}
+.hud-glyph { width: 16px; height: 16px; flex: none; }
+.hud-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.hud-deck button:focus-visible, .hud-deck a:focus-visible, .hud-deck canvas:focus-visible {
+  outline: 3px solid var(--hud);
+  outline-offset: 3px;
+}
+.hud-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.hud-deck .exploration-layout {
+  grid-template-columns: minmax(230px, 292px) minmax(0, 1fr) minmax(230px, 292px);
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+.hud-mission, .hud-deck .exploration-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+.hud-panel { padding: 14px 14px 12px; }
+.hud-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--hud);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.hud-kicker i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--hud);
+  border-radius: 50%;
+  box-shadow: 0 0 8px #39ff14;
+}
+.hud-deck .hud-brief h2 {
+  margin: 8px 0 6px;
+  color: var(--hud-title);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -.4px;
+  line-height: 1.15;
+}
+.hud-copy {
+  margin: 0;
+  color: var(--hud-dim);
+  font-size: 13px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hud-deck .hud-panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: var(--hud);
+  font-size: 15px;
+  font-weight: 700;
+}
+.hud-deck .hud-panel h3::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--hud);
+  border-radius: 50%;
+  box-shadow: 0 0 8px #39ff14;
+  flex: none;
+}
+.hud-deck .objective-list { gap: 4px; }
+.hud-deck .objective-list li {
+  align-items: center;
+  min-height: 32px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--hud-ink);
+}
+.hud-deck .objective-list li[data-state="done"] { color: #8dff6a; font-weight: 700; }
+.hud-deck .objective-list li[data-state="current"] {
+  color: #f4fff6;
+  border-color: var(--hud);
+  box-shadow: 0 0 12px #39ff1426;
+}
+.hud-deck .objective-list input {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid #5dff6a;
+  border-radius: 3px;
+  background: #04140c;
+  flex: none;
+}
+.hud-deck .objective-list input:checked {
+  border-color: var(--hud);
+  background: #39ff14 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M3 8.2 6.2 11.5 13 4.5' fill='none' stroke='%2302140c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 14px 14px no-repeat;
+}
+.hud-progress { display: grid; gap: 6px; margin-top: 12px; }
+.hud-progress div:first-child { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.hud-progress span, .hud-progress strong { color: var(--hud); font-size: 13px; font-weight: 700; }
+.hud-progress-track, .hud-meter-track {
+  height: 8px;
+  border-radius: 99px;
+  background: #07180f;
+  border: 1px solid #145c30;
+  overflow: hidden;
+}
+.hud-progress-track i, .hud-meter-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #1f8f32, #8dff4a);
+  box-shadow: 0 0 10px #39ff14;
+}
+.hud-deck .hud-mission .primary-button, .hud-deck .hud-mission .secondary-button {
+  color: var(--hud-ink);
+  background: #39ff1414;
+  border: 1px solid var(--hud);
+  box-shadow: 0 0 12px #39ff1422;
+}
+.hud-deck .hud-mission .primary-button:disabled {
+  color: #6f8f78;
+  background: #07140f;
+  border-color: #1c4a30;
+  box-shadow: none;
+}
+.hud-inspect { width: 100%; margin-top: 12px; }
+.hud-deck .ship-section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #030a08;
+  padding: 0;
+}
+.hud-deck .map-toolbar {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  align-items: flex-start;
+  background: transparent;
+  padding: 0;
+  pointer-events: none;
+}
+.hud-deck .map-toolbar > span, .hud-deck .zoom-controls {
+  pointer-events: auto;
+  background: #04140ce6;
+  border: 1px solid var(--hud-line);
+  border-radius: 999px;
+  color: var(--hud-ink);
+}
+.hud-deck .map-toolbar > span { padding: 6px 12px; }
+.hud-deck .zoom-controls { gap: 6px; padding: 4px; }
+.hud-deck .zoom-controls button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hud);
+  border-radius: 999px;
+  background: #062014;
+  color: var(--hud-ink);
+}
+.hud-deck .zoom-controls span { min-width: 52px; color: var(--hud-ink); }
+.hud-deck .deck-viewport { flex: 1; min-height: 0; height: 100%; }
+.hud-deck .ship-canvas { height: 100%; min-height: 0; }
+.hud-meters { display: grid; gap: 10px; }
+.hud-meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; align-items: center; }
+.hud-meter-name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--hud-ink); font-size: 14px; }
+.hud-meter-name i { width: 1.5em; color: var(--hud); font-style: normal; text-align: center; }
+.hud-meter strong { color: var(--hud-ink); font-size: 14px; font-weight: 700; }
+.hud-meter-track { grid-column: 1 / -1; }
+.hud-meter-note { margin: 0; color: var(--hud-dim); font-size: 12px; line-height: 1.45; }
+.hud-deck .crew-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+}
+.hud-deck .crew-card h3 { grid-column: 1 / -1; margin: 0; }
+.hud-deck .crew-card h3 span { margin-left: auto; color: #ffb4a8; font-size: 12px; letter-spacing: 0; font-weight: 650; }
+.hud-deck .portrait-button {
+  width: auto;
+  height: 96px;
+  margin: 0;
+  padding: 0 4px;
+  background: transparent;
+  align-items: flex-end;
+}
+.hud-deck .portrait-button img:first-child { width: 78px; margin: 0; }
+.hud-deck .portrait-button img:last-child { width: 62px; margin: 0; }
+.hud-deck .crew-card p { margin: 0; color: var(--hud-ink); font-size: 13px; line-height: 1.45; }
+.hud-deck .crew-card p b { color: var(--hud); }
+.hud-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  padding: 0 6px;
+  color: var(--hud);
+  font-size: 13px;
+}
+.hud-online { display: inline-flex; align-items: center; gap: 8px; }
+.hud-deck .hud-footer .map-footer {
+  margin-left: auto;
+  padding: 0;
+  background: transparent;
+  gap: 8px;
+}
+.hud-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--hud-line);
+  border-radius: 8px;
+  background: #04140ce6;
+  color: var(--hud-ink);
+}
+.hud-deck kbd {
+  border-color: #2f9a48;
+  background: #062014;
+  color: var(--hud-ink);
+}
+.hud-deck .touch-controls button {
+  background: #062014;
+  color: var(--hud-ink);
+  border-color: var(--hud);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hud-nav:hover { border-color: var(--hud); color: #f4fff6; background: #39ff141c; }
+  .hud-deck .portrait-button:hover { background: transparent; }
+  .hud-deck .hud-mission .primary-button:hover:not(:disabled),
+  .hud-deck .hud-mission .secondary-button:hover:not(:disabled) { background: #39ff1430; }
+  .hud-deck .zoom-controls button:hover:not(:disabled) { background: #0c2c1a; }
+}
+@media (min-width: 761px) {
+  .hud-deck { height: 100dvh; overflow: hidden; }
+  .hud-deck .hud-main { flex: 1; }
+  .hud-deck .exploration-layout { height: 100%; }
+  .hud-mission, .hud-deck .exploration-sidebar { overflow: auto; }
+  .hud-deck .ship-section { height: 100%; }
+}
+@media (max-width: 1100px) {
+  .hud-deck { padding: 10px; }
+  .hud-deck .app-header { flex-wrap: wrap; min-height: 0; }
+  .hud-deck .deck-mode { flex-basis: 100%; text-align: left; order: 3; }
+  .hud-deck .app-header nav { order: 4; flex-wrap: wrap; }
+  .hud-deck .exploration-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1.15fr) minmax(0, .85fr);
+    grid-template-areas: "map map" "mission status";
+  }
+  .hud-deck .ship-section { grid-area: map; }
+  .hud-deck .hud-mission { grid-area: mission; }
+  .hud-deck .exploration-sidebar { grid-area: status; }
+  .hud-deck .hud-brief h2 { font-size: 22px; }
+}
+@media (max-width: 760px) {
+  .hud-deck { height: auto; overflow: visible; padding: 8px; }
+  .hud-deck .brand h1 { font-size: 18px; letter-spacing: .12em; }
+  .hud-level { font-size: 12px; padding: 6px 10px; }
+  .hud-deck .deck-mode { white-space: normal; }
+  .hud-deck .app-header nav { width: 100%; gap: 6px; }
+  .hud-nav { font-size: 12px; padding: 6px 10px; }
+  .hud-deck .exploration-layout { display: flex; flex-direction: column; }
+  .hud-deck .ship-section, .hud-deck .hud-mission, .hud-deck .exploration-sidebar { width: 100%; min-width: 0; }
+  .hud-deck .ship-section { order: 1; }
+  .hud-deck .hud-mission { order: 2; }
+  .hud-deck .exploration-sidebar { order: 3; }
+  .hud-deck .deck-viewport { min-height: 390px; }
+  .hud-deck .ship-canvas { height: 390px; min-height: 390px; }
+  .hud-deck .map-footer, .hud-deck .crew-card { display: none; }
+  .hud-deck .map-toolbar { position: static; pointer-events: auto; padding: 8px; background: #04140c; }
+  .hud-deck .touch-controls { background: #04140c; }
+  .hud-footer { flex-wrap: wrap; }
 }
