@@ -19,7 +19,7 @@ Lee `src/game/titusGuide.js` y `src/game/titusBubbles.js` antes de cambiar una f
 ## Dónde vive cada frase
 
 - Al caminar, la tarjeta de Titus usa `titusBrief`. Al llegar, un guide `at-${task.id}` usa `titusAtStation` una sola vez.
-- En vista cenital, con la fase `active` y sin modal de estación, el globo alterna: tick par, guía corta; tick impar, un dato. El intervalo es 6500 ms, u 8000 ms con movimiento reducido. Se reinicia al cambiar de tarea o de nivel.
+- En vista cenital, con la fase `active` y sin modal de estación, el globo muestra la guía. Un dato sale en el tick 5 y después cada 6 ticks (6500 ms, u 8000 ms con movimiento reducido), y también unos 9 s al completar un objetivo. El tick vuelve a 0 al cambiar de tarea o de nivel. El primer tick sigue siendo la guía.
 - El nivel 6, sin tarea, usa el texto de operaciones: tres ciclos y tres actividades.
 - Estas cadenas siguen en el mensaje de campaña, no solo en el globo: «Comencemos por soporte vital.» al saltar la cinemática; «condiciones adecuadas para respirar» al llegar a soporte vital; «El soporte vital está preparado. Ahora iremos a comprobar la energía.» al completar el aire.
 

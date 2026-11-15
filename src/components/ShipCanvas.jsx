@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { moveActor, nearestStation, roomAt, canOccupy } from '../game/world.js';
-import { actorScreen, drawDeck } from '../game/deckRenderer.js';
+import { actorScreen, deckView, drawDeck } from '../game/deckRenderer.js';
+import { placeCrewBubble } from '../game/bubblePlace.js';
 import { loadArt } from '../game/assets.js';
 import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
@@ -84,10 +85,14 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
     drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: !reduced && Boolean(dx || dy), titusMood, emergency, grounded }, art, zoom);
     const bubble = bubbleRef.current;
     if (bubble) {
-      const spot = actorScreen(rect.width, rect.height, s.player, s.titus, art.manifest.deck, zoom);
-      const x = Math.min(rect.width - 220, Math.max(8, spot.x - 28));
-      const y = Math.max(78, spot.y - 6);
-      bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(0, -100%)`;
+      const deck = art.manifest.deck;
+      const view = deckView(rect.width, rect.height, s.player, deck, zoom);
+      placeCrewBubble(
+        bubble, canvas, { width: rect.width, height: rect.height }, view.scale,
+        actorScreen(rect.width, rect.height, s.player, s.player, deck, zoom),
+        actorScreen(rect.width, rect.height, s.player, s.titus, deck, zoom),
+        art.manifest.actors.astronaut, art.manifest.actors.titus,
+      );
     }
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>

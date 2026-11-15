@@ -3,6 +3,7 @@ import { loadArt } from '../game/assets.js';
 import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { SURFACE_OBJECTS, surfaceSpawn, canOccupySurface, moveSurfaceActor, nearestSurfaceObject } from '../game/surfaceWorld.js';
+import { placeCrewBubble } from '../game/bubblePlace.js';
 
 function sprite(ctx, art, name, actor, time, moving, mood, reduced) {
   const meta = art.manifest.actors[name];
@@ -151,10 +152,12 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     ctx.restore();
     const bubble = bubbleRef.current;
     if (bubble) {
-      const spot = surfaceSpot(rect.width, rect.height, state.player, state.titus, zoom);
-      const x = Math.min(rect.width - 220, Math.max(8, spot.x - 28));
-      const y = Math.max(78, spot.y - 6);
-      bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(0, -100%)`;
+      placeCrewBubble(
+        bubble, canvas, { width: rect.width, height: rect.height }, scale,
+        surfaceSpot(rect.width, rect.height, state.player, state.player, zoom),
+        surfaceSpot(rect.width, rect.height, state.player, state.titus, zoom),
+        art.manifest.actors.astronaut, art.manifest.actors.titus,
+      );
     }
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0}

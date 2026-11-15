@@ -43,14 +43,18 @@ export function bubbleGuide(task) {
   return shorts[task.id] || `Capitán Alex, vamos hacia ${task.title}.`;
 }
 
-export function bubbleLine(level, task, tick) {
-  if (tick % 2 === 0) return { kind: 'guide', text: bubbleGuide(task) };
-  const fact = curiosities[(Math.floor(tick / 2) + Number(level || 1)) % curiosities.length];
+const FACT_EVERY = 6;
+
+export function bubbleLine(level, task, tick, moment = 'walk') {
+  const showFact = moment === 'done' || (tick > 0 && tick % FACT_EVERY === FACT_EVERY - 1);
+  if (!showFact) return { kind: 'guide', text: bubbleGuide(task) };
+  const index = moment === 'done' ? Number(tick) : Math.floor(tick / FACT_EVERY) + Number(level || 1);
+  const fact = curiosities[((index % curiosities.length) + curiosities.length) % curiosities.length];
   return { kind: 'fact', text: fact.text, title: fact.title, sourceUrl: fact.sourceUrl, sourceTitle: fact.sourceTitle };
 }
 
-export function bubbleSpeech(level, task, tick) {
-  const line = bubbleLine(level, task, tick);
+export function bubbleSpeech(level, task, tick, moment = 'walk') {
+  const line = bubbleLine(level, task, tick, moment);
   if (line.kind !== 'fact') return line.text;
   return `${line.text} Fuente: ${line.sourceTitle}.`;
 }

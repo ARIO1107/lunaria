@@ -20,6 +20,6 @@ Alex y Titus se mueven con el atlas horneado. Un ciclo nuevo se hornea desde los
 
 ## Globo
 
-El globo es HTML sobre el canvas, dentro de `.deck-viewport`, con `pointer-events: none`. Cada frame lo coloca `actorScreen` o `surfaceSpot`. No guardes esa posición en el estado de React. La cola queda sobre Titus y el texto sigue visible al hacer zoom. El texto y el ritmo los decide `titus-voice`.
+El globo es HTML sobre el canvas, dentro de `.deck-viewport`, con `pointer-events: none`. Cada frame, `speechBox` lo coloca a partir de `actorScreen` o `surfaceSpot`. No guardes esa posición en el estado de React. La caja queda fuera de Alex y de Titus; la cola apunta a Titus. El texto sigue visible al hacer zoom. El texto y el ritmo los decide `titus-voice`.
 
 Comprueba en el navegador que, al caminar, cambia el frame de Alex y que el globo sigue a Titus al acercar la cámara.

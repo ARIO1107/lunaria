@@ -76,7 +76,9 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const [near, setNear] = useState(null);
   const [modal, setModal] = useState(null);
   const [bubbleTick, setBubbleTick] = useState(0);
+  const [moment, setMoment] = useState('walk');
   const seenGoals = useRef(campaign.completedObjectives.length);
+  const soundedGoals = useRef(campaign.completedObjectives.length);
   const alarmed = useRef(false);
   const reportRoom = useCallback(name => setRoom(name), []);
   const targetStation = STATIONS.find(station => station.id === task?.stationId);
@@ -86,8 +88,21 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
 
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   useEffect(() => {
-    if (campaign.completedObjectives.length > seenGoals.current) playSound('success');
-    seenGoals.current = campaign.completedObjectives.length;
+    const count = campaign.completedObjectives.length;
+    if (count <= seenGoals.current) return undefined;
+    const previous = seenGoals.current;
+    seenGoals.current = count;
+    if (count > soundedGoals.current) {
+      soundedGoals.current = count;
+      playSound('success');
+    }
+    setMoment('done');
+    const timer = window.setTimeout(() => setMoment('walk'), 9000);
+    return () => {
+      window.clearTimeout(timer);
+      // A cancelled run must be able to arm the fact again. Loading a save does not enter this branch.
+      seenGoals.current = previous;
+    };
   }, [campaign.completedObjectives.length]);
   useEffect(() => {
     if (campaign.phase === 'complete') playSound('levelComplete');
@@ -105,7 +120,9 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     const timer = window.setInterval(() => setBubbleTick(value => value + 1), settings.reducedMotion ? 8000 : 6500);
     return () => window.clearInterval(timer);
   }, [campaign.phase, settings.reducedMotion, task?.id, campaign.currentLevel]);
-  const speech = campaign.phase === 'active' && !modal ? bubbleSpeech(campaign.currentLevel, task, bubbleTick) : '';
+  const speech = campaign.phase === 'active' && !modal
+    ? bubbleSpeech(campaign.currentLevel, task, moment === 'done' ? campaign.completedObjectives.length : bubbleTick, moment)
+    : '';
   useEffect(() => {
     if (campaign.phase !== 'active' || !task || near?.id !== task.stationId) return;
     dispatch({ type: 'guide', id: 'at-' + task.id, message: titusAtStation(task) });
