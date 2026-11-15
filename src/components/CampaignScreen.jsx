@@ -16,6 +16,7 @@ import { operationsActions } from '../game/resourceEngine.js';
 import { assetUrl } from '../game/assets.js';
 import { playSound, suspendAudio } from '../audio/audioManager.js';
 import { titusAtStation } from '../game/titusGuide.js';
+import { bubbleSpeech } from '../game/titusBubbles.js';
 import FirstPersonBay from '../view/FirstPersonBay.jsx';
 
 registerCampaignStations(StationMission);
@@ -74,6 +75,7 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
   const [room, setRoom] = useState(() => onSurface ? 'Puesto avanzado · Región polar ficticia' : roomAt(campaign.position));
   const [near, setNear] = useState(null);
   const [modal, setModal] = useState(null);
+  const [bubbleTick, setBubbleTick] = useState(0);
   const seenGoals = useRef(campaign.completedObjectives.length);
   const alarmed = useRef(false);
   const reportRoom = useCallback(name => setRoom(name), []);
@@ -97,6 +99,13 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
     const timer = window.setInterval(() => dispatch({ type: 'position', position: shipPos.current, surfacePosition: surfacePos.current, zoom: zoomRef.current }), 1500);
     return () => window.clearInterval(timer);
   }, [dispatch]);
+  useEffect(() => { setBubbleTick(0); }, [task?.id, campaign.currentLevel]);
+  useEffect(() => {
+    if (campaign.phase !== 'active') return undefined;
+    const timer = window.setInterval(() => setBubbleTick(value => value + 1), settings.reducedMotion ? 8000 : 6500);
+    return () => window.clearInterval(timer);
+  }, [campaign.phase, settings.reducedMotion, task?.id, campaign.currentLevel]);
+  const speech = campaign.phase === 'active' && !modal ? bubbleSpeech(campaign.currentLevel, task, bubbleTick) : '';
   useEffect(() => {
     if (campaign.phase !== 'active' || !task || near?.id !== task.stationId) return;
     dispatch({ type: 'guide', id: 'at-' + task.id, message: titusAtStation(task) });
@@ -195,8 +204,8 @@ export default function CampaignScreen({ campaign, dispatch, settings, onSetting
         <section className="ship-section" aria-label={onSurface ? 'Superficie lunar' : 'Exploración de la nave'}>
           <div className="map-toolbar"><span><i className="status-light" /> {room}</span><div className="zoom-controls"><button aria-label="Alejar cámara" disabled={zoom <= .8} onClick={() => changeZoom(-.15)}>−</button><span>{Math.round(zoom * 100)} %</span><button aria-label="Acercar cámara" disabled={zoom >= 1.75} onClick={() => changeZoom(.15)}>+</button></div></div>
           {onSurface
-            ? <SurfaceCanvas positionRef={surfacePos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={solarAlert ? 'danger' : 'normal'} />
-            : <ShipCanvas positionRef={shipPos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={emergency ? 'danger' : undefined} emergency={emergency} grounded={campaign.currentLevel === 1} guidePoint={guidePoint} />}
+            ? <SurfaceCanvas positionRef={surfacePos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={solarAlert ? 'danger' : 'normal'} speech={speech} />
+            : <ShipCanvas positionRef={shipPos} reducedMotion={settings.reducedMotion} paused={Boolean(modal)} onNear={setNear} onRoom={reportRoom} onInteract={openStation} inputRef={inputRef} zoom={zoom} titusMood={emergency ? 'danger' : undefined} emergency={emergency} grounded={campaign.currentLevel === 1} guidePoint={guidePoint} speech={speech} />}
           <div className="map-footer"><span><kbd>W A S D</kbd> / Flechas · Moverse</span><span><kbd>E</kbd> / Espacio · Inspeccionar</span></div>
           <div className="touch-controls" aria-label="Controles táctiles de movimiento">
             {[['↑', 0, -1, 'arriba'], ['←', -1, 0, 'izquierda'], ['↓', 0, 1, 'abajo'], ['→', 1, 0, 'derecha']].map(([label, x, y, name]) => <button key={name} aria-label={'Mover ' + name} onPointerDown={event => direction(event, x, y)} onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}>{label}</button>)}

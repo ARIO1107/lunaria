@@ -36,7 +36,16 @@ function drawObject(ctx, object, near) {
   ctx.fillStyle = '#e5eadd'; ctx.fillText(object.short, x + w / 2, y + h + 22);
 }
 
-export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, onInteract, onRoom, zoom = 1, reducedMotion = false, titusMood = 'normal' }) {
+function surfaceSpot(width, height, player, actor, zoom) {
+  const scale = Math.min(width / 1000, height / 650) * zoom;
+  const viewW = width / scale;
+  const viewH = height / scale;
+  const originX = viewW > 1000 ? (width - 1000 * scale) / 2 : -Math.max(0, Math.min(1000 - viewW, player.x - viewW / 2)) * scale;
+  const originY = viewH > 650 ? (height - 650 * scale) / 2 : -Math.max(0, Math.min(650 - viewH, player.y - viewH / 2)) * scale;
+  return { x: originX + actor.x * scale, y: originY + actor.y * scale };
+}
+
+export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, onInteract, onRoom, zoom = 1, reducedMotion = false, titusMood = 'normal', speech = '' }) {
   const canvasRef = useRef(null);
   const keys = useRef(new Set());
   const actors = useRef(null);
@@ -46,6 +55,7 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
   const [attempt, setAttempt] = useState(0);
   const interactRef = useRef(onInteract);
   interactRef.current = onInteract;
+  const bubbleRef = useRef(null);
   const systemReduced = useReducedMotion();
   const reduced = reducedMotion || systemReduced;
   if (!actors.current) {
@@ -109,10 +119,9 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#0b1420'; ctx.fillRect(0, 0, rect.width, rect.height);
     const scale = Math.min(rect.width / 1000, rect.height / 650) * zoom;
-    const viewW = rect.width / scale, viewH = rect.height / scale;
+    const spotOrigin = surfaceSpot(rect.width, rect.height, state.player, { x: 0, y: 0 }, zoom);
     ctx.save();
-    ctx.translate(viewW > 1000 ? (rect.width - 1000 * scale) / 2 : -Math.max(0, Math.min(1000 - viewW, state.player.x - viewW / 2)) * scale,
-      viewH > 650 ? (rect.height - 650 * scale) / 2 : -Math.max(0, Math.min(650 - viewH, state.player.y - viewH / 2)) * scale);
+    ctx.translate(spotOrigin.x, spotOrigin.y);
     ctx.scale(scale, scale);
     ctx.fillStyle = '#626970'; ctx.fillRect(0, 0, 1000, 650);
     for (let index = 0; index < 80; index++) {
@@ -130,9 +139,17 @@ export default function SurfaceCanvas({ positionRef, inputRef, paused, onNear, o
       ctx.fillStyle = '#a2ff92'; ctx.textAlign = 'center'; ctx.font = '13px Segoe UI'; ctx.fillText('E · ' + near.short, state.player.x, state.player.y - 87);
     }
     ctx.restore();
+    const bubble = bubbleRef.current;
+    if (bubble) {
+      const spot = surfaceSpot(rect.width, rect.height, state.player, state.titus, zoom);
+      const x = Math.min(rect.width - 220, Math.max(8, spot.x - 28));
+      const y = Math.max(78, spot.y - 6);
+      bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(0, -100%)`;
+    }
   });
   return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0}
     aria-label="Superficie lunar. WASD o flechas para caminar. E para interactuar." />
+    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{speech}</span></p>}
     {!art && <div className="asset-loading" role="status">{error ? <><p>{error}</p><button onClick={() => setAttempt(value => value + 1)}>Reintentar carga</button></> : <p>Preparando la superficie lunar…</p>}</div>}
   </div>;
 }

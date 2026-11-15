@@ -4,6 +4,26 @@ export const projectFloor = (deck, actor) => ({
   y: deck.origin.y + actor.x * deck.axisX.y + actor.y * deck.axisY.y,
 });
 
+export function deckView(width, height, player, deck, zoom = 1) {
+  const scale = Math.min(width / 780, height / 620) * zoom;
+  const viewW = width / scale;
+  const viewH = height / scale;
+  const pos = projectFloor(deck, player);
+  const cameraX = Math.max(0, Math.min(deck.width - viewW, pos.x - viewW / 2));
+  const cameraY = Math.max(0, Math.min(deck.height - viewH, pos.y - viewH * .58));
+  return {
+    scale,
+    originX: viewW > deck.width ? (width - deck.width * scale) / 2 : -cameraX * scale,
+    originY: viewH > deck.height ? (height - deck.height * scale) / 2 : -cameraY * scale,
+  };
+}
+
+export function actorScreen(width, height, player, actor, deck, zoom = 1) {
+  const view = deckView(width, height, player, deck, zoom);
+  const pos = projectFloor(deck, actor);
+  return { x: view.originX + pos.x * view.scale, y: view.originY + pos.y * view.scale };
+}
+
 function drawPad(ctx, w, h, time, reduced) {
   const sky = ctx.createLinearGradient(0, 0, 0, h);
   sky.addColorStop(0, '#6eabd8');
@@ -76,14 +96,11 @@ export function drawDeck(ctx, width, height, state, art, zoom = 1) {
   if (state.grounded) drawPad(ctx, width, height, time, reduced);
   else drawSpace(ctx, width, height, time, reduced);
   const deck = art.manifest.deck;
-  // Fit the full ship on large screens; small screens follow the astronaut.
-  const scale = Math.min(width / 780, height / 620) * zoom;
-  const viewW = width / scale, viewH = height / scale;
   const pos = projectFloor(deck, player);
-  const cameraX = Math.max(0, Math.min(deck.width - viewW, pos.x - viewW / 2));
-  const cameraY = Math.max(0, Math.min(deck.height - viewH, pos.y - viewH * .58));
+  const view = deckView(width, height, player, deck, zoom);
+  const { scale } = view;
   ctx.save();
-  ctx.translate(viewW > deck.width ? (width - deck.width * scale) / 2 : -cameraX * scale, viewH > deck.height ? (height - deck.height * scale) / 2 : -cameraY * scale);
+  ctx.translate(view.originX, view.originY);
   ctx.scale(scale, scale);
   ctx.drawImage(art.images[deck.file], 0, 0, deck.width, deck.height);
   const sprites = art.manifest.props.map(prop => ({ depth: prop.depth, draw: () => {

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { moveActor, nearestStation, roomAt, canOccupy } from '../game/world.js';
-import { drawDeck } from '../game/deckRenderer.js';
+import { actorScreen, drawDeck } from '../game/deckRenderer.js';
 import { loadArt } from '../game/assets.js';
 import { useAnimationFrame } from '../hooks/useAnimationFrame.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 
 const MOVEMENT = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
-export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false, grounded = false, guidePoint = null }) {
+export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear, onRoom, onInteract, inputRef, zoom = 1, titusMood, emergency = false, grounded = false, guidePoint = null, speech = '' }) {
   const canvasRef = useRef(null);
   const keys = useRef(new Set());
   const state = useRef(null);
@@ -22,6 +22,7 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
   const [attempt, setAttempt] = useState(0);
   const interactRef = useRef(onInteract);
   interactRef.current = onInteract;
+  const bubbleRef = useRef(null);
   useEffect(() => {
     let cancelled = false;
     setLoadError('');
@@ -81,6 +82,15 @@ export default function ShipCanvas({ positionRef, reducedMotion, paused, onNear,
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     canvas.dataset.sky = grounded ? 'pad' : 'space';
     drawDeck(ctx, rect.width, rect.height, { ...s, near, time, reduced, moving: !reduced && Boolean(dx || dy), titusMood, emergency, grounded }, art, zoom);
+    const bubble = bubbleRef.current;
+    if (bubble) {
+      const spot = actorScreen(rect.width, rect.height, s.player, s.titus, art.manifest.deck, zoom);
+      const x = Math.min(rect.width - 220, Math.max(8, spot.x - 28));
+      const y = Math.max(78, spot.y - 6);
+      bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(0, -100%)`;
+    }
   });
-  return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>{!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>Reintentar carga</button></> : <p>Preparando la cubierta y la tripulación…</p>}</div>}</div>;
+  return <div className="deck-viewport"><canvas ref={canvasRef} className="ship-canvas" tabIndex={0} aria-label="Cubierta de exploración. Mueve al astronauta con WASD o flechas. Pulsa E junto a una consola para conocer su función.">Tu navegador necesita soporte Canvas para mostrar la nave.</canvas>
+    {speech && <p ref={bubbleRef} className="titus-bubble" role="status"><b>Titus</b><span>{speech}</span></p>}
+    {!art && <div className="asset-loading" role="status">{loadError ? <><p>{loadError}</p><button className="secondary-button" onClick={() => setAttempt(n => n + 1)}>Reintentar carga</button></> : <p>Preparando la cubierta y la tripulación…</p>}</div>}</div>;
 }

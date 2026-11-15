@@ -90,6 +90,16 @@
 .tour-gauges { display: flex; gap: 16px; }
 .tour-low { border-color: #d24b3a; }
 .tour-low span { color: #e7b2a4; }
+.tour-lamps { display: grid; gap: 8px; }
+.tour-lamps button[data-fault="true"] { box-shadow: inset 0 0 0 2px #d24b3a; }
+.tour-zones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tour-zones button { display: grid; min-height: 88px; }
+.tour-zones span { color: var(--muted); font-size: 12px; }
+.tour-horizon { position: relative; height: 72px; overflow: hidden; background: linear-gradient(#16304a, #6d675d); border-radius: 8px; }
+.tour-horizon i { position: absolute; left: 8px; right: 8px; top: 28px; height: 3px; background: #e7f2ee; }
+.tour-speed { font-size: 22px; }
+.tour-rock { height: 72px; border-radius: 8px; background: radial-gradient(circle at 20% 40%, #d9d3c4 0 8px, transparent 9px), radial-gradient(circle at 55% 60%, #8d8472 0 14px, transparent 15px), radial-gradient(circle at 75% 35%, #5c564c 0 6px, transparent 7px), #2a2824; }
+@media (max-width: 760px) { .tour-zones { grid-template-columns: 1fr; } }
 @media (max-width: 760px) {
   .eclss-layout { grid-template-columns: 1fr; }
 }

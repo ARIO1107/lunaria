@@ -5,7 +5,14 @@ import LaunchPanel from '../components/LaunchPanel.jsx';
 import LifeSupportConsole from './LifeSupportConsole.jsx';
 import LandingPanel from './LandingPanel.jsx';
 import { BackupBoard, CabinAir, CoasSight, SignalRadio, SupplyLocker } from './ShipTour.jsx';
+import { AirlockReturn, BaseAir, BreakerPull, FaultLamps, HabitatScan, HorizonLock, LabScope, LanderPrep, OrbitBurn, PartsTray, RepairSequence, RouteCheck, ShadowLink, SuitLock, TaggedSample, TextureLook, WaterChoice, ZoneMap } from './DistinctMissions.jsx';
 import { playSound } from '../audio/audioManager.js';
+
+const distinct = {
+  diagnose: FaultLamps, isolate: BreakerPull, replace: PartsTray, 'repair-test': RepairSequence, stabilize: HorizonLock, orbit: OrbitBurn,
+  site: ZoneMap, module: LanderPrep, 'eva-check': SuitLock, observe: TextureLook, return: AirlockReturn,
+  habitat: HabitatScan, solar: ShadowLink, life: BaseAir, water: WaterChoice, 'surface-suit': RouteCheck, sample: TaggedSample, analysis: LabScope,
+};
 function Challenge({ task, state, dispatch, onClose }) {
   const [checks, setChecks] = useState([]);
   const [value, setValue] = useState(task.kind === 'alignment' ? 0 : '');
@@ -28,6 +35,8 @@ function Challenge({ task, state, dispatch, onClose }) {
   if (task.id === 'atmosphere') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><CabinAir onAnswer={answer} /></div>;
   if (task.id === 'energy-tour') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><BackupBoard onAnswer={answer} /></div>;
   if (task.id === 'signal') return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><SignalRadio onAnswer={answer} /></div>;
+  const Distinct = distinct[task.id];
+  if (Distinct) return <div className="beta-panel"><h3>{task.title}</h3><p>{task.prompt}</p><Distinct onAnswer={answer} /></div>;
   if (task.kind === 'launch') return <div className="beta-panel"><p>Centro de control ficticio: autorización concedida. Este simulador cubre la primera etapa, todavía en la plataforma. Al separarla, una película resume el ascenso hasta la órbita terrestre.</p>
     {state.flight.status === 'ready' && <button className="secondary-button" disabled={countdown !== null} onClick={() => setCountdown(3)}>{countdown !== null ? 'Cuenta regresiva ' + countdown : 'Cuenta regresiva de control'}</button>}
     <LaunchPanel flight={state.flight} setFlight={value => dispatch({ type: 'flight', value })} onFinish={() => answer(true)} onClose={onClose} />

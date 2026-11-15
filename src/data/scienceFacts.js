@@ -167,3 +167,13 @@ export const scienceFacts = [
 ];
 export const factsForLevel = level => scienceFacts.filter(fact => fact.level === Math.min(6, Math.max(1, Number(level) || 1)));
 
+export const skyFacts = [
+  { id: 'moon-satellite', title: 'Satélite natural', text: 'La Luna es el único satélite natural de la Tierra.', sourceUrl: 'https://science.nasa.gov/moon/facts/', sourceTitle: 'NASA · La Luna' },
+  { id: 'iss-lap', title: 'Estación espacial', text: 'La Estación Espacial Internacional da una vuelta a la Tierra aproximadamente cada 90 minutos.', sourceUrl: 'https://www.nasa.gov/international-space-station/', sourceTitle: 'NASA · Estación Espacial Internacional' },
+  { id: 'earth-third', title: 'La Tierra', text: 'La Tierra es el tercer planeta desde el Sol.', sourceUrl: 'https://science.nasa.gov/earth/facts/', sourceTitle: 'NASA · La Tierra' },
+  { id: 'mars-fourth', title: 'Marte', text: 'Marte es el cuarto planeta desde el Sol. El color rojizo viene del óxido de hierro de su suelo.', sourceUrl: 'https://science.nasa.gov/mars/facts/', sourceTitle: 'NASA · Marte' },
+  { id: 'jupiter-giant', title: 'Júpiter', text: 'Júpiter es el planeta más grande del sistema solar.', sourceUrl: 'https://science.nasa.gov/jupiter/', sourceTitle: 'NASA · Júpiter' },
+  { id: 'sun-star', title: 'El Sol', text: 'El Sol es una estrella. Su luz tarda unos ocho minutos en llegar a la Tierra.', sourceUrl: 'https://science.nasa.gov/sun/facts/', sourceTitle: 'NASA · El Sol' },
+  { id: 'gps-sats', title: 'Satélites de navegación', text: 'Los satélites de navegación orbitan la Tierra y permiten calcular una posición en la superficie.', sourceUrl: 'https://www.nasa.gov/directorates/somd/space-communications-navigation-program/', sourceTitle: 'NASA · Navegación espacial' },
+];
+

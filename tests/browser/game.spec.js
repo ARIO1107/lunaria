@@ -89,6 +89,11 @@ for (const width of [1440, 768, 390]) {
     await expect(page.getByRole('heading', { name: 'Lunaria', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: `test-results/deck-${width}.png`, fullPage: true });
+    if (width === 1440) {
+      await expect(page.locator('.titus-bubble')).toBeVisible();
+      await expect(page.locator('.titus-bubble')).toContainText(/Capitán Alex/);
+      await expect(page.locator('.titus-bubble')).toContainText(/soporte vital/);
+    }
     await page.getByRole('button', { name: 'Acercar cámara' }).click();
     await expect(page.locator('.zoom-controls span')).toHaveText('130 %');
     await page.getByRole('button', { name: 'Alejar cámara' }).click();

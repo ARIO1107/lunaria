@@ -12,6 +12,10 @@
 .exploration-shell .map-toolbar { padding: 10px 16px; align-items: center; background: #182124; }
 .exploration-shell .map-footer { background: #182124; padding: 12px 16px; }
 .deck-viewport { position: relative; flex: 1; display: flex; min-height: 520px; }
+.titus-bubble { position: absolute; left: 0; top: 0; z-index: 3; width: min(240px, 46vw); margin: 0; padding: 8px 10px 10px; background: #f4f1e6; color: #17252c; border-radius: 12px; box-shadow: 0 8px 18px #00000033; pointer-events: none; line-height: 1.35; }
+.titus-bubble b { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #8a5a12; }
+.titus-bubble span { font-size: 13px; }
+.titus-bubble::after { content: ""; position: absolute; left: 22px; bottom: -8px; border: 8px solid transparent; border-top-color: #f4f1e6; border-bottom: 0; }
 .exploration-shell .ship-canvas { height: clamp(520px, 62vh, 740px); min-height: 520px; flex: 1; }
 .zoom-controls { display: flex; gap: 12px; align-items: center; }
 .zoom-controls button { border: 1px solid #53615d; background: #273430; color: var(--text); width: 34px; height: 32px; border-radius: 4px; font-size: 20px; }
